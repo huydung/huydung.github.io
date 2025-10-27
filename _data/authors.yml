@@ -27,8 +27,11 @@ author1:
   # Rearrange to change the order in which they appear
   # You can also provide an absolute URL (starting with https://) instead of usernames
   social:
-    twitter:         <username>
-    github:          <username>
+    linkedin:        nguyenhuydung
+    facebook:        https://www.facebook.com/huydung1406
+    calendly:        huydung/clarity-call
+    youtube:         https://youtube.com/@huydungdave
+    github:          huydung
     # email:           <mail@domain.tld>
     # rss:             https://<url>/feed.xml
     # facebook:        <username>

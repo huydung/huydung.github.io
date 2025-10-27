@@ -60,7 +60,7 @@ body:not(.no-third-column) {
 
 // Meta data line below post title
 .post-date {
-  @extend .h4;
+  //@extend .h4;
   display: flex;
   justify-content: space-between;
   margin-top: -.6rem;

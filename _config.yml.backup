@@ -1,15 +1,15 @@
 # Config
 # ========================================================================================
 
-# Uncomment and set the URL of your site (with protocol, e.g. `https://`)
+# Uncomment and set the URL of your site (with protocol, e.g. https://)
 # NOTE: You don't need to provide this property when hosting on GitHub Pages or Netlify.
-url:                   https://huydung.github.io
+url:                   "https://huydung.github.io"
 
 # Uncomment and set the "base URL" of your site.
 # When your site is in a subdirectory, set to `/<name of directory>`,
 # with a leading `/` but no trailing `/`. Use the empty string '' otherwise.
 # NOTE: You don't need to provide this property when hosting on GitHub Pages or Netlify.
-# baseurl:               '/hydejack-starter-kit'
+# baseurl: '/hydejack-starter-kit'
 
 
 # General settings
@@ -25,11 +25,10 @@ title:                 Huy Dũng
 # A short description (~150 chars) of the page used for the meta description tag.
 # Can use markdown, but no more than one paragraph (enforced by `>`)
 description:           >
-  Personal website of Huy Dũng - Father of Two, Production Manager in Gameloft Hanoi, and a Trainer at heart. MIB, PMP, PMOCP.
-
+  Personal website of Huy Dũng - father of two, production manager in video game, trainer at heart.
 
 # A shorter description for the sidebar.
-tagline:               Father of Two. Production Manager in Gameloft Hanoi. Educator at heart. MIB, PMP, PMOCP.
+tagline:               Father of Two. Production Manager @ Gameloft Hanoi. Educator at heart.
 
 # A list of keywords for your blog
 keywords:              []
@@ -56,20 +55,22 @@ menu:
   - title:             Résumé*
     url:               /resume/
   - title:             Contact Me
-    url:               https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform
+    url:               https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform 
+#  - title:             Documentation
+#    url: /docs/
 
 # Add links to the footer.
 # Typically you'll want to link to your cookie- or privacy policy (if appliable), etc..
-# legal:
-#   - title:             LICENSE
-#     url:               /LICENSE/
-#   - title:             NOTICE
-#     url:               /NOTICE/
-#   - title:             CHANGELOG
-#     url:               /CHANGELOG/
+legal:
+  - title:             LICENSE
+    url:               /LICENSE/
+  - title:             NOTICE
+    url:               /NOTICE/
+  - title:             CHANGELOG
+    url:               /CHANGELOG/
 
 # This text will appear in a `<small>` tag in the footer of every page.
-copyright:             Huy Dũng © 2025. All rights reserved.
+copyright:             © 2025. All rights reserved.
 
 # Format of the permalinks
 permalink:             /blog/:categories/:year-:title/
@@ -114,11 +115,11 @@ google_fonts:          Merriweather:700|Be+Vietnam+Pro:400,400i,700,700i
 
 # The text font. Expects a string that is a valid CSS font-family value.
 # To change font-weight, see _sass/variables.scss
-font:                  'Be Vietnam Pro'
+font:                  'Be Vietnam Pro', Helvetica, Arial, sans-serif
 
 # The font used for headings. Expects a string that is a valid CSS font-family value.
 # To change font-weight, see _sass/variables.scss
-font_heading:          'Merriweather'
+font_heading:          'Merriweather', Georgia, serif
 
 # The font used for code blocks. Expects a string that is a valid CSS font-family value. 
 # Defaults to the [System Monospace Font Stack](https://qwtel.com/posts/software/the-monospaced-system-ui-css-font-stack/).
@@ -185,10 +186,10 @@ kramdown:
 
 hydejack:
   # Configure the order of complementary content on blog posts
-  post_addons:         [newsletter, related, comments]
+  post_addons:         [about, newsletter, related, random, comments]
 
   # Configure the order of complementary content on project pages
-  project_addons:      [newsletter, other, comments]
+  project_addons:      [about, newsletter, other, comments]
 
   # Set to `true` if you don't want to show an icon indicating external links
   no_mark_external:    false
@@ -318,8 +319,6 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - functions
-  - "*.nul"
-  - nul
 include:
   - _routes.json
   - .well-known

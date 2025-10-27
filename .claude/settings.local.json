@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bundle exec jekyll serve:*)",
+      "Bash(curl:*)",
+      "Bash(bundle exec jekyll build:*)",
+      "Bash(ruby -ryaml -e:*)",
+      "Bash(cat:*)",
+      "Bash(python3:*)",
+      "Bash(xxd:*)",
+      "Bash(dos2unix:*)",
+      "Bash(git checkout:*)",
+      "Bash(ruby fix_config.rb:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
