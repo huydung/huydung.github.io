@@ -263,5 +263,5 @@ mastodon:
   icon: icon-mastodon
 calendly:
   name: Calendly
-  icon: icon-phone
+  icon: icon-bubbles
   prepend: "https://calendly.com/"

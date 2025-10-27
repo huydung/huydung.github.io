@@ -2,102 +2,164 @@
 # If you don't have a JSON Resume you can just edit this YAML file instead.
 # See also: <https://jsonresume.org/>.
 basics:
-  name: "Richard Hendricks"
-  label: "Programmer"
-  picture: "https://via.placeholder.com/240x240"
-  email: ""
-  phone: "(912) 555-4321"
-  website: "https://piedpiper.com"
+  name: "Nguyễn Huy Dũng (DaveHD)"
+  label: "Production Manager"
+  picture: "https://gravatar.com/avatar/d167bf64850d70683b14c6a027e249937fc7e558b446aacca1200422752a2d91?size=240&d=initials"
+  email: "contact@huydung.com"
+  phone: "+84 984 903 707"
+  website: "https://huydung.com"
   summary: >
-    Richard hails from Tulsa.
-    He has earned degrees from the University of Oklahoma and Stanford. (Go Sooners and Cardinals!)
-    Before starting Pied Piper, he worked for Hooli as a part time software developer.
-    While his work focuses on applied information theory,
-    mostly optimizing lossless compression schema of both the length-limited and adaptive variants,
-    his non-work interests range widely,
-    everything from quantum computing to chaos theory.
-    He could tell you about it, but THAT would NOT be a “length-limited” conversation!
-    Open `_data/resume.yml` to edit this text.
+    I'm a video game Production Manager by profession, a trainer at heart, and a proud
+    father of two.<br/><br/>
+    
+    Since 2008, I've been passionate about:<br/>
+    - Building tech products that enhance the human experience - software, websites, games<br/>
+    - Delivering training, coaching, and mentorship that helps people grow<br/>
+    - Creating work environments where teams can achieve great results and thrive as individuals<br/><br/>
+
+    My life and work are guided by 5 values: Take Ownership, Seek Clarity, Be Effective,
+    Stay Balanced, and Embrace Humanity.
   location:
-    address: "2712 Broadway St"
-    postalCode: "CA 94115"
-    city: "San Francisco"
-    countryCode: "US"
-    region: "California"
+    address: ""
+    postalCode: ""
+    city: "Hanoi"
+    countryCode: "VN"
+    # region: "Hanoi"
   profiles:
-    - network: "Twitter"
-      username: "RHendricksCEO"
-      url: ""
     - network: "LinkedIn"
-      username: "Richard Hendricks"
-      url: ""
+      username: "Nguyễn Huy Dũng (DaveHD)"
+      url: "https://www.linkedin.com/in/nguyenhuydung/"
 work:
-  - company: "Pied Piper"
-    position: "CEO/President"
-    website: "https://piedpiper.com"
-    startDate: "2013-12-01"
+  - company: "Gameloft"
+    position: "Production Manager"
+    website: "https://www.gameloft.com"
+    startDate: "2017-03-01"
     endDate: ""
     summary: >
-      Pied Piper is a multi-platform technology based on a proprietary universal compression algorithm that has
-      consistently fielded high Weisman Scores™ that are not merely competitive,
-      but approach the theoretical limit of lossless compression.
+      Full-time position in Hanoi (Hybrid). Managing and leading all production activities
+      across multiple teams and departments in the HAN studio.
     highlights:
-      - "Built an algorithm for artist to detect if their music was violating copy right infringement laws"
-      - "Successfully won Techcrunch Disrupt"
-      - "Optimized an algorithm that holds the current world record for Weisman Scores"
-volunteer:
-  - organization: "CoderDojo"
-    position: "Teacher"
-    website: "https://coderdojo.com/"
-    startDate: "2012-01-01"
-    endDate: "2013-01-01"
-    summary: "Global movement of free coding clubs for young people."
+      - "Managed and led all production activities in the HAN studio across 10+ teams and multiple departments (Production, Programming, Graphic Art, Game Design, and Quality Assurance)"
+      - "Spearheaded the ongoing critical transformation from a pure Porting and Service studio into a LiveOps studio—running game projects with greater creative freedom and direct impact on company revenue"
+      - "Successfully guided the studio through a critical crisis in 2022 when nearly half of the workforce - including most senior staff and leaders - departed within a six-month period for external opportunities in the NFT game gold rush"
+      - "Led studio-wide initiatives to enhance our working environment and processes, including redesigning the Evaluation and Bonus system, strengthen Leadership teams, Studio Renovation projects"
+      - "Oversaw technical and professional development programs. Directly lead and deliver at least one major studio-wide training program every year"
+  - company: "Gameloft"
+    position: "Video Game Lead Producer"
+    website: "https://www.gameloft.com"
+    startDate: "2015-10-01"
+    endDate: "2017-03-01"
+    summary: >
+      Leading multiple high-profile game projects and developing training programs for producers.
     highlights:
-      - "Awarded 'Teacher of the Month'"
+      - "Simultaneously managed up to seven high-profile game projects across multiple platforms and markets, including Disney Magic Kingdoms, Order and Chaos 2, Dungeon Hunter 5, and Gods of Rome"
+      - "Developed and delivered management and technical training programs for producers to enhance their skills and effectiveness"
+      - "Leveraged programming expertise to create custom tools that streamlined producers' workflows across global studios"
+      - "Implemented a new growth management system providing monthly feedback to producers, resulting in more consistent performance evaluation and professional development"
+  - company: "Gameloft"
+    position: "Programmer Division Lead"
+    website: "https://www.gameloft.com"
+    startDate: "2014-07-01"
+    endDate: "2015-10-01"
+    summary: >
+      Leading the Programming Division in Hanoi, supervising technical development and implementing department programs.
+    highlights:
+      - "Supervised technical development of high-profile game projects including Ice Age Adventures, Shark Dash, and Order and Chaos 2"
+      - "Created and implemented successful programs for the Programming department, such as Manager Club, Programmer Magazine, and English Club, which led to improved retention rates, enhanced collaboration with Producers, and better management skills for the Programmer Supervisors"
+      - "Led the R&D and development of Ice Age Adventures, the studio's expansion point to Windows 8 and Windows Phone 8 platforms"
+  - company: "IndochinaPro"
+    position: "Web Master - Software Executive"
+    website: ""
+    startDate: "2008-04-01"
+    endDate: "2011-05-01"
+    summary: >
+      Managing technical equipment and processes, web development, and conducting public sales seminars.
+    highlights:
+      - "Managed all technical equipment and processes, including Flash programming, web development, and video editing"
+      - "Developed and maintained a popular Facebook app 'Predict World Cup 2010 Results' that attracted approximately 10,000 daily active users"
+      - "Built and maintained bethongminh.vn, including both the public-facing website and the student management web application using Drupal"
+      - "Conducted public sales seminars for prospective customers"
+# volunteer:
+#   - organization: "Education, Science and Technology"
+#     position: "Volunteer"
+#     website: ""
+#     startDate: ""
+#     endDate: ""
+#     summary: "Open to volunteer for Education, Science and Technology causes."
+#     highlights: []
 education:
-  - institution: "University of Oklahoma"
-    area: "Information Technology"
-    studyType: "Bachelor"
-    startDate: "2011-06-01"
-    endDate: "2014-01-01"
-    gpa: "4.0"
-    courses:
-      - "DB1101 - Basic SQL"
-      - "CS2011 - Java Introduction"
+  - institution: "RMIT University Vietnam"
+    #area: "International Business"
+    studyType: "Master of International Business"
+    startDate: "2018-10-01"
+    endDate: "2020-07-01"
+    gpa: "Distinction"
+    courses: []
+  - institution: "Hanoi Aptech"
+    area: "Computer Software Engineering"
+    studyType: "Higher Diploma"
+    startDate: "2006-01-01"
+    endDate: "2009-01-01"
+    gpa: "Distinction"
+    courses: []
 awards:
-  - title: "Digital Compression Pioneer Award"
-    date: "2014-11-01"
-    awarder: "Techcrunch"
-    summary: "There is no spoon."
-publications:
-  - name: "Video compression for 3d media"
-    publisher: "Hooli"
-    releaseDate: "2014-10-01"
-    website: "https://en.wikipedia.org/wiki/Silicon_Valley_(TV_series)"
-    summary: "Innovative middle-out compression algorithm that changes the way we store data."
+  - title: "First Prize & Third Prize of the 2011 bada Developer Challenge"
+    date: "2011-02-01"
+    awarder: "Samsung Vietnam"
+    summary: "Developed & Published 5 bada Mobile Applications in C++, including 2 winners: The personal finance app 'Vi Tien' and the game 'O An Quan'"
+certificates:
+  - name: "PMI PMO Certified Professional (PMI-PMOCP)™"
+    date: "2025-03-01"
+    issuer: "Project Management Institute"
+    url: "https://www.credly.com/badges/cddad5d0-ad4c-497a-a92f-08ba04d08f1d/linked_in_profile"
+  - name: "Project Management Professional (PMP)"
+    date: "2024-11-01"
+    issuer: "Project Management Institute"
+    url: "Skills: Project Management, Management"
+  - name: "Become an L&D Professional"
+    date: "2021-03-01"
+    issuer: "LinkedIn Learning"
+    url: "https://www.linkedin.com/learning/certificates/b1675d6f4bdd852678ae0b7e6d0191465c3dddf8679c73f73fb489f1988dc991?trk=backfilled_certificate"
+  - name: "miniMBA"
+    date: "2018-03-01"
+    issuer: "FPT School of Business"
+publications: []
 skills:
-  - name: "Web Development"
-    level: "Master"
+  - name: "Top Skills"
+    level: ""
     keywords:
-      - "HTML"
-      - "CSS"
-      - "Javascript"
-  - name: "Compression"
-    level: "Master"
+      - "Problem Solving"
+      - "Leadership & Management"
+      - "Employee Learning & Development"
+      - "Training, Coaching, Mentoring"
+      - "Digital Technology"
+  - name: "Services"
+    level: ""
     keywords:
-      - "Mpeg"
-      - "MP4"
-      - "GIF"
+      - "Training"
+      - "Public Speaking"
+      - "Leadership Development"
+      - "Organizational Management Advising"
+      - "Life Coaching"
+  - name: "Technical Skills"
+    level: ""
+    keywords:
+      - "Organizational Development"
+      - "Training Management, Design, Delivery"
+      - "Project Management, Team Leadership"
+      - "Video Editing"
+      - "Writing"      
 languages:
-  - language: "English"
+  - language: "Vietnamese"
     fluency: "Native speaker"
+  - language: "English"
+    fluency: "Professional working proficiency"
 interests:
-  - name: "Wildlife"
+  - name: "Hobbies & Interests"
     keywords:
-      - "Ferrets"
-      - "Unicorns"
-references:
-  - name: "Erlich Bachman"
-    reference: >
-      It is my pleasure to recommend Richard, his performance working as a consultant for Main St.
-      Company proved that he will be a valuable addition to any company.
+      - "Poker"
+      - "Pool (Billiard)"
+      - "Origami"
+      - "LEGO"
+      - "Clash Royale & Games"
+references: []

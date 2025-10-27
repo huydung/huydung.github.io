@@ -53,10 +53,12 @@ menu:
     url:               /blog/
   - title:             Projects
     url:               /projects/
-  - title:             Résumé*
+  - title:             'Résumé/CV'
     url:               /resume/
-  - title:             Contact Me
+  - title:             Ask Me Anything
     url:               https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform
+  - title:             Book a free Call
+    url:               https://calendly.com/huydung/clarity-call
 
 # Add links to the footer.
 # Typically you'll want to link to your cookie- or privacy policy (if appliable), etc..
