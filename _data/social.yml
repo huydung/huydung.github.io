@@ -261,3 +261,6 @@ discord:
 mastodon:
   name: Mastodon
   icon: icon-mastodon
+calendly:
+  name: Calendly
+  icon: icon-calendar
