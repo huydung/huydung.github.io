@@ -29,7 +29,7 @@ description:           >
 
 
 # A shorter description for the sidebar.
-tagline:               Father of Two. Production Manager in Gameloft Hanoi. Educator at heart. MIB, PMP, PMOCP.
+tagline:               Father of Two. Educator at heart. Production Manager in Gameloft Hanoi. 
 
 # A list of keywords for your blog
 keywords:              []
@@ -57,7 +57,7 @@ menu:
     url:               /resume/
   - title:             Ask Me Anything
     url:               https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform
-  - title:             Book a free Call
+  - title:             Book a Free Call
     url:               https://calendly.com/huydung/clarity-call
 
 # Add links to the footer.

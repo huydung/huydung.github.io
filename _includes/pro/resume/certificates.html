@@ -13,7 +13,7 @@
           <time datetime="{{ awa.date | date_to_xmlschema }}">{{ awa.date | date:from_to_format }}</time>
         </p>
       {% endif %}
-      <h3 class="h4 faded" property="award">
+      <strong class=" faded" property="award">
         {% capture name %}<span class="bc">{{ awa.name }}</span>{% endcapture %}
         {% capture issuer %}<span class="bc">{{ awa.issuer }}</span>{% endcapture %}
         {{ strings.resume.certificate_title
@@ -21,7 +21,7 @@
           | replace:"<!--name-->", name
           | replace:"<!--issuer-->", issuer
         }}
-      </h3>
+      </strong>
     </header>
 
     {% include components/message.html class="note" text=awa.summary alt="" %}

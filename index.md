@@ -1,47 +1,30 @@
 ---
-layout: page
-title: Hello
+layout: welcome
+title: Xin chào! Hello there!
+cover: false
 sitemap: false
+projects_page: projects.md
 ---
 
-Thank you for buying the PRO version of Hydejack! 🎉
+I'm **Huy Dũng** (DaveHD).
 
-More than one year ago I was looking for a blogging platform but couldn't find it:
-One that would let me write posts in markdown with my own editor,
-one that didn't look awful buy modern design standards, and one that felt snappy on a mobile phone.
-That and more is now Hydejack. I hope you enjoy it [as much as I do](https://qwtel.com/).
+Since 2008, I've been passionate about three things:
+- **Building tech products** that enhance the human experience - software, websites, games
+- **Delivering training, coaching, and mentorship** that helps people grow
+- **Creating work environments** where teams can achieve great results and thrive as individuals
 
-## First Steps
-Start by reading the [Documentation]{:.heading.flip-title}.
-Specifically, the chapters below should be relevant now:
+My life and work are guided by five values: **Take Ownership**, **Seek Clarity**, **Be Effective**, **Stay Balanced**, and **Embrace Humanity**.
 
-* [Install]{:.heading.flip-title} --- How to install and run Hydejack.
-* [Config]{:.heading.flip-title} --- Once Jekyll is running you can start with basic configuration.
-{:.related-posts.faded}
+## Let's Connect
 
-After you've familiarized yourself with Hydejack, you can delete the following folders and files
-containing example content:
+I'm always look forward to great conversations about:
+- Technology, games, and product development
+- Training, coaching, and people development
+- Leadership and organizational transformation
+- Life, parenting, finding balance, psychology, philosophy
 
-~~~
-├── _featured_categories
-│   └── example.md
-├── _projects
-│   └── *
-├── docs
-├── example
-├── licenses
-├── assets
-│   └── img
-│       ├── blog
-│       ├── docs
-│       └── projects
-├── CHANGELOG.md
-├── forms-by-example.md
-├── LICENSE.md
-└── NOTICE.md
-~~~
+Feel free to [check out my blog](/blog/), [view my résumé](/resume/), [ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call) with me.
 
-[documentation]: docs/README.md
-[install]: docs/install.md
-[upgrade]: docs/upgrade.md
-[config]: docs/config.md
+## Featured Work
+
+<!--projects-->

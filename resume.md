@@ -7,12 +7,12 @@ description: >
 hide_description: true
 left_column:
   - work
-  - volunteer
-  - education  
+  - volunteer  
   - publications
   - awards
   - references
 right_column:  
+  - education  
   - certificates
   - languages
   - skills
