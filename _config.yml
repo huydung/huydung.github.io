@@ -76,7 +76,7 @@ permalink:             /blog/:categories/:year-:title/
 
 # Pagination configuration (used by the `blog` layout)
 paginate:              10
-paginate_path:         /blog/:num/
+paginate_path:         /blog/page:num/
 
 
 # Theme
