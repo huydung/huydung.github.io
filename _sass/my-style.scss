@@ -119,20 +119,8 @@ body.light-mode {
     }
   }
 
-  // Center featured image
-  .post-featured-image-centered {
-    margin-left: auto;
-    margin-right: auto;
-    text-align: center;
-  }
+  
 
-  // Center all images in post content
-  .content img,
-  img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-  }
 }
 
 // Simple blog post list styling with thumbnail
@@ -246,7 +234,7 @@ body.light-mode {
 .post-simple:last-of-type {
   border-bottom: none;
 }
-
+/*
 // Responsive image sizing
 // Images in post content: 50% width on desktop, full width on mobile
 .markdown-body img,
@@ -265,7 +253,7 @@ article img,
     margin-left: auto;
     margin-right: auto;
   }
-}
+} */
 
 // Keep figure elements responsive too
 figure {
