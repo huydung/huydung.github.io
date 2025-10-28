@@ -268,3 +268,27 @@ figure {
     }
   }
 }
+
+// Featured category list styling - align dates to the right
+.list-post,
+.related-posts > li {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: baseline !important;
+  gap: 1rem !important;
+
+  .post-date,
+  > time,
+  > .heading + time {
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+    color: var(--gray-text) !important;
+    font-size: 0.9rem !important;
+    white-space: nowrap !important;
+  }
+
+  .flip-title {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+}

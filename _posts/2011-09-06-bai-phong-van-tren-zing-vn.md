@@ -3,8 +3,8 @@ layout: post
 title: Bài phỏng vấn trên zing.vn
 image:
   path: /assets/img/posts/2011-interview-featured.jpg
-categories: [Personal]
-tags: [interview, career, education]
+categories: [vietnamese]
+tags: [interview, career, education, personal]
 ---
 
 Sau đợt nhận giải bada, mình có kha khá cơ hội xuất hiện trên truyền thông như là báo điện tử hay VTC. Tự thấy đấy là một điều rất quý, bởi qua đó có thể nói với thật nhiều người về những quan điểm của mình một cách thật đường hoàng. Trong đó, [Bài phỏng vấn trên zing.vn](http://www.zing.vn/news/teen-viet/chang-lap-trinh-vien-thich-choi-ngong/a113539.html) là bài mà mình thích nhất. Vì một lí do đơn giản, bài đó sát với suy nghĩ thực của mình nhất. 

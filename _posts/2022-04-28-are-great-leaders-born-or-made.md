@@ -1,8 +1,8 @@
 ---
 layout: post
 title: Are great leaders born or made?
-categories: [Life]
-tags: [leadership, management, growth, mindset]
+categories: [english]
+tags: [leadership, management, growth, mindset, life]
 date: 2022-04-28
 ---
 

@@ -1,8 +1,8 @@
 ---
 layout: post
 title: I introduced Coding to my 5-year-old. You should, too.
-categories: [Life]
-tags: [parenting, education, programming, children]
+categories: [english]
+tags: [parenting, education, programming, children, life]
 date: 2022-04-27
 ---
 

@@ -3,8 +3,8 @@ layout: post
 title: Sống trọn mỗi tuần - Bạn không có nhiều đâu
 image:
   path: /assets/img/posts/2024-song-tron-1.png
-categories: [Life]
-tags: [life, productivity]
+categories: [vietnamese]
+tags: [life, productivity, philosophy]
 ---
 
 **Đây là toàn bộ cuộc đời chúng ta. Our Life, in Weeks.**

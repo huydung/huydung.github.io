@@ -1,7 +1,8 @@
 ---
 layout: post
 title: Do you want to be a manager?
-categories: [Leadership]
+categories: [english]
+tags: [leadership, management, career]
 date: 2022-04-25
 ---
 
