@@ -3,7 +3,7 @@ layout: welcome
 title: Hi, I'm Huy Dũng (DaveHD)
 cover: false
 sitemap: false
-projects_page: projects.md
+# projects_page: projects.md
 ---
 
 Since 2008, I've been passionate about three things:
@@ -18,10 +18,6 @@ On this site, I share my thoughts on {% assign filtered_categories = site.featur
 ## I've got the honored to speak at
 
 {% include speaking-section.html %}
-
-## Featured Work
-
-<!--projects-->
 
 ---
 
