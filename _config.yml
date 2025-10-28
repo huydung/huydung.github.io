@@ -30,7 +30,7 @@ description:           >
 
 # A shorter description for the sidebar.
 tagline:               >
-  Father of Two. Educator at Heart. Production Manager in Gameloft Hanoi. 
+  Production Manager in Gameloft Hanoi. Father of Two.<br/>Educator at Heart. 
 
 # A list of keywords for your blog
 keywords:              []
@@ -52,9 +52,9 @@ author:
 menu:
   - title:             Home
     url:               /
-  - title:             English Posts
+  - title:             Articles (en)
     url:               /blog/english/
-  - title:             Bài Viết Tiếng Việt
+  - title:             Bài Viết (vi)
     url:               /blog/vietnamese/
   - title:             'Résumé/CV'
     url:               /resume/

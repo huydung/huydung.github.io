@@ -36,49 +36,48 @@ work:
     startDate: "2017-03-01"
     endDate: ""
     summary: >
-      Full-time position in Hanoi (Hybrid). Managing and leading all production activities
-      across multiple teams and departments in the HAN studio.
+      Leading all production activities across multiple teams and departments in Hanoi studio.
     highlights:
-      - "Managed and led all production activities in the HAN studio across 10+ teams and multiple departments (Production, Programming, Graphic Art, Game Design, and Quality Assurance)"
-      - "Spearheaded the ongoing critical transformation from a pure Porting and Service studio into a LiveOps studio—running game projects with greater creative freedom and direct impact on company revenue"
-      - "Successfully guided the studio through a critical crisis in 2022 when nearly half of the workforce - including most senior staff and leaders - departed within a six-month period for external opportunities in the NFT game gold rush"
-      - "Led studio-wide initiatives to enhance our working environment and processes, including redesigning the Evaluation and Bonus system, strengthen Leadership teams, Studio Renovation projects"
-      - "Oversaw technical and professional development programs. Directly lead and deliver at least one major studio-wide training program every year"
+      - "Oversee 7+ game teams across 5 departments (Producer, Programming, Art, Design, and QA)"
+      - "Spearheaded studio transformation from Porting/Service model to LiveOps, enabling greater creative freedom and direct revenue impact"
+      - "Led the studio through critical 2022 retention crisis when 50% of workforce—including most senior leaders—departed during NFT gaming boom"
+      - "Drive studio-wide initiatives such as Evaluation & Bonus system, Career Paths, Hardware Box, Training Programs."
+      - "Deliver at least one major studio-wide training program annually"
   - company: "Gameloft"
     position: "Video Game Lead Producer"
     website: "https://www.gameloft.com"
     startDate: "2015-10-01"
     endDate: "2017-03-01"
     summary: >
-      Leading multiple high-profile game projects and developing training programs for producers.
+      Led multiple high-profile game projects while developing producer training programs.
     highlights:
-      - "Simultaneously managed up to seven high-profile game projects across multiple platforms and markets, including Disney Magic Kingdoms, Order and Chaos 2, Dungeon Hunter 5, and Gods of Rome"
-      - "Developed and delivered management and technical training programs for producers to enhance their skills and effectiveness"
-      - "Leveraged programming expertise to create custom tools that streamlined producers' workflows across global studios"
-      - "Implemented a new growth management system providing monthly feedback to producers, resulting in more consistent performance evaluation and professional development"
+      - "Simultaneously managed seven AAA mobile games including Disney Magic Kingdoms, Order & Chaos 2, Dungeon Hunter 5, and Gods of Rome"
+      - "Designed and delivered management and technical training programs for producers"
+      - "Built custom tools leveraging programming expertise to streamline producer workflows across global studios"
+      - "Implemented monthly feedback system for producers, improving performance evaluation consistency and career development"
   - company: "Gameloft"
     position: "Programmer Division Lead"
     website: "https://www.gameloft.com"
     startDate: "2014-07-01"
     endDate: "2015-10-01"
     summary: >
-      Leading the Programming Division in Hanoi, supervising technical development and implementing department programs.
+      Led Programming Division in Hanoi, overseeing technical development and departmental initiatives.
     highlights:
-      - "Supervised technical development of high-profile game projects including Ice Age Adventures, Shark Dash, and Order and Chaos 2"
-      - "Created and implemented successful programs for the Programming department, such as Manager Club, Programmer Magazine, and English Club, which led to improved retention rates, enhanced collaboration with Producers, and better management skills for the Programmer Supervisors"
-      - "Led the R&D and development of Ice Age Adventures, the studio's expansion point to Windows 8 and Windows Phone 8 platforms"
+      - "Supervised technical development of major titles: Ice Age Adventures, Shark Dash, and Order & Chaos 2"
+      - "Launched Manager Club, Programmer Magazine, and English Club—improving retention, producer collaboration, and supervisor management skills"
+      - "Pioneered studio's expansion to Windows 8 and Windows Phone 8 platforms through Ice Age Adventures R&D"
   - company: "IndochinaPro"
     position: "Web Master - Software Executive"
     website: ""
     startDate: "2008-04-01"
     endDate: "2011-05-01"
     summary: >
-      Managing technical equipment and processes, web development, and conducting public sales seminars.
+      Managed technical operations, web development, and delivered public sales seminars.
     highlights:
-      - "Managed all technical equipment and processes, including Flash programming, web development, and video editing"
-      - "Developed and maintained a popular Facebook app 'Predict World Cup 2010 Results' that attracted approximately 10,000 daily active users"
-      - "Built and maintained bethongminh.vn, including both the public-facing website and the student management web application using Drupal"
-      - "Conducted public sales seminars for prospective customers"
+      - "Oversaw all technical equipment and processes including Flash programming, web development, and video editing"
+      - "Built viral Facebook app 'Predict World Cup 2010 Results' reaching 10,000 daily active users"
+      - "Developed and maintained bethongminh.vn: public website and student management system using Drupal"
+      - "Delivered public sales seminars to prospective customers"
 # volunteer:
 #   - organization: "Education, Science and Technology"
 #     position: "Volunteer"
@@ -103,10 +102,10 @@ education:
     gpa: "Distinction"
     courses: []
 awards:
-  - title: "First Prize & Third Prize of the 2011 bada Developer Challenge"
+  - title: "First Prize & Third Prize - 2011 bada Developer Challenge"
     date: "2011-02-01"
     awarder: "Samsung Vietnam"
-    summary: "Developed & Published 5 bada Mobile Applications in C++, including 2 winners: The personal finance app 'Vi Tien' and the game 'O An Quan'"
+    # summary: "Won 2 of 5 awards with personal finance app 'Vi Tien' (1st) and game 'O An Quan' (3rd) among 5 published C++ applications"
 certificates:
   - name: "PMI PMO Certified Professional (PMI-PMOCP)™"
     date: "2025-03-01"

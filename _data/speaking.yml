@@ -3,24 +3,33 @@
 # Logo format: PNG with transparent background preferred
 
 organizations:
+  # Row 1: Left | Portrait (Middle) | Right
+  - name: "Techcombank"
+    logo: "/assets/img/speaking/processed_logos/techcombank.png"
+    url: "https://www.techcombank.com.vn/"
+    year: "2018"
+
   - name: "Gameloft"
     logo: "/assets/img/speaking/processed_logos/gameloft.png"
     url: "https://gameloft.com/"
     year: "2016"
 
-  - name: "Đại học Thủy Lợi"
-    logo: "/assets/img/speaking/processed_logos/ThuyLoi.png"
-    url: "https://tlu.edu.vn/"
-    year: "2024"
+  - name: "Titan Technology Corporation"
+    logo: "/assets/img/speaking/processed_logos/titan.png"
+    url: "https://titanglobal.studio/"
+    year: "2020"
+
+  # Row 2: Left | Portrait (Middle) | Right
+
+
+  - name: "Aprotrain Aptech"
+    logo: "/assets/img/speaking/processed_logos/aptech.png"
+    url: "https://aptechvietnam.com.vn/"
+    year: "2019"
 
   - name: "RMIT University Vietnam"
     logo: "/assets/img/speaking/processed_logos/rmit.png"
     url: "https://www.rmit.edu.vn/"
-    year: "2023"
-
-  - name: "PTIT (Posts and Telecommunications Institute of Technology)"
-    logo: "/assets/img/speaking/processed_logos/ptit.png"
-    url: "https://ptit.edu.vn/"
     year: "2023"
 
   - name: "Học viện Agile"
@@ -28,40 +37,39 @@ organizations:
     url: "https://agileacademy.vn/"
     year: "2022"
 
+  # Row 3: Left | Portrait (Middle) | Right
+  - name: "Đại học Thủy Lợi"
+    logo: "/assets/img/speaking/processed_logos/ThuyLoi.png"
+    url: "https://tlu.edu.vn/"
+    year: "2024"
+
+  - name: "PTIT (Posts and Telecommunications Institute of Technology)"
+    logo: "/assets/img/speaking/processed_logos/ptit.png"
+    url: "https://ptit.edu.vn/"
+    year: "2023"
+
   - name: "JohnHunt"
     logo: "/assets/img/speaking/processed_logos/johnhunt.png"
     url: "https://nguoiphuhop.com/"
     year: "2022"
+
+  # Row 4: Left | Portrait (Middle) | Right
+  - name: "GameGeek"
+    logo: "/assets/img/speaking/processed_logos/gamegeek.png"
+    url: "https://gamegeek.asia/"
+    year: "2016"
 
   - name: "Curieous"
     logo: "/assets/img/speaking/processed_logos/curieous.png"
     url: "https://curieous.com/"
     year: "2021"
 
-  - name: "Titan Technology Corporation"
-    logo: "/assets/img/speaking/processed_logos/titan.png"
-    url: "https://titanglobal.studio/"
-    year: "2020"
-
-  - name: "Aprotrain Aptech"
-    logo: "/assets/img/speaking/processed_logos/aptech.png"
-    url: "https://aptechvietnam.com.vn/"
-    year: "2019"
-
-  - name: "Techcombank"
-    logo: "/assets/img/speaking/techcombank.png"
-    url: "https://www.techcombank.com.vn/"
-    year: "2018"
-
   - name: "eJoy"
     logo: "/assets/img/speaking/processed_logos/ejoy.png"
     url: "https://ejoy-english.com/"
     year: "2017"
 
-  - name: "GameGeek"
-    logo: "/assets/img/speaking/processed_logos/gamegeek.png"
-    url: "https://gamegeek.asia/"
-    year: "2016"
+
 
 # Topics covered (for display in the topics list)
 topics:

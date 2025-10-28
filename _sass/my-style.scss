@@ -295,10 +295,10 @@ figure {
 
 // Speaking Section Styling
 .speaking-section {
-  margin: 3rem 0;
-  padding: 2rem 0;
-  border-top: 1px solid var(--border-color);
-  border-bottom: 1px solid var(--border-color);
+  // margin: 3rem 0;
+  // padding: 2rem 0;
+  // border-top: 1px solid var(--border-color);
+  // border-bottom: 1px solid var(--border-color);
 }
 
 .speaking-container {
@@ -450,4 +450,12 @@ a[href*="://"]::after,
 a.no-push-state::after {
   display: none !important;
   content: '' !important;
+}
+
+// Hide site title "Huy Dũng" on home page and resume page
+.layout-welcome,
+.layout-resume {
+  .sidebar-sticky .sidebar-title {
+    display: none;
+  }
 }

@@ -1,12 +1,10 @@
 ---
 layout: welcome
-title: Xin chào! Hello there!
+title: Hi, I'm Huy Dũng (DaveHD)
 cover: false
 sitemap: false
 projects_page: projects.md
 ---
-
-I'm **Huy Dũng** (DaveHD).
 
 Since 2008, I've been passionate about three things:
 - **Building tech products** that enhance the human experience - software, websites, games
@@ -17,15 +15,9 @@ My life and work are guided by five values: **Take Ownership**, **Seek Clarity**
 
 ## Let's Connect
 
-I'm always look forward to great conversations about:
-- Technology, games, and product development
-- Training, coaching, and people development
-- Leadership and organizational transformation
-- Life, parenting, finding balance, psychology, philosophy
-
 Feel free to [check out my blog](/blog/), [view my résumé](/resume/), [ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call) with me.
 
-## Speaking, Training, Guest Lectures
+## I've the honored to spoke at
 
 {% include speaking-section.html %}
 
