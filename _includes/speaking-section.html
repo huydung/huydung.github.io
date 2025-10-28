@@ -1,0 +1,41 @@
+{% comment %}
+Speaking, training, and workshop engagements
+Two-column layout: Logo wall (left) | Topics list (right)
+{% endcomment %}
+
+{% assign speaking_data = site.data.speaking %}
+
+<div class="speaking-section">
+  <div class="speaking-container">
+
+    <!-- Left Column: Logo Wall -->
+    <div class="speaking-logos">
+      {% for org in speaking_data.organizations %}
+        <a href="{{ org.url }}"
+           class="speaking-logo-item"
+           target="_blank"
+           rel="noopener noreferrer"
+           title="{{ org.name }} ({{ org.year }})">
+          <img src="{{ org.logo | relative_url }}"
+               alt="{{ org.name }} logo"
+               loading="lazy">
+          <div class="speaking-tooltip">
+            <strong>{{ org.name }}</strong><br>
+            {{ org.year }}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+
+    <!-- Right Column: Topics List -->
+    <div class="speaking-topics">
+      <!-- <h3 class="speaking-topics-title">On these topics:</h3> -->
+      <ul class="speaking-topics-list">
+        {% for topic in speaking_data.topics %}
+          <li>{{ topic }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  </div>
+</div>

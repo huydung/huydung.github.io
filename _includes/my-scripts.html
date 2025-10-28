@@ -53,3 +53,37 @@ The snippet below will run the code on every `hy-push-state-load` event instead.
   });
 </script>
 {% endcomment %}
+
+<!-- Open all external links in new tabs -->
+<script>
+  function setExternalLinksTarget() {
+    // Get all links on the page
+    var links = document.querySelectorAll('a[href]');
+
+    links.forEach(function(link) {
+      var href = link.getAttribute('href');
+      var hostname = link.hostname;
+
+      // Check if it's an external link (contains :// and not current domain)
+      if (href &&
+          (href.indexOf('://') > -1 || href.indexOf('//') === 0) &&
+          hostname !== window.location.hostname) {
+        // Don't override if target already set
+        if (!link.getAttribute('target')) {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      }
+    });
+  }
+
+  // Run on initial load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setExternalLinksTarget);
+  } else {
+    setExternalLinksTarget();
+  }
+
+  // Run on Hydejack push-state navigation
+  document.getElementById('_pushState').addEventListener('hy-push-state-load', setExternalLinksTarget);
+</script>

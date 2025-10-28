@@ -50,12 +50,12 @@ author:
 
 # Add links to the sidebar.
 menu:
+  - title:             Home
+    url:               /
   - title:             English Posts
     url:               /blog/english/
   - title:             Bài Viết Tiếng Việt
     url:               /blog/vietnamese/
-  - title:             Projects
-    url:               /projects/
   - title:             'Résumé/CV'
     url:               /resume/
   - title:             Ask Me Anything

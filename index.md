@@ -25,6 +25,10 @@ I'm always look forward to great conversations about:
 
 Feel free to [check out my blog](/blog/), [view my résumé](/resume/), [ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call) with me.
 
+## Speaking, Training, Guest Lectures
+
+{% include speaking-section.html %}
+
 ## Featured Work
 
 <!--projects-->
