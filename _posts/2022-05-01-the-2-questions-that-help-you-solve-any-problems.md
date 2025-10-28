@@ -1,7 +1,7 @@
 ---
 layout: post
 title: The 2 questions that help you solve any problems
-categories: [english]
+categories: [english, skills]
 tags: [problem solving, critical thinking, communication, leadership]
 date: 2022-05-01
 ---

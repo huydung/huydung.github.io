@@ -1,7 +1,5 @@
 ---
 layout: list
-title: Life
+title: Life Lessons
 slug: life
-description: >
-  Posts about life lessons, philosophy, and reflections.
 ---

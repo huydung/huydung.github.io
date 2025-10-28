@@ -13,14 +13,16 @@ Since 2008, I've been passionate about three things:
 
 My life and work are guided by five values: **Take Ownership**, **Seek Clarity**, **Be Effective**, **Stay Balanced**, and **Embrace Humanity**.
 
-## Let's Connect
+On this site, I share my thoughts on {% assign filtered_categories = site.featured_categories | where_exp: "item", "item.menu != true" %}{% for category in filtered_categories %}[{{ category.title }}]({{ category.url }}){% if forloop.last == false and forloop.rindex > 2 %}, {% elsif forloop.rindex == 2 %} and {% endif %}{% endfor %}.
 
-Feel free to [check out my blog](/blog/), [view my résumé](/resume/), [ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call) with me.
-
-## I've the honored to spoke at
+## I've got the honored to speak at
 
 {% include speaking-section.html %}
 
 ## Featured Work
 
 <!--projects-->
+
+---
+
+## Let's Connect: [Ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call)!

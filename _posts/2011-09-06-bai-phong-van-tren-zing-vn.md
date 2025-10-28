@@ -3,7 +3,7 @@ layout: post
 title: Bài phỏng vấn trên zing.vn
 image:
   path: /assets/img/posts/2011-interview-featured.jpg
-categories: [vietnamese]
+categories: [vietnamese, personal]
 tags: [interview, career, education, personal]
 ---
 

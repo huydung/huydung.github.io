@@ -1,7 +1,7 @@
 ---
 layout: post
 title: The moment of emotional intelligence
-categories: [english]
+categories: [english, leadership]
 tags: [leadership, emotional intelligence, self-awareness, personal growth]
 date: 2022-04-29
 ---

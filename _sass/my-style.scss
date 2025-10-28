@@ -453,9 +453,8 @@ a.no-push-state::after {
 }
 
 // Hide site title "Huy Dũng" on home page and resume page
-.layout-welcome,
-.layout-resume {
-  .sidebar-sticky .sidebar-title {
-    display: none;
-  }
+// Hide sidebar title on Home and Resume pages
+.layout-welcome ~ #_drawer .sidebar-about .sidebar-title,
+.layout-resume ~ #_drawer .sidebar-about .sidebar-title {
+  display: none;
 }

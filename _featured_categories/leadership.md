@@ -1,7 +1,5 @@
 ---
 layout: list
-title: Leadership
+title: Leadership & Management
 slug: leadership
-description: >
-  Posts about leadership, management, and team building.
 ---
