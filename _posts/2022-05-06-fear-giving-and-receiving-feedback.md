@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "Fear giving and receiving Feedback? You may misunderstood what Feedback actually is."
+title: "Fear giving and receiving Feedback? You may misunderstood its core meaning."
 date: 2022-05-06
 categories: [english, skills, leadership]
 image: no
@@ -34,8 +34,8 @@ Another game, look at these 3 examples, which one is true Feedback?
 
 If your answer is 2 – you are absolutely correct. For both (1) and (3), well-intention or not, positive or negative, they do not help the person to improve. Hence, they are not true feedback.
 
-You give feedback to help other people improve. Not to express your frustration. Not to blame. Not to flatter. Not to approve or disapprove. Therefore, each feedback is a gift. An Improvement Pill. 
-{:.note title="Remember"}
+> You give feedback to help other people improve. Not to express your frustration. Not to blame. Not to flatter. Not to approve or disapprove. Therefore, each feedback is a gift. An Improvement Pill. 
+
 
 The world – and certainly all organizations – will be a better place if people are giving and receiving the gift of feedback more.
 
