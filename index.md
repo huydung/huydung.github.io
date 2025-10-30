@@ -11,7 +11,7 @@ Since 2008, I've been passionate about three things:
 - **Delivering training, coaching, and mentorship** that helps people grow
 - **Creating work environments** where teams can achieve great results and thrive as individuals
 
-My life and work are guided by five values: **Take Ownership**, **Seek Clarity**, **Be Effective**, **Stay Balanced**, and **Embrace Humanity**.
+My life and work are guided by five values: **Take Ownership**, **Seek Clarity**, **Seek Balance**, **Be Generous**, and **Stay Adaptive**.
 
 On this site, I share my thoughts on {% assign filtered_categories = site.featured_categories | where_exp: "item", "item.menu != true" %}{% for category in filtered_categories %}[{{ category.title }}]({{ category.url }}){% if forloop.last == false and forloop.rindex > 2 %}, {% elsif forloop.rindex == 2 %} and {% endif %}{% endfor %}.
 

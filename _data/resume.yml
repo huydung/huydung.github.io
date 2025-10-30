@@ -17,8 +17,7 @@ basics:
     - Delivering training, coaching, and mentorship that helps people grow<br/>
     - Creating work environments where teams can achieve great results and thrive as individuals<br/><br/>
 
-    My life and work are guided by 5 values: Take Ownership, Seek Clarity, Be Effective,
-    Stay Balanced, and Embrace Humanity.
+    My life and work are guided by 5 values: Take Ownership, Seek Clarity, Seek Balance, Be Generous, and Be Adaptive.
   location:
     address: ""
     postalCode: ""
@@ -29,6 +28,12 @@ basics:
     - network: "LinkedIn"
       username: "Nguyễn Huy Dũng (DaveHD)"
       url: "https://www.linkedin.com/in/nguyenhuydung/"
+    - network: "Facebook"
+      username: "Nguyễn Huy Dũng"
+      url: "https://www.facebook.com/huydung1406"
+    - network: "YouTube"
+      username: "Huy Dũng (DaveHD)"
+      url: "https://www.youtube.com/@huydungdave"
 work:
   - company: "Gameloft"
     position: "Production Manager"
