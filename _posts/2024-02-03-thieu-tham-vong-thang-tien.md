@@ -26,13 +26,13 @@ Thay vào đó, trong thao luaạ này mình đi thẳng vào cái nhu cầu có
 
 Vì những yếu tố như lương, thưởng, chức danh…. là động lực ngoại-thân, nên ít nhất là có tới 3 lí do khiến nó không tốt, không bền vững.
 
-**Một là, nó thúc đẩy mình làm những chuyện không hay.**
+### **Một là, nó thúc đẩy mình làm những chuyện không hay.**
 
 Nếu bạn không có một hệ giá trị tốt và mạnh đủ để cân bằng lại, thì những mục tiêu mang tính ích-kỳ, thuần tuý hướng vào lợi-ích của mình rất dễ đẩy bạn đi lạc lối.
 
 Thôi thì đủ kiểu cả. Lươn lẹo, dối trá, lừa lọc, vượt rào, vân vân.
 
-**Hai là, nó dễ khiến mình bất mãn, không hạnh phúc vui vẻ.**
+### **Hai là, nó dễ khiến mình bất mãn, không hạnh phúc vui vẻ.**
 
 Vì lúc nào cũng thấy mình còn cái A cái B chưa "lấy" được.
 
@@ -40,7 +40,7 @@ Giống như trường hợp của S. trước kia tôi làm cùng (rồi sau đ
 
 Mà nếu bạn không hợp-tác tốt được với sếp thì… E hèm…
 
-**Ba là, nó không giúp duy trì động lực một cách bền vững, lâu dài.**
+### **Ba là, nó không giúp duy trì động lực một cách bền vững, lâu dài.**
 
 Bạn có thể phải cố gắng nhiều tháng, mơ tưởng về một pha tăng lương gấp đôi, chức danh oách xà lách. Và bạn nhận được thật! Bạn sẽ hào hứng và phấn khích trong bao lâu?
 
@@ -62,7 +62,7 @@ Tất nhiên, lợi ích nhận được về có tương xứng hay không thì
 
 Nhưng nếu bạn không thể (và không muốn) đem giá trị, lợi ích đến cho người khác, thì thua, không cứu được.
 
-## 4. Lời giải cho việc đặt mục tiêu khó khăn?
+## 4. Lời giải cho việc khó đặt mục tiêu?
 
 → Bạn hãy thử nhìn rộng ra hơn 1 chút về các loại mục tiêu mình đặt. Đâu phải chỉ có chuyện thăng tiến không thôi đâu.
 

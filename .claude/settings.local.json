@@ -10,7 +10,9 @@
       "Bash(xxd:*)",
       "Bash(dos2unix:*)",
       "Bash(git checkout:*)",
-      "Bash(ruby fix_config.rb:*)"
+      "Bash(ruby fix_config.rb:*)",
+      "Bash(python extract_article.py:*)",
+      "Bash(python extract_vietnamese_article.py:*)"
     ],
     "deny": [],
     "ask": []

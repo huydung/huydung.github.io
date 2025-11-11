@@ -13,7 +13,7 @@ Here are the 3 biggest reasons why you should organize knowledge-sharing session
 
 The process of reviewing, researching, re-organizing your body of knowledge, and engaging with people will help you discover holes you didn't know were there, introduce you to new perspectives, and update your thinking.
 
-I guarantee that no matter how well you think you knew a topic or how much experience you had, your expertise will improve after teaching us to others,
+I guarantee that no matter how well you think you knew a topic or how much experience you had, your expertise will improve after teaching it to others.
 
 ## 2. It brings vast value to your colleagues, your organization, and yourself
 
