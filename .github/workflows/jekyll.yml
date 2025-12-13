@@ -48,6 +48,13 @@ jobs:
         env:
           JEKYLL_ENV: production
 
+      - name: Debug - List static folder contents
+        run: |
+          echo "Checking if static folder was built:"
+          ls -la _site/static/ || echo "static folder not found in _site"
+          echo "Files in _site root:"
+          ls -la _site/ | head -20
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
 
