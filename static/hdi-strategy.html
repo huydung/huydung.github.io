@@ -1,0 +1,791 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strategy Canvas | Cái gì mới được gọi là Strategy?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+Pro:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1a1a2e;
+            --paper: #faf9f7;
+            --accent: #e63946;
+            --accent-light: #fff0f0;
+            --muted: #6b7280;
+            --border: #e5e5e5;
+            --highlight: #fef3c7;
+            --blue: #2563eb;
+            --blue-light: #eff6ff;
+            --green: #059669;
+            --green-light: #ecfdf5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background: var(--paper);
+            color: var(--ink);
+            line-height: 1.7;
+            font-size: 17px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+        
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding-bottom: 40px;
+            border-bottom: 3px solid var(--ink);
+        }
+        
+        .header-label {
+            font-size: 12px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.2rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: var(--muted);
+            font-weight: 300;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Section styling */
+        .section {
+            margin-bottom: 60px;
+        }
+        
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent);
+            display: inline-block;
+        }
+        
+        /* Checklist */
+        .checklist {
+            background: white;
+            border: 2px solid var(--ink);
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .checklist-item {
+            padding: 25px 0;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 45px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .checklist-item:first-child {
+            padding-top: 0;
+        }
+        
+        .check-number {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            color: white;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        
+        .checklist-item h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .checklist-item p {
+            color: #444;
+        }
+        
+        .checklist-item em {
+            background: var(--highlight);
+            padding: 2px 6px;
+            font-style: normal;
+        }
+        
+        .checklist-item strong {
+            color: var(--ink);
+        }
+        
+        /* Sub-bullets */
+        .sub-items {
+            margin-top: 15px;
+            padding-left: 0;
+        }
+        
+        .sub-item {
+            display: grid;
+            grid-template-columns: 24px 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: start;
+        }
+        
+        .sub-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .sub-bullet {
+            width: 20px;
+            height: 20px;
+            background: var(--ink);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 3px;
+        }
+        
+        .sub-item-content strong {
+            color: var(--accent);
+        }
+        
+        /* ERRC Box */
+        .errc-box {
+            background: var(--highlight);
+            padding: 20px;
+            margin-top: 15px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .errc-box h4 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .errc-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .errc-item {
+            font-size: 0.9rem;
+        }
+        
+        .errc-item strong {
+            color: var(--ink);
+        }
+        
+        /* Test box */
+        .test-box {
+            background: var(--accent-light);
+            border-left: 4px solid var(--accent);
+            padding: 25px 30px;
+            margin: 30px 0;
+        }
+        
+        .test-box h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--accent);
+        }
+        
+        .test-box p {
+            margin: 0;
+        }
+        
+        /* Comparison Section */
+        .comparison {
+            margin-bottom: 50px;
+        }
+        
+        .comparison-header {
+            background: var(--ink);
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .comparison-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+        }
+        
+        .comparison-header .industry {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .comparison-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: white;
+            border: 2px solid var(--ink);
+            border-top: none;
+        }
+        
+        .company-col {
+            padding: 30px;
+        }
+        
+        .company-col:first-child {
+            border-right: 2px solid var(--border);
+            background: var(--blue-light);
+        }
+        
+        .company-col:last-child {
+            background: var(--green-light);
+        }
+        
+        .company-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .company-col:first-child .company-name {
+            color: var(--blue);
+        }
+        
+        .company-col:last-child .company-name {
+            color: var(--green);
+        }
+        
+        .company-tagline {
+            font-size: 0.9rem;
+            color: var(--muted);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .strategy-block {
+            margin-bottom: 20px;
+        }
+        
+        .strategy-block h4 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+        
+        .strategy-block p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        .strategy-block.highlight {
+            background: white;
+            padding: 15px;
+            border-left: 3px solid;
+            margin: 15px 0;
+        }
+        
+        .company-col:first-child .strategy-block.highlight {
+            border-color: var(--blue);
+        }
+        
+        .company-col:last-child .strategy-block.highlight {
+            border-color: var(--green);
+        }
+        
+        .actions-list {
+            font-size: 0.9rem;
+        }
+        
+        .actions-list li {
+            margin-bottom: 6px;
+            padding-left: 5px;
+        }
+        
+        .not-do {
+            color: var(--accent);
+            font-weight: 600;
+        }
+        
+        /* Key insight box */
+        .insight-box {
+            background: var(--highlight);
+            padding: 20px;
+            margin-top: 0;
+            border: 2px solid var(--ink);
+            border-top: none;
+        }
+        
+        .insight-box h4 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--accent);
+        }
+        
+        .insight-box p {
+            font-size: 0.95rem;
+            margin: 0;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer strong {
+            color: var(--ink);
+        }
+        
+        /* Responsive */
+        @media (max-width: 800px) {
+            .comparison-body {
+                grid-template-columns: 1fr;
+            }
+            .company-col:first-child {
+                border-right: none;
+                border-bottom: 2px solid var(--border);
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            .container {
+                padding: 40px 20px;
+            }
+            .checklist {
+                padding: 25px;
+            }
+            .errc-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Print styles */
+        @media print {
+            body {
+                font-size: 12px;
+            }
+            .container {
+                padding: 20px;
+            }
+            .comparison {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-label">Strategy Framework</div>
+            <h1>Cái gì mới được gọi là "Strategy"?</h1>
+            <p class="subtitle">5 tiêu chí để phân biệt Strategy thật với một danh sách goals có rắc thêm tham vọng cho đẹp</p>
+        </header>
+        
+        <!-- Checklist Section -->
+        <section class="section">
+            <h2>Checklist</h2>
+            
+            <div class="checklist">
+                <div class="checklist-item">
+                    <div class="check-number">1</div>
+                    <div>
+                        <h3>Có WHY và HOW rõ ràng</h3>
+                        <p>Xuất phát từ một <strong>thách thức cụ thể</strong> cần giải quyết, hoặc hướng tới một vision lớn hơn. Và quan trọng: phải có một "lý thuyết" giải thích <em>TẠI SAO</em> cách tiếp cận này sẽ hiệu quả. Không phải kiểu "ta sẽ làm X" mà là "ta sẽ làm X <em>vì</em> Y, và cơ chế hoạt động là Z."</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="check-number">2</div>
+                    <div>
+                        <h3>Khác biệt — Differentiated</h3>
+                        <p>Strategy phải tạo ra sự khác biệt rõ ràng, không phải câu chung chung ai cũng nói được.</p>
+                        
+                        <div class="sub-items">
+                            <div class="sub-item">
+                                <div class="sub-bullet">a</div>
+                                <div class="sub-item-content"><strong>Trade-offs:</strong> Chỉ rõ các lựa chọn khó khăn — làm cái này và <strong>KHÔNG</strong> làm cái kia. Strategy mà không có "không" thì chưa phải strategy.</div>
+                            </div>
+                            <div class="sub-item">
+                                <div class="sub-bullet">b</div>
+                                <div class="sub-item-content"><strong>Khác với đối thủ:</strong> Nếu là câu mà công ty nào cũng có thể nói được thì fail. Strategy phải chỉ ra điểm khác biệt so với cách tiếp cận của thị trường.</div>
+                            </div>
+                            <div class="sub-item">
+                                <div class="sub-bullet">c</div>
+                                <div class="sub-item-content"><strong>Phù hợp với mình:</strong> Sự khác biệt đó phải dựa trên thế mạnh, năng lực, văn hóa, độ trưởng thành của chính công ty mình. Không copy chiến lược của ông hàng xóm về dán vào.</div>
+                            </div>
+                            <div class="sub-item">
+                                <div class="sub-bullet">d</div>
+                                <div class="sub-item-content"><strong>ERRC Framework:</strong> Dùng 4 câu hỏi từ Blue Ocean Strategy để kiểm tra sự khác biệt:</div>
+                            </div>
+                        </div>
+                        
+                        <div class="errc-box">
+                            <h4>ERRC — 4 Actions Framework</h4>
+                            <div class="errc-grid">
+                                <div class="errc-item"><strong>Eliminate:</strong> Loại bỏ yếu tố nào mà ngành đang coi là hiển nhiên?</div>
+                                <div class="errc-item"><strong>Reduce:</strong> Giảm yếu tố nào xuống dưới chuẩn ngành?</div>
+                                <div class="errc-item"><strong>Raise:</strong> Nâng yếu tố nào lên trên chuẩn ngành?</div>
+                                <div class="errc-item"><strong>Create:</strong> Tạo ra yếu tố nào mà ngành chưa từng có?</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="check-number">3</div>
+                    <div>
+                        <h3>Tóm gọn được trong 2-3 câu</h3>
+                        <p>Nói sao cho toàn dân hiểu được, thấy rõ mồn một là chiến lược này hợp lý trong việc đạt mission/vision như thế nào. Nếu giải thích 30 phút mà người ta vẫn mơ hồ thì có vấn đề.</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="check-number">4</div>
+                    <div>
+                        <h3>Trung hạn, mang tính định hướng</h3>
+                        <p>Strategy là <strong>phương thức</strong>, chứ không phải là hành động nhỏ lẻ. Không phải action plan tuần này, cũng không phải vision 20 năm mơ mộng.</p>
+                    </div>
+                </div>
+                
+                <div class="checklist-item">
+                    <div class="check-number">5</div>
+                    <div>
+                        <h3>Đóng vai trò như một bộ lọc</h3>
+                        <p>Mỗi khi cần chọn giữa goal A hay B, project C hay D, action E hay F — hỏi nhau: <em>"Cái này có phù hợp với strategy hiện tại không?"</em> Nếu strategy mù mờ không trả lời được câu hỏi đó → hỏng.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <div class="test-box">
+            <h4>🧪 Acid Test cho Strategy</h4>
+            <p>Nếu "strategy" của bạn không giúp trả lời được câu hỏi <strong>"Có nên làm X không?"</strong> một cách rõ ràng, thì khả năng cao nó chỉ là một danh sách goals có rắc thêm chút tham vọng cho đẹp.</p>
+        </div>
+        
+        <!-- Examples Section -->
+        <section class="section">
+            <h2>3 Ví dụ so sánh</h2>
+            <p style="color: var(--muted); margin-bottom: 30px;">Cùng ngành, cùng thị trường — nhưng strategy khác nhau dẫn đến hành động và sản phẩm khác nhau.</p>
+            
+            <!-- Example 1: Apple vs Samsung -->
+            <div class="comparison">
+                <div class="comparison-header">
+                    <h3>🍎 Apple vs Samsung</h3>
+                    <span class="industry">Smartphone Hardware</span>
+                </div>
+                <div class="comparison-body">
+                    <div class="company-col">
+                        <div class="company-name">Apple</div>
+                        <div class="company-tagline">"Think Different"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Kiểm soát toàn bộ trải nghiệm (closed ecosystem)</strong> thay vì chạy đua thông số. Vì: DNA thiết kế mạnh, người dùng trả premium cho đơn giản + đẹp, ecosystem khóa chân khách hàng lâu dài.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>Chỉ 4 model iPhone/năm (Pro, Pro Max, standard, SE)</li>
+                                <li>Tự thiết kế chip (A-series, M-series)</li>
+                                <li>iOS độc quyền, không license cho ai</li>
+                                <li>Apple Store kiểm soát trải nghiệm bán hàng</li>
+                                <li>Services: iCloud, Apple Music, Apple TV+</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không cạnh tranh giá rẻ. Không mở iOS cho hãng khác. Không làm nhiều dòng sản phẩm phủ mọi phân khúc.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="company-col">
+                        <div class="company-name">Samsung</div>
+                        <div class="company-tagline">"Do What You Can't"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Thống trị chuỗi cung ứng + đa dạng hóa sản phẩm</strong> để phủ mọi phân khúc. Vì: Năng lực sản xuất linh kiện (màn hình, chip, RAM) không ai sánh bằng, có thể scale nhanh và cạnh tranh giá ở mọi tầm.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>20+ model điện thoại/năm (S, Z, A, M, F series)</li>
+                                <li>Sản xuất màn hình OLED bán cho cả Apple</li>
+                                <li>Dùng Android (open), tự do customize</li>
+                                <li>Bán qua mọi kênh: carrier, retail, online</li>
+                                <li>Đầu tư mạnh vào form factor mới (foldable)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không tự phát triển OS riêng (đã thử Tizen, fail). Không giới hạn dòng sản phẩm. Không từ chối bán linh kiện cho đối thủ.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 Insight</h4>
+                    <p><strong>Cùng bán smartphone, nhưng cách thắng hoàn toàn khác.</strong> Apple chọn ít model + premium + ecosystem lock-in. Samsung chọn phủ rộng + supply chain dominance + hardware innovation. Cả hai đều thành công vì strategy rõ ràng và nhất quán.</p>
+                </div>
+            </div>
+            
+            <!-- Example 2: Google vs Facebook -->
+            <div class="comparison">
+                <div class="comparison-header">
+                    <h3>🔍 Google vs 👤 Facebook (Meta)</h3>
+                    <span class="industry">Digital Advertising</span>
+                </div>
+                <div class="comparison-body">
+                    <div class="company-col">
+                        <div class="company-name">Google</div>
+                        <div class="company-tagline">"Organize the world's information"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Bắt người dùng tại thời điểm có intent (ý định)</strong> — khi họ chủ động tìm kiếm. Vì: Intent signal cực kỳ mạnh, advertiser trả premium cho người "đang muốn mua", conversion rate cao hơn.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>Search Ads: đấu giá keyword theo intent</li>
+                                <li>YouTube: video ads khi người dùng tìm content</li>
+                                <li>Google Maps: local search → local ads</li>
+                                <li>Shopping: product search → shopping ads</li>
+                                <li>Đầu tư vào AI/ML để hiểu intent tốt hơn</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không xây social network thành công (Google+ fail). Không đẩy mạnh brand awareness ads như TV. Không dựa vào demographic targeting như Facebook.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="company-col">
+                        <div class="company-name">Facebook (Meta)</div>
+                        <div class="company-tagline">"Give people the power to build community"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Hiểu sâu về CON NGƯỜI (identity + behavior)</strong> để target chính xác, tạo demand mới. Vì: Có data về ai bạn là, bạn thích gì, bạn quen ai — có thể "gợi ý" sản phẩm trước khi bạn biết mình cần.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>Feed Ads: chen vào giữa nội dung social</li>
+                                <li>Lookalike Audiences: tìm người giống khách hàng tốt nhất</li>
+                                <li>Instagram: visual discovery → impulse purchase</li>
+                                <li>Reels: short video để giữ engagement</li>
+                                <li>Pixel tracking: theo dõi hành vi cross-site</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không xây search engine. Không dựa vào keyword intent. Không bán ads cho người "đang tìm" mà bán cho người "có thể thích".</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 Insight</h4>
+                    <p><strong>Cùng bán quảng cáo digital, nhưng logic hoàn toàn khác.</strong> Google bắt bạn khi bạn "đang muốn" (intent-based). Facebook tìm bạn khi bạn "có thể thích" (identity-based). Advertiser chọn platform tùy mục tiêu: demand capture vs demand creation.</p>
+                </div>
+            </div>
+            
+            <!-- Example 3: Techcombank vs VIB -->
+            <div class="comparison">
+                <div class="comparison-header">
+                    <h3>🏦 Techcombank vs VIB</h3>
+                    <span class="industry">Vietnam Commercial Banking</span>
+                </div>
+                <div class="comparison-body">
+                    <div class="company-col">
+                        <div class="company-name">Techcombank</div>
+                        <div class="company-tagline">"Change banking, Change lives"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Chiếm toàn bộ chuỗi giá trị (value chain) thông qua ecosystem</strong> — từ doanh nghiệp lớn → SME → nhân viên → gia đình họ. Vì: Partnership với Vingroup/Masan tạo lợi thế không ai có (70% wallet share dự án Vingroup), CASA cao nhờ Main Operating Account, fee income đa dạng từ TCBS + bảo hiểm.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>CIBG: Corporate + Investment Banking mạnh</li>
+                                <li>TCBS: công ty chứng khoán #1 về market share</li>
+                                <li>TCLife: tự lập công ty bảo hiểm (80% vốn)</li>
+                                <li>One Mount: ecosystem Vingroup/Masan</li>
+                                <li>13.4 triệu khách hàng, CASA ~40%</li>
+                                <li>Diversify: giảm tỷ trọng BĐS, tăng SME</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không từ bỏ corporate lending. Không chỉ focus vào 1 phân khúc. Không dựa hoàn toàn vào partnership bên ngoài cho insurance.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="company-col">
+                        <div class="company-name">VIB</div>
+                        <div class="company-tagline">"Ngân hàng bán lẻ sáng tạo nhất"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Đào sâu vào bán lẻ chất lượng cao (home, car, card)</strong> — không mở rộng sang Corporate/SME. Vì: Đây là DNA 7 năm, đã có brand + ecosystem trong retail, NIM retail cao hơn corporate, non-interest income từ card/bancassurance bù đắp. Trade-off: chấp nhận quy mô nhỏ hơn để đổi lấy ROE cao.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>85% danh mục là retail lending</li>
+                                <li>Credit card: 1 triệu thẻ, #1 Mastercard VN</li>
+                                <li>Home loan, Car loan: top thị phần</li>
+                                <li>MyVIB app: digital-first experience</li>
+                                <li>5 triệu khách hàng, ROE ~25%</li>
+                                <li>Privilege Banking: phân khúc affluent</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không đua corporate lending. Không cạnh tranh bằng lãi suất thấp nhất. Không mở rộng quá nhanh mạng lưới vật lý. Không tự xây công ty bảo hiểm.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 Insight</h4>
+                    <p><strong>Cùng là ngân hàng tư nhân top Vietnam, nhưng chơi game khác nhau.</strong> Techcombank chọn "ecosystem bank" — capture toàn bộ value chain, partner với tập đoàn lớn, đa dạng hóa thu nhập. VIB chọn "retail specialist" — làm sâu một phân khúc, từ chối corporate, đổi scale lấy efficiency. Cả hai đều có ROE cao nhất ngành vì strategy rõ ràng.</p>
+                </div>
+            </div>
+        </section>
+        
+            <!-- Example 4: Treasury Techcombank vs VIB -->
+            <div class="comparison">
+                <div class="comparison-header">
+                    <h3>💰 Treasury: Techcombank vs VIB</h3>
+                    <span class="industry">Bank Treasury Department</span>
+                </div>
+                <div class="comparison-body">
+                    <div class="company-col">
+                        <div class="company-name">Techcombank Treasury</div>
+                        <div class="company-tagline">Treasury cho "Ecosystem Bank"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Tối ưu hóa funding cost + hỗ trợ đa dạng hóa thu nhập</strong> — Treasury không chỉ quản lý thanh khoản mà còn là profit center. Vì: CASA cao (~40%) tạo lợi thế funding cost, TCBS cần support cho trading/underwriting, ecosystem đa dạng cần Treasury linh hoạt để seize opportunities.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>Đẩy mạnh CASA qua Auto-earning, Main Operating Account</li>
+                                <li>FTP pricing linh hoạt theo segment (Corporate vs Retail)</li>
+                                <li>Trading book lớn hơn, support TCBS bond underwriting</li>
+                                <li>Quản lý liquidity cho cả bank + securities</li>
+                                <li>Tham gia interbank market tích cực hơn</li>
+                                <li>Diversify funding sources: domestic + international</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không giữ liquidity buffer quá dư thừa (opportunity cost cao). Không từ chối support các deal lớn vì lý do liquidity ngắn hạn.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="company-col">
+                        <div class="company-name">VIB Treasury</div>
+                        <div class="company-tagline">Treasury cho "Retail Specialist"</div>
+                        
+                        <div class="strategy-block highlight">
+                            <h4>Strategy</h4>
+                            <p><strong>Ưu tiên ổn định và chi phí vốn thấp, không chase trading profit</strong> — Treasury là cost center hỗ trợ NIM của retail lending. Vì: 85% là retail lending (home loan 15-20 năm), core profit đến từ NIM retail — không phải trading, môi trường tỷ giá biến động = rủi ro trading cao. Trade-off: chấp nhận yield thấp hơn để đổi lấy funding stability.</p>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4>Kết quả: Sản phẩm & Hành động</h4>
+                            <ul class="actions-list">
+                                <li>Duy trì LDR ≤80%, NSFR >100%</li>
+                                <li>Tăng tiền gửi kỳ hạn 6-12 tháng (sản phẩm "1-1-1")</li>
+                                <li>Trading book nhỏ, focus vào ALM hedging</li>
+                                <li>FTP đơn giản hơn (chủ yếu retail)</li>
+                                <li>Liquidity buffer dày để chịu được stress scenarios</li>
+                                <li>Huy động USD trung hạn từ thị trường quốc tế</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="strategy-block">
+                            <h4 class="not-do">Không làm</h4>
+                            <p class="not-do">Không tăng trading book để kiếm lời ngắn hạn. Không phụ thuộc vay liên ngân hàng ngắn hạn. Không chase yield bằng trái phiếu DN rủi ro cao.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-box">
+                    <h4>💡 Insight</h4>
+                    <p><strong>Treasury strategy phải align với bank strategy.</strong> Techcombank Treasury cần linh hoạt, có thể chấp nhận rủi ro cao hơn để support ecosystem đa dạng và tạo thêm profit từ trading. VIB Treasury cần conservative, ưu tiên stability vì bank sống chết bằng NIM của retail lending dài hạn — Treasury không phải là nơi tạo profit mà là nơi bảo vệ profit.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Framework by <strong>Huy-Dũng (DaveHD)</strong></p>
+            <p style="margin-top: 8px;">Inspired by Roger Martin, Michael Porter, Richard Rumelt, W. Chan Kim & Renée Mauborgne</p>
+        </footer>
+    </div>
+</body>
+</html>
