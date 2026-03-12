@@ -1,0 +1,5 @@
+# Approaches to Data Analysis
+
+The pathway through data analysis diverges significantly depending on whether the research is quantitative, qualitative, or mixed-methods. Quantitative analysis follows a structured nine-step sequence: problem clarification, hypothesis specification, raw data inspection, data entry and cleaning, distribution testing, variable redefinition if necessary, hypothesis testing, covariate control, and results synthesis. Qualitative analysis is iterative and emergent—coding, memoing, and pattern-finding happen simultaneously with ongoing data collection, producing progressively refined codes, focused categories, and integrated themes.
+
+Both approaches demand rigor and intentionality. In research on organizational psychological safety, quantitative studies apply this pipeline to test mediation pathways; in qualitative research exploring team dynamics across multiple interviews, iterative cycles refine raw observations into actionable themes. Choosing the right analytic approach—and executing it with precision—determines whether research findings are credible, actionable, and compelling to stakeholders.

@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBA Program – Knowledge Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+  body { background: #0b0d14; font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; color: #e0e0e0; }
+  #root { min-height: 100vh; }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.10); border-radius: 6px; }
+
+  @keyframes slideIn   { from { opacity:0; transform:translateX(30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes slideOut  { from { opacity:0; transform:translateX(-30px); } to { opacity:1; transform:translateX(0); } }
+  @keyframes cardPop   { from { opacity:0; transform:translateY(14px) scale(.98); } to { opacity:1; transform:translateY(0) scale(1); } }
+  @keyframes fadeIn    { from { opacity:0; } to { opacity:1; } }
+  @keyframes pulse     { 0%,100% { opacity:.25; } 50% { opacity:.55; } }
+
+  /* Responsive grid util */
+  .card-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 560px)  { .card-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px)  { .card-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* For leaf sub-cards — always 2 col on medium, 3 on large */
+  .subcard-grid {
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 560px)  { .subcard-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1000px) { .subcard-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* Card hover */
+  .nav-card { transition: transform .15s, border-color .15s, box-shadow .15s; }
+  .nav-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,.35); }
+
+  .sub-card { transition: transform .15s, border-color .15s, box-shadow .15s; cursor: pointer; }
+  .sub-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    animation: fadeIn .2s ease;
+    padding: 20px;
+  }
+  .modal-box {
+    background: #13151e; border-radius: 18px;
+    width: 100%; max-width: 680px; max-height: 85vh;
+    overflow-y: auto; position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08);
+    animation: modalPop .25s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes modalPop {
+    from { opacity:0; transform:scale(.95) translateY(10px); }
+    to   { opacity:1; transform:scale(1) translateY(0); }
+  }
+  .modal-box::-webkit-scrollbar { width: 5px; }
+  .modal-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 5px; }
+
+  /* Rich markdown inside modal */
+  .rich-md { color: rgba(255,255,255,.8); font-size: .97rem; line-height: 1.8; }
+  .rich-md p { margin-bottom: .75em; }
+  .rich-md strong { color: #fff; font-weight: 600; }
+  .rich-md em { color: rgba(255,255,255,.7); }
+  .rich-md code {
+    background: rgba(255,255,255,.07); padding: 2px 7px; border-radius: 4px;
+    font-size: .88em; color: #ccc; font-family: 'SF Mono', Consolas, monospace;
+  }
+  .rich-md ul, .rich-md ol { margin: .5em 0 .75em 1.4em; }
+  .rich-md li { margin-bottom: .35em; }
+  .rich-md li::marker { color: rgba(255,255,255,.35); }
+  .rich-md h3 { color: #fff; font-size: 1.05rem; font-weight: 600; margin: 1.2em 0 .4em; }
+  .rich-md blockquote {
+    border-left: 3px solid rgba(255,255,255,.15); margin: .6em 0; padding: .4em 0 .4em 1em;
+    color: rgba(255,255,255,.6); font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useCallback, useEffect, useRef } = React;
+
+/* ─── DATA TREE ─── */
+const DATA = {
+  id:"root", label:"DBA Knowledge Map",
+  children:[
+    { id:"s1", label:"Foundations", icon:"🧭", color:"#f59e42",
+      children:[
+        { id:"s1.1", label:"What is Research?", icon:"📖",
+          children:[
+            { id:"s1.1a", label:"Qualities", leaf:true },
+            { id:"s1.1b", label:"Pseudo-research", leaf:true },
+            { id:"s1.1c", label:"Scholar-Practitioner", leaf:true },
+          ]},
+        { id:"s1.2", label:"Types of Research", icon:"🔀",
+          children:[
+            { id:"s1.2a", label:"Classification Pairs", leaf:true },
+            { id:"s1.2b", label:"Quant vs. Qual", leaf:true },
+          ]},
+        { id:"s1.3", label:"Research Philosophy", icon:"🏛",
+          children:[
+            { id:"s1.3a", label:"Paradigms", leaf:true },
+            { id:"s1.3b", label:"Ontology & Epistemology", leaf:true },
+          ]},
+        { id:"s1.4", label:"6-Step Process", icon:"🔄", leaf:true },
+      ]},
+    { id:"s2", label:"Problem & Question", icon:"🎯", color:"#e05a8a",
+      children:[
+        { id:"s2.1", label:"Inquiry Process", icon:"🔍", leaf:true },
+        { id:"s2.2", label:"Problem Statement", icon:"📌", leaf:true },
+        { id:"s2.3", label:"Research Question", icon:"❓",
+          children:[
+            { id:"s2.3a", label:"Shared Attributes", leaf:true },
+            { id:"s2.3b", label:"⚡ Quant RQ", leaf:true },
+            { id:"s2.3c", label:"🌿 Qual RQ", leaf:true },
+          ]},
+        { id:"s2.4", label:"Hypothesis vs. Propositions", icon:"⚖️",
+          children:[
+            { id:"s2.4a", label:"⚡ Hypothesis (Quant)", leaf:true },
+            { id:"s2.4b", label:"🌿 Propositions (Qual)", leaf:true },
+          ]},
+      ]},
+    { id:"s3", label:"Literature Review", icon:"📚", color:"#7c6df0",
+      children:[
+        { id:"s3.1", label:"Fundamentals & Aims", icon:"🎓", leaf:true },
+        { id:"s3.2", label:"Types", icon:"📋", leaf:true },
+        { id:"s3.3", label:"Search & Evaluation", icon:"🔎", leaf:true },
+        { id:"s3.4", label:"Structure & Drafting", icon:"✍️", leaf:true },
+      ]},
+    { id:"s4", label:"Research Design", icon:"🏗", color:"#3daadb",
+      children:[
+        { id:"s4.1", label:"Fundamentals", icon:"📐", leaf:true },
+        { id:"s4.2", label:"Design Types", icon:"🔬",
+          children:[
+            { id:"s4.2a", label:"⚡ Quantitative Designs", leaf:true },
+            { id:"s4.2b", label:"🌿 Qualitative Designs", leaf:true },
+          ]},
+        { id:"s4.3", label:"🌿 Patton's 3 Pillars", icon:"🧩", leaf:true },
+        { id:"s4.4", label:"Variables & Models", icon:"🔗", leaf:true },
+      ]},
+    { id:"s5", label:"Sampling", icon:"🎲", color:"#e6a940",
+      children:[
+        { id:"s5.1", label:"Core Concepts", icon:"👥", leaf:true },
+        { id:"s5.2", label:"Techniques", icon:"⚙️",
+          children:[
+            { id:"s5.2a", label:"⚡ Quant Sampling", leaf:true },
+            { id:"s5.2b", label:"🌿 Qual Sampling", leaf:true },
+          ]},
+        { id:"s5.3", label:"Errors & Bias", icon:"⚠️", leaf:true },
+      ]},
+    { id:"s6", label:"Data Collection", icon:"📥", color:"#50b87a",
+      children:[
+        { id:"s6.1", label:"Data Fundamentals", icon:"💾",
+          children:[
+            { id:"s6.1a", label:"Core", leaf:true },
+            { id:"s6.1b", label:"⚡ Quant Data", leaf:true },
+            { id:"s6.1c", label:"🌿 Qual Data", leaf:true },
+          ]},
+        { id:"s6.2", label:"Collection Methods", icon:"🛠",
+          children:[
+            { id:"s6.2a", label:"⚡ Quant Methods", leaf:true },
+            { id:"s6.2b", label:"🌿 Qual: 6 Sources", leaf:true },
+          ]},
+        { id:"s6.3", label:"Principles", icon:"📏", leaf:true },
+        { id:"s6.4", label:"Survey & Questionnaire", icon:"📝", leaf:true },
+        { id:"s6.5", label:"🌿 Interviews & Focus Groups", icon:"🎙", leaf:true },
+      ]},
+    { id:"s7", label:"Data Analysis", icon:"📊", color:"#dd6b5e",
+      children:[
+        { id:"s7.1", label:"Approaches", icon:"🔀",
+          children:[
+            { id:"s7.1a", label:"⚡ Quant: 9-Step Process", leaf:true },
+            { id:"s7.1b", label:"🌿 Qual: Iterative Process", leaf:true },
+          ]},
+        { id:"s7.2", label:"🌿 Qualitative Coding", icon:"🏷", leaf:true },
+        { id:"s7.3", label:"⚡ Statistical Tests", icon:"📈", leaf:true },
+        { id:"s7.4", label:"Data Display", icon:"🖼",
+          children:[
+            { id:"s7.4a", label:"⚡ Quant Display", leaf:true },
+            { id:"s7.4b", label:"🌿 Qual Display", leaf:true },
+          ]},
+        { id:"s7.5", label:"🌿 Verifying Meaning", icon:"✅", leaf:true },
+        { id:"s7.6", label:"Mixed Methods", icon:"🔄", leaf:true },
+      ]},
+    { id:"s8", label:"Validity & Reliability", icon:"🛡", color:"#5bafd6",
+      children:[
+        { id:"s8.1", label:"Validity", icon:"🎯",
+          children:[
+            { id:"s8.1a", label:"Shared Concepts", leaf:true },
+            { id:"s8.1b", label:"⚡ Quant Validity", leaf:true },
+            { id:"s8.1c", label:"🌿 Qual Validity", leaf:true },
+          ]},
+        { id:"s8.2", label:"Reliability", icon:"🔁",
+          children:[
+            { id:"s8.2a", label:"⚡ Quant Reliability", leaf:true },
+            { id:"s8.2b", label:"🌿 Qual Reliability", leaf:true },
+          ]},
+        { id:"s8.3", label:"Bias", icon:"⚖️", leaf:true },
+        { id:"s8.4", label:"Quality Standards", icon:"🏆", leaf:true },
+      ]},
+    { id:"s9", label:"Ethics", icon:"⚖️", color:"#c76dba",
+      children:[
+        { id:"s9.1", label:"Principles", icon:"📜", leaf:true },
+        { id:"s9.2", label:"Misconduct", icon:"🚫", leaf:true },
+        { id:"s9.3", label:"IRB & Consent", icon:"✋", leaf:true },
+      ]},
+    { id:"s10", label:"Writing & Feedback", icon:"✏️", color:"#8a9ba8",
+      children:[
+        { id:"s10.1", label:"Writing Skills", icon:"🖊", leaf:true },
+        { id:"s10.2", label:"Presenting Findings", icon:"📤",
+          children:[
+            { id:"s10.2a", label:"⚡ Quant Report", leaf:true },
+            { id:"s10.2b", label:"🌿 Qual Report", leaf:true },
+          ]},
+        { id:"s10.3", label:"Feedback & Revision", icon:"🔄", leaf:true },
+        { id:"s10.4", label:"🌿 Extra Qual Methods", icon:"🧪", leaf:true },
+      ]},
+  ]
+};
+
+/* ─── CONTENT PATH MAP ─── */
+const CONTENT_MAP = {
+  "s1":"content/s1/_desc.md","s1.1":"content/s1/s1.1/_desc.md","s1.2":"content/s1/s1.2/_desc.md","s1.3":"content/s1/s1.3/_desc.md",
+  "s2":"content/s2/_desc.md","s2.3":"content/s2/s2.3/_desc.md","s2.4":"content/s2/s2.4/_desc.md",
+  "s3":"content/s3/_desc.md","s4":"content/s4/_desc.md","s4.2":"content/s4/s4.2/_desc.md",
+  "s5":"content/s5/_desc.md","s5.2":"content/s5/s5.2/_desc.md",
+  "s6":"content/s6/_desc.md","s6.1":"content/s6/s6.1/_desc.md","s6.2":"content/s6/s6.2/_desc.md",
+  "s7":"content/s7/_desc.md","s7.1":"content/s7/s7.1/_desc.md","s7.4":"content/s7/s7.4/_desc.md",
+  "s8":"content/s8/_desc.md","s8.1":"content/s8/s8.1/_desc.md","s8.2":"content/s8/s8.2/_desc.md",
+  "s9":"content/s9/_desc.md","s10":"content/s10/_desc.md","s10.2":"content/s10/s10.2/_desc.md",
+  "s1.1a":"content/s1/s1.1/s1.1a.md","s1.1b":"content/s1/s1.1/s1.1b.md","s1.1c":"content/s1/s1.1/s1.1c.md",
+  "s1.2a":"content/s1/s1.2/s1.2a.md","s1.2b":"content/s1/s1.2/s1.2b.md",
+  "s1.3a":"content/s1/s1.3/s1.3a.md","s1.3b":"content/s1/s1.3/s1.3b.md","s1.4":"content/s1/s1.4.md",
+  "s2.1":"content/s2/s2.1.md","s2.2":"content/s2/s2.2.md",
+  "s2.3a":"content/s2/s2.3/s2.3a.md","s2.3b":"content/s2/s2.3/s2.3b.md","s2.3c":"content/s2/s2.3/s2.3c.md",
+  "s2.4a":"content/s2/s2.4/s2.4a.md","s2.4b":"content/s2/s2.4/s2.4b.md",
+  "s3.1":"content/s3/s3.1.md","s3.2":"content/s3/s3.2.md","s3.3":"content/s3/s3.3.md","s3.4":"content/s3/s3.4.md",
+  "s4.1":"content/s4/s4.1.md","s4.2a":"content/s4/s4.2/s4.2a.md","s4.2b":"content/s4/s4.2/s4.2b.md",
+  "s4.3":"content/s4/s4.3.md","s4.4":"content/s4/s4.4.md",
+  "s5.1":"content/s5/s5.1.md","s5.2a":"content/s5/s5.2/s5.2a.md","s5.2b":"content/s5/s5.2/s5.2b.md","s5.3":"content/s5/s5.3.md",
+  "s6.1a":"content/s6/s6.1/s6.1a.md","s6.1b":"content/s6/s6.1/s6.1b.md","s6.1c":"content/s6/s6.1/s6.1c.md",
+  "s6.2a":"content/s6/s6.2/s6.2a.md","s6.2b":"content/s6/s6.2/s6.2b.md",
+  "s6.3":"content/s6/s6.3.md","s6.4":"content/s6/s6.4.md","s6.5":"content/s6/s6.5.md",
+  "s7.1a":"content/s7/s7.1/s7.1a.md","s7.1b":"content/s7/s7.1/s7.1b.md",
+  "s7.2":"content/s7/s7.2.md","s7.3":"content/s7/s7.3.md",
+  "s7.4a":"content/s7/s7.4/s7.4a.md","s7.4b":"content/s7/s7.4/s7.4b.md",
+  "s7.5":"content/s7/s7.5.md","s7.6":"content/s7/s7.6.md",
+  "s8.1a":"content/s8/s8.1/s8.1a.md","s8.1b":"content/s8/s8.1/s8.1b.md","s8.1c":"content/s8/s8.1/s8.1c.md",
+  "s8.2a":"content/s8/s8.2/s8.2a.md","s8.2b":"content/s8/s8.2/s8.2b.md",
+  "s8.3":"content/s8/s8.3.md","s8.4":"content/s8/s8.4.md",
+  "s9.1":"content/s9/s9.1.md","s9.2":"content/s9/s9.2.md","s9.3":"content/s9/s9.3.md",
+  "s10.1":"content/s10/s10.1.md","s10.2a":"content/s10/s10.2/s10.2a.md","s10.2b":"content/s10/s10.2/s10.2b.md",
+  "s10.3":"content/s10/s10.3.md","s10.4":"content/s10/s10.4.md",
+};
+
+/* ─── HELPERS ─── */
+const COLORS = {
+  s1:"#f59e42",s2:"#e05a8a",s3:"#7c6df0",s4:"#3daadb",s5:"#e6a940",
+  s6:"#50b87a",s7:"#dd6b5e",s8:"#5bafd6",s9:"#c76dba",s10:"#8a9ba8"
+};
+function getColor(id) { const m = id.match(/^s\d+/); return m ? (COLORS[m[0]]||"#888") : "#888"; }
+function findNode(id, n=DATA) {
+  if (n.id===id) return n;
+  if (n.children) for (const c of n.children) { const r=findNode(id,c); if(r) return r; }
+  return null;
+}
+function buildPath(id, n=DATA, p=[]) {
+  if (n.id===id) return [...p, n];
+  if (n.children) for (const c of n.children) { const r=buildPath(id,c,[...p,n]); if(r) return r; }
+  return null;
+}
+
+/* Markdown → HTML (simple inline, for desc blocks) */
+function md(text) {
+  if (!text) return "";
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:#fff">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code style="background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;font-size:.88em;color:#ccc">$1</code>')
+    .replace(/\n\n/g, '</p><p style="margin-top:.6em">')
+    .replace(/\n/g, '<br>');
+}
+
+/* Rich markdown → HTML (for modal body: paragraphs, bullets, bold, etc.) */
+function richMd(text) {
+  if (!text) return "";
+  const lines = text.split('\n');
+  let html = '';
+  let inUl = false, inOl = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+
+    // Inline formatting
+    line = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    line = line.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    line = line.replace(/`(.+?)`/g, '<code>$1</code>');
+
+    // ### Subheading
+    if (line.match(/^### /)) {
+      if (inUl) { html += '</ul>'; inUl = false; }
+      if (inOl) { html += '</ol>'; inOl = false; }
+      html += '<h3>' + line.slice(4) + '</h3>';
+      continue;
+    }
+
+    // Unordered list
+    if (line.match(/^[-*] /)) {
+      if (!inUl) { html += '<ul>'; inUl = true; }
+      html += '<li>' + line.slice(2) + '</li>';
+      continue;
+    }
+
+    // Numbered list
+    if (line.match(/^\d+\.\s/)) {
+      if (!inOl) { html += '<ol>'; inOl = true; }
+      html += '<li>' + line.replace(/^\d+\.\s/, '') + '</li>';
+      continue;
+    }
+
+    // Close lists if we hit a non-list line
+    if (inUl) { html += '</ul>'; inUl = false; }
+    if (inOl) { html += '</ol>'; inOl = false; }
+
+    // Empty line = paragraph break
+    if (line.trim() === '') {
+      continue;
+    }
+
+    // Regular paragraph
+    html += '<p>' + line + '</p>';
+  }
+
+  if (inUl) html += '</ul>';
+  if (inOl) html += '</ol>';
+  return html;
+}
+
+function parseMd(raw) {
+  const lines = raw.split('\n');
+  let intro=[], sections=[], current=null, pastTitle=false;
+  for (const line of lines) {
+    if (!pastTitle && line.startsWith('# ') && !line.startsWith('## ')) { pastTitle=true; continue; }
+    pastTitle=true;
+    if (line.startsWith('## ')) {
+      if (current) sections.push(current);
+      current = { title: line.slice(3).trim(), body: [] };
+    } else if (current) { current.body.push(line); }
+    else { intro.push(line); }
+  }
+  if (current) sections.push(current);
+  return { intro: intro.join('\n').trim(), sections: sections.map(s=>({title:s.title, body:s.body.join('\n').trim()})) };
+}
+
+function parseDesc(raw) {
+  const lines = raw.split('\n'), out=[]; let past=false;
+  for (const l of lines) { if(!past&&l.startsWith('# ')){past=true;continue;} past=true; out.push(l); }
+  return out.join('\n').trim();
+}
+
+const contentCache = {};
+async function fetchContent(id) {
+  if (contentCache[id]) return contentCache[id];
+  const path = CONTENT_MAP[id];
+  if (!path) return null;
+  try { const r=await fetch(path); if(!r.ok) return null; const t=await r.text(); contentCache[id]=t; return t; } catch { return null; }
+}
+
+/* ─── COMPONENTS ─── */
+
+function LoadingDots() {
+  return <div style={{textAlign:'center',padding:'40px 0'}}>
+    <div style={{display:'inline-flex',gap:8}}>
+      {[0,1,2].map(i=><div key={i} style={{width:10,height:10,borderRadius:'50%',background:'rgba(255,255,255,.25)',animation:`pulse 1s ease ${i*.15}s infinite`}}/>)}
+    </div>
+  </div>;
+}
+
+function DescBlock({text, color}) {
+  if (!text) return null;
+  return <div style={{
+    padding:'20px 24px', marginBottom:16, borderRadius:14,
+    background:'rgba(255,255,255,.025)', border:`1px solid ${color}20`,
+    animation:'fadeIn .3s ease', gridColumn:'1 / -1',
+  }}>
+    <div style={{color:'rgba(255,255,255,.78)',fontSize:'1rem',lineHeight:1.75,letterSpacing:.1}}
+      dangerouslySetInnerHTML={{__html:'<p>'+md(text)+'</p>'}} />
+  </div>;
+}
+
+/* Navigation card (for mid-level children) */
+function NavCard({child, color, index, onClick}) {
+  const isQ = child.label.includes("⚡") || child.label.toLowerCase().includes("quant");
+  const isL = child.label.includes("🌿") || child.label.toLowerCase().includes("qual");
+  let border = color+"44";
+  if (isQ) border = "rgba(91,175,214,.30)";
+  if (isL) border = "rgba(80,184,122,.30)";
+  const hasKids = child.children && child.children.length>0;
+  const bg = isQ ? "linear-gradient(135deg,rgba(91,175,214,.06),rgba(91,175,214,.015))"
+    : isL ? "linear-gradient(135deg,rgba(80,184,122,.06),rgba(80,184,122,.015))"
+    : `linear-gradient(135deg,${color}0a,${color}03)`;
+
+  return <button className="nav-card" onClick={onClick} style={{
+    border:`1px solid ${border}`, borderRadius:16, padding:0, cursor:'pointer',
+    textAlign:'left', fontFamily:'inherit', background:bg,
+    animation:`cardPop .3s ease ${index*.04}s both`, minHeight:80,
+    display:'flex', alignItems:'stretch', width:'100%',
+  }}>
+    <div style={{display:'flex',alignItems:'center',gap:14,padding:'18px 22px',width:'100%'}}>
+      <div style={{fontSize:30,flexShrink:0,width:44,textAlign:'center',color}}>{child.icon||"◆"}</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:'1.05rem',fontWeight:600,lineHeight:1.35,
+          color:isQ?"#8ad4f8":isL?"#7ee8b0":"#fff"}}>{child.label}</div>
+        {hasKids && <div style={{fontSize:'.8rem',color:'rgba(255,255,255,.35)',marginTop:3}}>
+          {child.children.length} subtopics</div>}
+        {child.leaf && <div style={{fontSize:'.8rem',color:'rgba(255,255,255,.35)',marginTop:3}}>
+          tap to explore</div>}
+      </div>
+      <div style={{fontSize:'.85rem',color:'rgba(255,255,255,.25)',flexShrink:0}}>→</div>
+    </div>
+  </button>;
+}
+
+/* Sub-card (leaf ## section — title-only, click opens modal) */
+function SubCard({title, color, index, onClick}) {
+  return <div className="sub-card" onClick={onClick} style={{
+    border:`1px solid ${color}25`, borderRadius:14, padding:'16px 20px',
+    background:`linear-gradient(145deg,${color}06,${color}02)`,
+    animation:`cardPop .3s ease ${index*.025}s both`,
+    display:'flex', alignItems:'center', gap:10,
+  }}>
+    <div style={{width:7,height:7,borderRadius:'50%',background:color,opacity:.6,flexShrink:0}} />
+    <div style={{fontSize:'1rem',fontWeight:600,color:'#fff',lineHeight:1.35,flex:1}}>{title}</div>
+    <div style={{fontSize:'.8rem',color:'rgba(255,255,255,.2)',flexShrink:0}}>↗</div>
+  </div>;
+}
+
+/* Modal popup for sub-card content */
+function Modal({title, body, color, onClose}) {
+  const overlayRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', handler);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', handler); document.body.style.overflow = ''; };
+  }, [onClose]);
+
+  return <div className="modal-overlay" ref={overlayRef}
+    onClick={(e) => { if (e.target === overlayRef.current) onClose(); }}>
+    <div className="modal-box">
+      {/* Header */}
+      <div style={{
+        position:'sticky', top:0, zIndex:1,
+        background:'linear-gradient(180deg,#13151e 80%,transparent)',
+        padding:'24px 28px 16px', display:'flex', alignItems:'flex-start', gap:12,
+      }}>
+        <div style={{width:10,height:10,borderRadius:'50%',background:color,opacity:.7,flexShrink:0,marginTop:7}} />
+        <div style={{fontSize:'1.25rem',fontWeight:700,color:'#fff',lineHeight:1.35,flex:1}}>{title}</div>
+        <button onClick={onClose} style={{
+          background:'rgba(255,255,255,.08)',border:'none',color:'rgba(255,255,255,.5)',
+          width:32,height:32,borderRadius:8,cursor:'pointer',fontSize:16,flexShrink:0,
+          display:'flex',alignItems:'center',justifyContent:'center',fontFamily:'inherit',
+          transition:'.15s',
+        }}>✕</button>
+      </div>
+      {/* Body */}
+      <div className="rich-md" style={{padding:'0 28px 28px'}}
+        dangerouslySetInnerHTML={{__html: richMd(body)}} />
+    </div>
+  </div>;
+}
+
+/* ─── MAIN APP ─── */
+function App() {
+  const [currentId, setCurrentId] = useState("root");
+  const [animDir, setAnimDir] = useState("in");
+  const [animKey, setAnimKey] = useState(0);
+  const [descContent, setDescContent] = useState(null);
+  const [leafContent, setLeafContent] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [modal, setModal] = useState(null); // {title, body, color}
+
+  const nav = useCallback((id, dir="in") => {
+    setAnimDir(dir); setAnimKey(k=>k+1); setCurrentId(id);
+    setDescContent(null); setLeafContent(null); setModal(null);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, []);
+
+  useEffect(() => {
+    const node = findNode(currentId);
+    if (!node || currentId==="root") return;
+    const hasChildren = node.children && node.children.length>0;
+    const isLeaf = node.leaf===true;
+    setLoading(true);
+    if (hasChildren) {
+      fetchContent(currentId).then(raw => { if(raw) setDescContent(parseDesc(raw)); setLoading(false); });
+    } else if (isLeaf) {
+      fetchContent(currentId).then(raw => { if(raw) setLeafContent(parseMd(raw)); setLoading(false); });
+    } else { setLoading(false); }
+  }, [currentId]);
+
+  const node = findNode(currentId);
+  const path = buildPath(currentId)||[DATA];
+  const isRoot = currentId==="root";
+  const hasChildren = node && node.children && node.children.length>0;
+  const isLeaf = node && node.leaf===true;
+  const color = getColor(currentId);
+
+  return <div style={{maxWidth:1100,margin:'0 auto',padding:'0 20px 60px'}}>
+
+    {/* ─── Breadcrumb ─── */}
+    <div style={{display:'flex',alignItems:'center',gap:3,padding:'14px 0',flexWrap:'wrap',
+      borderBottom:'1px solid rgba(255,255,255,.06)',marginBottom:8}}>
+      {path.map((p,i) => <span key={p.id} style={{display:'flex',alignItems:'center',gap:4}}>
+        {i>0 && <span style={{color:'rgba(255,255,255,.18)',fontSize:14,margin:'0 2px'}}>›</span>}
+        <button onClick={()=>i<path.length-1 && nav(p.id,"out")} style={{
+          background:'none',border:'none',fontFamily:'inherit',fontSize:14,padding:'3px 5px',borderRadius:5,
+          color:i===path.length-1?'#fff':'rgba(255,255,255,.45)',
+          cursor:i<path.length-1?'pointer':'default',
+          fontWeight:i===path.length-1?700:400,
+          transition:'.15s',
+        }}>{p.id==="root"?"🏠":(p.icon||"")+" "+p.label}</button>
+      </span>)}
+    </div>
+
+    {/* ─── Title ─── */}
+    {!isRoot && <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 0 12px'}}>
+      <button onClick={()=>{
+        const parent=path.length>=2?path[path.length-2]:DATA; nav(parent.id,"out");
+      }} style={{
+        background:'rgba(255,255,255,.06)',border:'1px solid rgba(255,255,255,.1)',
+        color:'rgba(255,255,255,.65)',fontFamily:'inherit',fontSize:14,padding:'8px 18px',
+        borderRadius:22,cursor:'pointer',transition:'.15s',flexShrink:0,
+      }}>← Back</button>
+      <div style={{fontSize:'1.5rem',fontWeight:700,textAlign:'center',color,letterSpacing:-.3,flex:1}}>
+        {node?.icon && <span style={{marginRight:10}}>{node.icon}</span>}{node?.label}
+      </div>
+      <div style={{width:80}} />
+    </div>}
+
+    {isRoot && <div style={{textAlign:'center',padding:'36px 0 16px'}}>
+      <div style={{fontSize:'2.2rem',fontWeight:700,letterSpacing:-.5,
+        background:'linear-gradient(135deg,#f59e42,#e05a8a,#7c6df0,#3daadb,#50b87a)',
+        WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>DBA Knowledge Map</div>
+      <div style={{fontSize:15,color:'rgba(255,255,255,.4)',marginTop:6}}>10 unified sections · Click to explore</div>
+      <div style={{display:'flex',justifyContent:'center',gap:20,marginTop:12,fontSize:12,color:'rgba(255,255,255,.35)'}}>
+        <span style={{display:'flex',alignItems:'center',gap:6}}><span style={{width:9,height:9,borderRadius:'50%',background:'#fff'}}/> Shared</span>
+        <span style={{display:'flex',alignItems:'center',gap:6}}><span style={{width:9,height:9,borderRadius:'50%',background:'#5bafd6'}}/> ⚡ Quant</span>
+        <span style={{display:'flex',alignItems:'center',gap:6}}><span style={{width:9,height:9,borderRadius:'50%',background:'#50b87a'}}/> 🌿 Qual</span>
+      </div>
+    </div>}
+
+    {/* ─── Content ─── */}
+    <div key={animKey} style={{animation:`${animDir==="in"?"slideIn":"slideOut"} .28s ease`,marginTop:8}}>
+
+      {loading && <LoadingDots />}
+
+      {/* Description for mid-level */}
+      {!loading && hasChildren && descContent && <DescBlock text={descContent} color={color} />}
+
+      {/* Child nav-cards */}
+      {hasChildren && <div className="card-grid">
+        {node.children.map((child,i) =>
+          <NavCard key={child.id} child={child} color={child.color||getColor(child.id)} index={i}
+            onClick={()=>nav(child.id,"in")} />
+        )}
+      </div>}
+
+      {/* Leaf content — intro + title-only sub-cards in grid */}
+      {!loading && isLeaf && leafContent && <div>
+        {leafContent.intro && <DescBlock text={leafContent.intro} color={color} />}
+        <div className="subcard-grid">
+          {leafContent.sections.map((sec,i) =>
+            <SubCard key={i} title={sec.title} color={color} index={i}
+              onClick={() => setModal({title:sec.title, body:sec.body, color})} />
+          )}
+        </div>
+      </div>}
+
+      {!loading && isLeaf && !leafContent && <div style={{
+        padding:30,color:'rgba(255,255,255,.35)',fontSize:15,textAlign:'center',
+      }}>Content not available. Run <code style={{background:'rgba(255,255,255,.07)',padding:'3px 8px',borderRadius:5}}>python serve.py</code> to load content files.</div>}
+    </div>
+
+    {/* Modal */}
+    {modal && <Modal title={modal.title} body={modal.body} color={modal.color}
+      onClose={() => setModal(null)} />}
+  </div>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

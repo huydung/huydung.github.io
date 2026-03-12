@@ -1,0 +1,5 @@
+# Sampling
+
+Sampling is the process of selecting a subset of people, groups, or data from a larger population to study. Because studying entire populations is rarely feasible, researchers sample strategically—choosing whom to include in their study to answer the research question credibly and efficiently. Sampling bridges theory and practice: a rigorous sampling strategy ensures findings are trustworthy, applicable, and not biased by who participated. The choice between quantitative sampling methods (random, stratified, quota) and qualitative methods (purposeful, maximum variation, snowball) reflects your research aim: generalization to a broader population (quantitative) or rich understanding of a specific phenomenon (qualitative).
+
+Strategic sampling decisions shape what you can claim. Sampling the right population with representative methods enables confident generalization to broader contexts. Sampling information-rich participants with purposeful methods yields deep insight into mechanisms and lived experiences. Understanding sampling methods, errors, and mitigation strategies is essential for credible research that stakeholders can trust.

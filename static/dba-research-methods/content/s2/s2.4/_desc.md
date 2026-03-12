@@ -1,0 +1,3 @@
+## Hypothesis vs. Propositions
+
+Research questions set up inquiry; hypotheses and propositions predict or explain what you expect to find. Hypotheses are the quantitative researcher's tool: specific, testable predictions about relationships between variables, formulated *before* data collection. Propositions are the qualitative researcher's tool: tentative explanations or predictions framed *from* a conceptual framework and often revised as data emerges. Both serve similar functions—guiding analysis, focusing attention, and providing logic against which findings are compared—but differ in timing, precision, and revision. Well-formulated hypotheses and propositions transform vague curiosity into testable or explorable predictions grounded in theory.

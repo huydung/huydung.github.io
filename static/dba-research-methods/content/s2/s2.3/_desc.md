@@ -1,0 +1,3 @@
+## Research Question
+
+A research question is the specific, focused inquiry that drives investigation. Unlike the broad problem statement, the research question is narrowly tailored, precisely worded, and answerable through systematic research. It bridges the gap between "What is the problem?" and "What will I study?" Research questions differ by methodology: quantitative questions ask "what" and "how much," predicting measurable relationships; qualitative questions ask "why" and "how," exploring processes and meanings. Well-crafted research questions are clear, specific, researchable, and aligned with both the research problem and the chosen methodology.

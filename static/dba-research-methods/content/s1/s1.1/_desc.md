@@ -1,0 +1,5 @@
+# What is Research?
+
+Research is a structured, systematic inquiry conducted to answer specific questions about the world using empirical evidence and logical reasoning. Unlike casual thinking or opinion-sharing, rigorous research follows defined methodologies, maintains neutrality, and seeks to minimize bias. It's the difference between wondering whether team dynamics affect performance and designing a study to measure that effect across multiple teams with consistent instruments.
+
+Research comes in many forms—some focus on what exists (descriptive), others on why things happen (analytical). Some pursue knowledge for its own sake (fundamental), while others solve immediate business problems (applied). Understanding these distinctions and recognizing pseudo-research (work that mimics research but lacks rigor) helps you evaluate credibility. For scholar-practitioners, bridging theory and practice means using rigorous research methods to generate insights that directly improve organizational performance.
