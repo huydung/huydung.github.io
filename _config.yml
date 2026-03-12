@@ -154,6 +154,11 @@ defaults:
       layout:          plain
       sitemap:         false
 
+  - scope:
+      path: "static/dba-research-methods/content/**"
+    values:
+      layout: null
+
   # # You can use the following to enable comments on all posts.
   # - scope:
   #     type:            posts
