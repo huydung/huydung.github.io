@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBA801 Statistical Methods Cheat Sheet</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e2e4ed;
+    --text-dim: #8b90a5;
+    --accent-blue: #5b9cf6;
+    --accent-green: #4ade80;
+    --accent-amber: #fbbf24;
+    --accent-rose: #f87171;
+    --accent-purple: #a78bfa;
+    --accent-cyan: #22d3ee;
+    --accent-orange: #fb923c;
+    --tag-blue-bg: #1e3a5f;
+    --tag-green-bg: #1a3d2e;
+    --tag-amber-bg: #3d3019;
+    --tag-rose-bg: #3d1f1f;
+    --tag-purple-bg: #2d1f4e;
+    --tag-cyan-bg: #0f3d4a;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; padding: 2rem; }
+  .header { max-width: 1400px; margin: 0 auto 1.5rem; padding-bottom: 1.5rem; border-bottom: 2px solid var(--border); }
+  .header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 0.3rem; }
+  .header .subtitle { color: var(--text-dim); font-size: 0.9rem; }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.75rem; color: var(--text-dim); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .star-note { margin-top: 0.8rem; padding: 0.6rem 1rem; background: var(--tag-rose-bg); border-left: 3px solid var(--accent-rose); border-radius: 4px; font-size: 0.8rem; color: var(--accent-rose); }
+  .section { max-width: 1400px; margin: 0 auto 2.5rem; }
+  .section-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.6rem; }
+  .section-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 700; flex-shrink: 0; }
+  .section-source { font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-left: auto; }
+  .table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  thead th { background: var(--surface2); padding: 0.7rem 0.9rem; text-align: left; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); border-bottom: 2px solid var(--border); position: sticky; top: 0; white-space: nowrap; }
+  tbody td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: rgba(91, 156, 246, 0.04); }
+  .method-name { font-weight: 700; font-size: 0.88rem; color: var(--text); white-space: nowrap; }
+  .method-aka { font-size: 0.72rem; color: var(--text-dim); font-style: italic; margin-top: 2px; }
+  .method-star { color: var(--accent-rose); font-weight: 700; }
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.68rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; margin: 1px 2px; }
+  .tag-cat { background: var(--tag-amber-bg); color: var(--accent-amber); }
+  .tag-cont { background: var(--tag-blue-bg); color: var(--accent-blue); }
+  .tag-ord { background: var(--tag-purple-bg); color: var(--accent-purple); }
+  .tag-bin { background: var(--tag-rose-bg); color: var(--accent-rose); }
+  .tag-mix { background: var(--tag-cyan-bg); color: var(--accent-cyan); }
+  .example { font-size: 0.78rem; color: var(--text-dim); margin-top: 4px; line-height: 1.4; }
+  .example em { color: var(--accent-cyan); font-style: normal; }
+  .caveat { font-size: 0.76rem; color: var(--accent-amber); margin-top: 4px; line-height: 1.4; }
+  .caveat::before { content: "⚠ "; }
+  .threshold { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--accent-green); background: var(--tag-green-bg); padding: 2px 6px; border-radius: 3px; display: inline-block; margin: 1px 0; }
+  .purpose { font-size: 0.8rem; line-height: 1.45; }
+  .col-method { min-width: 140px; }
+  .col-purpose { min-width: 170px; }
+  .col-vars { min-width: 140px; }
+  .col-example { min-width: 200px; }
+  .col-caveat { min-width: 200px; }
+
+  .decision-box { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; max-width: 1400px; margin: 0 auto 2.5rem; }
+  .decision-box h3 { font-size: 1rem; margin-bottom: 1rem; color: var(--accent-cyan); }
+  .decision-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+  .decision-card { background: var(--surface2); border-radius: 8px; padding: 1rem; border-left: 3px solid var(--accent-blue); }
+  .decision-card h4 { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--accent-blue); }
+  .decision-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.5; }
+  .decision-card .arrow { color: var(--accent-green); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+
+  .footnotes { max-width: 1400px; margin: 2rem auto; padding-top: 1.5rem; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); line-height: 1.6; }
+  .footnotes strong { color: var(--text); }
+
+  @media print {
+    body { background: #fff; color: #111; padding: 0.5rem; font-size: 9pt; }
+    .header h1 { background: none; -webkit-text-fill-color: #1a3a6a; }
+    .table-wrap { border-color: #ccc; }
+    thead th { background: #f0f0f0; color: #333; border-color: #ccc; }
+    tbody td { border-color: #ddd; }
+    .decision-box, .decision-card { border-color: #ccc; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>DBA801 Statistical Methods Cheat Sheet</h1>
+  <p class="subtitle">Aligned with GGU/upGrad course material — quick reference for quantitative business research</p>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-amber)"></div> CAT = Categorical/Nominal</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-purple)"></div> ORD = Ordinal</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-blue)"></div> CONT = Continuous</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-rose)"></div> BIN = Binary (Yes/No)</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--accent-cyan)"></div> MIX = Mixed types</div>
+  </div>
+  <div class="star-note">
+    <strong>(*)</strong> = Method NOT covered in DBA801 course material but essential for handling common research scenarios. Use with caution in exams — acknowledge it as supplementary knowledge.
+  </div>
+</div>
+
+<!-- DECISION FLOWCHART -->
+<div class="decision-box">
+  <h3>The 3 Basic Model Groups (from DBA801)</h3>
+  <div class="decision-flow">
+    <div class="decision-card">
+      <h4>A. Test of Differences</h4>
+      <p><em>"Is there a significant difference between groups?"</em><br><br>
+      2 groups <span class="arrow">→</span> T-test<br>
+      3+ groups <span class="arrow">→</span> One-way ANOVA<br>
+      2+ IVs <span class="arrow">→</span> Factorial ANOVA<br>
+      + covariate <span class="arrow">→</span> ANCOVA<br>
+      Multiple DVs <span class="arrow">→</span> MANOVA / MANCOVA<br>
+      Non-normal data* <span class="arrow">→</span> Mann-Whitney / Kruskal-Wallis</p>
+    </div>
+    <div class="decision-card">
+      <h4>B. Test of Association / Relationships</h4>
+      <p><em>"Is there a relationship between variables?"</em><br><br>
+      2 continuous vars <span class="arrow">→</span> Correlation (Pearson r)<br>
+      2 nominal vars <span class="arrow">→</span> Chi-Square<br>
+      Predict continuous DV <span class="arrow">→</span> Simple / Multiple Regression<br>
+      Predict binary DV <span class="arrow">→</span> Logistic Regression<br>
+      Complex model + latent vars <span class="arrow">→</span> SEM / PLS-SEM<br>
+      Mechanism (why?) <span class="arrow">→</span> Mediation<br>
+      Boundary condition (when?) <span class="arrow">→</span> Moderation</p>
+    </div>
+    <div class="decision-card">
+      <h4>C. Cluster Model</h4>
+      <p><em>"How do observations group together?"</em><br><br>
+      Segment customers/people <span class="arrow">→</span> K-means / Hierarchical Clustering<br>
+      Reduce many variables <span class="arrow">→</span> Factor Analysis (EFA)<br>
+      Attribute preference <span class="arrow">→</span> Conjoint Analysis<br>
+      Time-dependent forecasting <span class="arrow">→</span> ARIMA / Time Series</p>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: TEST OF DIFFERENCES -->
+<div class="section">
+  <div class="section-title">
+    <div class="section-icon" style="background:var(--tag-blue-bg);color:var(--accent-blue);">A</div>
+    Test of Differences
+    <span class="section-source">DBA801: Preparatory Content + Constructing Statistical Models</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-method">Method</th>
+          <th class="col-purpose">When / Purpose</th>
+          <th class="col-vars">IV → DV</th>
+          <th class="col-example">Business Example</th>
+          <th class="col-caveat">Key Thresholds & Caveats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="method-name">T-test</div>
+            <div class="method-aka">Independent samples</div>
+          </td>
+          <td class="purpose">Compare means of <strong>2 groups</strong>. Course says: "conducted when the researcher has only two groups in the data set"</td>
+          <td><span class="tag tag-cat">CAT</span> (2 groups)<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Compare average test scores between two groups receiving different teaching methods
+            <div class="example">IV: Teaching method (A/B) → DV: Test scores</div>
+          </td>
+          <td>
+            <span class="threshold">p &lt; .05</span> <span class="threshold">n ≥ 30/group</span>
+            <div class="caveat">Assumes normality & equal variances. Use Levene's test to check. If violated, use Welch's t-test.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Paired T-test <span class="method-star">*</span></div>
+            <div class="method-aka">Dependent samples</div>
+          </td>
+          <td class="purpose">Compare means from <strong>same group at 2 time points</strong> (before/after, pre/post-test)</td>
+          <td><span class="tag tag-cat">CAT</span> (time)<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Did employee performance improve <em>before vs after</em> a training program? (pre-test / post-test)
+            <div class="example">IV: Time (pre/post) → DV: Performance score</div>
+          </td>
+          <td>
+            <span class="threshold">p &lt; .05</span>
+            <div class="caveat">Differences must be ~normally distributed. Key for experimental pre/post designs discussed in the course.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">One-way ANOVA</div>
+            <div class="method-aka">Analysis of Variance</div>
+          </td>
+          <td class="purpose">Compare means across <strong>3+ groups</strong>. Course: "conducted when the researcher has three or more groups"</td>
+          <td><span class="tag tag-cat">CAT</span> (3+ groups)<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Compare income across 3 age groups (under 30, 30-50, over 50). Or: CCC experiment comparing 4 incentive groups on program attendance
+            <div class="example">IV: Group (A/B/C/D) → DV: Programs attended</div>
+          </td>
+          <td>
+            <span class="threshold">F-statistic</span> <span class="threshold">p &lt; .05</span>
+            <div class="caveat">Only tells you "a difference exists" — use <strong>post-hoc</strong> (Tukey/Bonferroni) to find WHICH groups differ. Check normality + homogeneity of variance.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Factorial ANOVA</div>
+            <div class="method-aka">Two-way / Three-way</div>
+          </td>
+          <td class="purpose">Test effects of <strong>2+ categorical IVs</strong> + their <strong>interaction</strong> on a continuous DV. Course covers 2×2, 3×3, 3×2, 5×7 designs</td>
+          <td><span class="tag tag-cat">CAT</span> × <span class="tag tag-cat">CAT</span><br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Does the effect of ad format (video/image/text) on engagement vary by placement (social/search/email)?
+            <div class="example">Main effects + interaction effect. Course example: gender × age group on job satisfaction</div>
+          </td>
+          <td>
+            <span class="threshold">F for main effects + interaction</span>
+            <div class="caveat"><strong>Interaction effect</strong> is the key insight — it reveals when the effect of one IV depends on the level of another. Report eta squared (η²) for effect size. Data must be continuous.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">ANCOVA</div>
+            <div class="method-aka">Analysis of Covariance</div>
+          </td>
+          <td class="purpose">Compare group means while <strong>controlling for a covariate</strong>. Course: "when a control variable needs to be considered for some aspects of a factor"</td>
+          <td><span class="tag tag-cat">CAT</span> + <span class="tag tag-cont">CONT</span> covariate<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Compare sales across price points while controlling for advertising spend
+            <div class="example">IV: Price group + Covariate: Ad spend → DV: Sales</div>
+          </td>
+          <td>
+            <span class="threshold">Homogeneity of regression slopes</span>
+            <div class="caveat">Covariate must not interact with IV. Covariate must correlate with DV. Linearity between covariate and DV within each group.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">MANOVA</div>
+            <div class="method-aka">Multivariate ANOVA</div>
+          </td>
+          <td class="purpose">Compare groups on <strong>multiple DVs simultaneously</strong>. Course: "used when multiple dependent variables exist"</td>
+          <td><span class="tag tag-cat">CAT</span><br>→ Multiple <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Do different training programs affect <em>both</em> accuracy <em>and</em> speed <em>and</em> quality simultaneously?
+            <div class="example">Course: effect of price, quality, brand on satisfaction AND loyalty</div>
+          </td>
+          <td>
+            <span class="threshold">Wilks' Λ</span> <span class="threshold">p &lt; .05</span>
+            <div class="caveat">Controls Type I error across multiple DVs. Assumes multivariate normality + homogeneity of covariance matrices. Can use bootstrapping if assumptions violated.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">MANCOVA</div>
+          </td>
+          <td class="purpose">MANOVA + <strong>controlling for covariates</strong>. Course: "extended version of ANCOVA that allows multiple DVs"</td>
+          <td><span class="tag tag-cat">CAT</span> + <span class="tag tag-cont">CONT</span> covariates<br>→ Multiple <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Effect of training programs on productivity while controlling for employee experience and education level
+          </td>
+          <td>
+            <span class="threshold">Same as MANOVA + covariate checks</span>
+            <div class="caveat">Combines MANOVA + ANCOVA logic. Requires even larger samples.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Mann-Whitney U <span class="method-star">*</span></div>
+            <div class="method-aka">Wilcoxon rank-sum</div>
+          </td>
+          <td class="purpose">Non-parametric alternative to t-test. Compare <strong>2 groups on ordinal/non-normal</strong> data</td>
+          <td><span class="tag tag-cat">CAT</span> (2 groups)<br>→ <span class="tag tag-ord">ORD</span> / non-normal</td>
+          <td>
+            Do entrepreneurs vs non-entrepreneurs differ on Likert-scale "experience" rating (1-5)?
+            <div class="example">IV: Start business? (Y/N) → DV: Likert rating</div>
+          </td>
+          <td>
+            <span class="threshold">p &lt; .05</span>
+            <div class="caveat">No normality needed. Compares rank distributions. Better than chi-square for ordinal data as it preserves order information.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Kruskal-Wallis <span class="method-star">*</span></div>
+            <div class="method-aka">Non-parametric ANOVA</div>
+          </td>
+          <td class="purpose">Non-parametric alternative to one-way ANOVA for <strong>3+ groups on ordinal/non-normal</strong> data</td>
+          <td><span class="tag tag-cat">CAT</span> (3+ groups)<br>→ <span class="tag tag-ord">ORD</span> / non-normal</td>
+          <td>
+            Do Likert culture ratings differ across 4 departments?
+          </td>
+          <td>
+            <span class="threshold">p &lt; .05</span>
+            <div class="caveat">Follow up with Dunn's post-hoc + Bonferroni correction. Use when ANOVA assumptions are violated.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 2: TEST OF ASSOCIATION -->
+<div class="section">
+  <div class="section-title">
+    <div class="section-icon" style="background:var(--tag-purple-bg);color:var(--accent-purple);">B</div>
+    Test of Association / Relationships
+    <span class="section-source">DBA801: Preparatory Content + Multivariate Analyses</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-method">Method</th>
+          <th class="col-purpose">When / Purpose</th>
+          <th class="col-vars">Variable Types</th>
+          <th class="col-example">Business Example</th>
+          <th class="col-caveat">Key Thresholds & Caveats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="method-name">Correlation</div>
+            <div class="method-aka">Pearson r</div>
+          </td>
+          <td class="purpose">Find <strong>general association</strong> between 2 continuous variables. Course: "measures the strength and direction of the linear relationship"</td>
+          <td><span class="tag tag-cont">CONT</span> ↔ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Relationship between advertising expenditures and sales revenue
+            <div class="example">r ranges from −1 to +1. Positive = both increase together. Negative = one increases, other decreases.</div>
+          </td>
+          <td>
+            <span class="threshold">|r| .1=small .3=med .5=large</span>
+            <div class="caveat">Only detects LINEAR relationships. Correlation ≠ causation. Both vars must be ~normal. Sensitive to outliers.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Spearman ρ <span class="method-star">*</span></div>
+            <div class="method-aka">Rank correlation</div>
+          </td>
+          <td class="purpose">Non-parametric correlation for <strong>ordinal or non-normal</strong> data</td>
+          <td><span class="tag tag-ord">ORD</span> ↔ <span class="tag tag-ord">ORD</span><br>or non-normal <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Relationship between employee rank and satisfaction rating (Likert scale)
+          </td>
+          <td>
+            <span class="threshold">Same benchmarks as Pearson</span>
+            <div class="caveat">No normality needed. Detects monotonic (not just linear) relationships. Use for Likert scales.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Chi-Square</div>
+            <div class="method-aka">χ² test of independence</div>
+          </td>
+          <td class="purpose">Find association between <strong>2 nominal variables</strong>. Course: "measures the significance of the association between two variables by comparing observed with expected frequencies"</td>
+          <td><span class="tag tag-cat">CAT</span> ↔ <span class="tag tag-cat">CAT</span></td>
+          <td>
+            Is customer demographic (age group) associated with product type purchased? Or: CCC group (A/B/C/D) × Renewal (yes/no)
+            <div class="example">Cross-tabulation table. Compare observed vs expected counts.</div>
+          </td>
+          <td>
+            <span class="threshold">p &lt; .05</span> <span class="threshold">Expected freq ≥ 5</span>
+            <div class="caveat">Does NOT show direction or strength — report <strong>Cramér's V</strong> for effect size. Use Fisher's Exact if expected &lt; 5. Loses info on ordinal data.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Simple Regression</div>
+          </td>
+          <td class="purpose">Predict DV from <strong>1 IV</strong> + establish magnitude + direction. Course: "analyzes the relationship between one dependent variable and a single independent variable"</td>
+          <td><span class="tag tag-cont">CONT</span><br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Predict sales based on temperature (ice cream example from course)
+            <div class="example">Y = β₀ + β₁X. β₁ positive = positive relationship</div>
+          </td>
+          <td>
+            <span class="threshold">R²</span> <span class="threshold">p &lt; .05</span>
+            <div class="caveat">Check: linearity, normality of residuals, homoscedasticity. R² = % of variance explained. β sign tells direction.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Multiple Regression</div>
+            <div class="method-aka">OLS regression</div>
+          </td>
+          <td class="purpose">Predict DV from <strong>multiple IVs</strong>. Course: "examines the relationship between one dependent and multiple independent variables"</td>
+          <td><span class="tag tag-mix">MIX</span> (multiple)<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Predict GPA from hours studying, attendance, and extracurricular activities
+            <div class="example">Y = β₀ + β₁X₁ + β₂X₂ + ... Each β shows unique contribution</div>
+          </td>
+          <td>
+            <span class="threshold">VIF &lt; 5</span> <span class="threshold">R²</span>
+            <div class="caveat">Check multicollinearity (VIF), residual normality, homoscedasticity. Report β weights for relative importance. Rule of thumb: n ≥ 50 + 8k (k = IVs).</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Multivariate Regression</div>
+          </td>
+          <td class="purpose">Multiple IVs predicting <strong>multiple DVs</strong>. Course distinguishes this from "multiple regression"</td>
+          <td><span class="tag tag-mix">MIX</span><br>→ Multiple <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Predict cardiovascular disease, diabetes, AND hypertension from diet, exercise, and stress simultaneously
+            <div class="example">Course: combine DV items into composite OR test separately</div>
+          </td>
+          <td>
+            <span class="threshold">R² per DV</span>
+            <div class="caveat">Different from "multiple regression" (1 DV). Can create composite DV by averaging items, or analyze DVs separately.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Hierarchical Regression <span class="method-star">*</span></div>
+          </td>
+          <td class="purpose">Enter IVs in <strong>theoretically-ordered blocks</strong> to test incremental contribution</td>
+          <td><span class="tag tag-mix">MIX</span> (blocks)<br>→ <span class="tag tag-cont">CONT</span></td>
+          <td>
+            Block 1: Demographics (age, gender) → Block 2: Job factors (tenure, role). Does Block 2 add explanatory power?
+            <div class="example">ΔR² shows how much EXTRA variance each block explains</div>
+          </td>
+          <td>
+            <span class="threshold">ΔR² sig at p &lt; .05</span>
+            <div class="caveat">Block order must be theory-driven. Very common in management/OB research. Addresses "above and beyond" questions.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Logistic Regression</div>
+          </td>
+          <td class="purpose">Predict a <strong>binary outcome</strong>. Course: "dependent variable is binary (win/lose, yes/no, success/failure)"</td>
+          <td><span class="tag tag-mix">MIX</span><br>→ <span class="tag tag-bin">BIN</span></td>
+          <td>
+            Predict whether employee will leave company (yes/no) from age, salary, satisfaction, tenure, commute
+            <div class="example">S-shaped logistic curve maps to probability 0–1. Course uses R Commander.</div>
+          </td>
+          <td>
+            <span class="threshold">Odds Ratio (OR)</span> <span class="threshold">AIC (lower = better)</span>
+            <div class="caveat">OR &gt; 1 = increases odds, OR &lt; 1 = decreases odds. No normality assumption. Check Hosmer-Lemeshow fit. n ≥ ~10 events per predictor.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 3: MEDIATION & MODERATION -->
+<div class="section">
+  <div class="section-title">
+    <div class="section-icon" style="background:var(--tag-cyan-bg);color:var(--accent-cyan);">M</div>
+    Mediation & Moderation
+    <span class="section-source">DBA801: Constructing Statistical Models</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-method">Method</th>
+          <th class="col-purpose">When / Purpose</th>
+          <th class="col-vars">Variable Setup</th>
+          <th class="col-example">Business Example (from course)</th>
+          <th class="col-caveat">Key Thresholds & Caveats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="method-name">Mediation</div>
+            <div class="method-aka">"Why / How?"</div>
+          </td>
+          <td class="purpose">A <strong>mediator explains the mechanism</strong> by which IV affects DV. Course: "a middle construct explains the relationship between variables"</td>
+          <td>IV → <span class="tag tag-cont">MEDIATOR</span> → DV</td>
+          <td>
+            Employee morale → <em>Work-life balance</em> → Productivity. The effect of morale on productivity is partially explained by work-life balance (ABC Solutions example)
+            <div class="example">Also: advertising → brand awareness → sales</div>
+          </td>
+          <td>
+            <span class="threshold">Indirect effect CI excludes 0</span>
+            <div class="caveat">Use bootstrapping (5000+ samples) for indirect effect. Course warns: "do not start research with a mediating variable" — establish direct effect first. Used in "mature studies."</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Moderation</div>
+            <div class="method-aka">"When / For whom?"</div>
+          </td>
+          <td class="purpose">A <strong>moderator changes the strength/direction</strong> of the IV→DV relationship. Course: "the relationship is strong or weak for different groups"</td>
+          <td>IV × <span class="tag tag-mix">MODERATOR</span> → DV</td>
+          <td>
+            Weekly parties → Employee engagement, moderated by <em>Age</em>. Younger employees show stronger effect than older ones (XYZ Corp example)
+            <div class="example">Also: engagement → satisfaction, moderated by compensation level</div>
+          </td>
+          <td>
+            <span class="threshold">Interaction term p &lt; .05</span>
+            <div class="caveat">Mean-center variables before creating interaction. Use simple slopes to probe. Course: "requires larger sample size and statistical power than simple regression." Plan in advance.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 4: ADVANCED -->
+<div class="section">
+  <div class="section-title">
+    <div class="section-icon" style="background:var(--tag-rose-bg);color:var(--accent-rose);">+</div>
+    Advanced & Multivariate Methods
+    <span class="section-source">DBA801: Enhancing Statistical Models + Multivariate Analyses</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-method">Method</th>
+          <th class="col-purpose">When / Purpose</th>
+          <th class="col-vars">Data Setup</th>
+          <th class="col-example">Business Example</th>
+          <th class="col-caveat">Key Thresholds & Caveats</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="method-name">Factor Analysis</div>
+            <div class="method-aka">EFA / CFA</div>
+          </td>
+          <td class="purpose"><strong>Data reduction</strong> — reduce many variables into manageable constructs. Course: "a multivariate technique... creating a mathematical model to identify patterns"</td>
+          <td>Many <span class="tag tag-cont">CONT</span> / <span class="tag tag-ord">ORD</span> items<br>→ Latent factors</td>
+          <td>
+            Reduce variables (price, quality, brand, advertising) into key constructs driving consumer behavior
+            <div class="example">Course: marketing team condensing variables into "brand reputation" + "perceived quality"</div>
+          </td>
+          <td>
+            <span class="threshold">Factor loading &gt; 0.707</span> <span class="threshold">Eigenvalue &gt; 1</span>
+            <div class="caveat">Course emphasis: <strong>loading ≥ 0.707 means ≥50% variance captured</strong> → keep. Below 0.707 → revise/remove. n ≥ 5-10 per item. Use EFA first, CFA to confirm (not on same data).</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">SEM</div>
+            <div class="method-aka">Structural Equation Modeling</div>
+          </td>
+          <td class="purpose">Test <strong>complex models with latent variables, multiple paths</strong> simultaneously. Course: "performed when we have multiple constructs, multiple IVs, and multiple DVs"</td>
+          <td><span class="tag tag-mix">MIX</span> (latent + observed)<br>→ <span class="tag tag-mix">MIX</span></td>
+          <td>
+            Full model: Leadership → PS → Performance, with PD moderating (your DBA801 paper). Course uses SmartPLS
+            <div class="example">Inner model (paths) + Outer model (indicators)</div>
+          </td>
+          <td>
+            <span class="threshold">AVE &gt; .50</span> <span class="threshold">VIF &lt; 3</span> <span class="threshold">R²</span>
+            <div class="caveat">Course steps: (1) Data quality + Cronbach α, (2) Estimate model, (3) Inner/outer model, (4) Reliability + AVE, (5) Discriminant validity (Fornell-Larcker), (6) VIF for collinearity, (7) Path coefficients, (8) R².</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Conjoint Analysis</div>
+          </td>
+          <td class="purpose">Determine <strong>relative importance of product attributes</strong>. Course: "used to determine the relative importance of different attributes of a product or service"</td>
+          <td>Attribute profiles<br>→ Preference ranking</td>
+          <td>
+            How much do customers value screen size vs battery life vs camera vs price vs brand for a phone?
+            <div class="example">Steps: select attributes → orthogonal design → rank profiles → utility function</div>
+          </td>
+          <td>
+            <span class="threshold">Utility scores per attribute</span>
+            <div class="caveat">Orthogonal design ensures attributes aren't correlated. Commonly used in product development and pricing research.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Cluster Analysis</div>
+          </td>
+          <td class="purpose"><strong>Group similar observations</strong> into segments. Course: "group data based on similar characteristics or behavior"</td>
+          <td>Multiple <span class="tag tag-cont">CONT</span> / <span class="tag tag-mix">MIX</span><br>→ Segments</td>
+          <td>
+            Segment customers by purchasing behavior. Course: growing importance in ML and AI
+            <div class="example">K-means or Hierarchical clustering in R Commander</div>
+          </td>
+          <td>
+            <span class="threshold">Silhouette &gt; .5 good</span>
+            <div class="caveat">No single "correct" solution. Standardize variables first. Different from factor analysis: FA groups variables, Cluster groups observations.</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="method-name">Time Series / ARIMA</div>
+          </td>
+          <td class="purpose"><strong>Forecast</strong> values over time. Course: "ARIMA used for time series data forecasting; simple regression is NOT suitable for such data"</td>
+          <td>Time-ordered <span class="tag tag-cont">CONT</span><br>→ Future values</td>
+          <td>
+            Forecast monthly sales for next 12 months. Stock prices, weather patterns, economic indicators
+            <div class="example">Components: Autoregression + Differencing + Moving Averages</div>
+          </td>
+          <td>
+            <span class="threshold">AIC for model selection</span>
+            <div class="caveat">Handles trends, seasonality, autocorrelation that regular regression cannot. Course distinguishes cross-sectional vs panel data. Fixed effects vs random effects for panel data.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SECTION 5: RELIABILITY & VALIDITY -->
+<div class="section">
+  <div class="section-title">
+    <div class="section-icon" style="background:var(--tag-amber-bg);color:var(--accent-amber);">R</div>
+    Reliability & Validity
+    <span class="section-source">DBA801: Measurement and Sampling + Multivariate Analyses (SEM)</span>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-method">Measure</th>
+          <th class="col-purpose">What It Tests</th>
+          <th class="col-example">Business Example</th>
+          <th class="col-caveat" style="min-width:280px;">Key Thresholds & Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="method-name">Cronbach's Alpha</div></td>
+          <td class="purpose"><strong>Internal consistency</strong> — do items in a scale consistently measure the same thing? Course: "evaluates the degree to which all items on a test or scale are related"</td>
+          <td>
+            Do 5 items measuring "job satisfaction" yield consistent responses?
+            <div class="example">Course: expressed as a number between 0 and 1</div>
+          </td>
+          <td>
+            <span class="threshold">α ≥ 0.707 strong</span> <span class="threshold">α &gt; .95 suspicious</span>
+            <div class="caveat">Course uses the <strong>0.707 threshold</strong> (same as factor loading). α &gt; .95 may mean item redundancy. Report "if item deleted" values.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">Test-Retest Reliability</div></td>
+          <td class="purpose"><strong>Stability over time</strong> — same test, same people, different times. Course: "consistency between two measurements conducted under different circumstances"</td>
+          <td>
+            Administer employee performance test twice under different conditions → consistent results?
+          </td>
+          <td>
+            <span class="threshold">r &gt; .70 acceptable</span>
+            <div class="caveat">High correlation between test 1 and test 2 = reliable measure.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">Interrater Reliability</div></td>
+          <td class="purpose"><strong>Agreement between raters</strong>. Course: "measures agreement between raters rating the same phenomenon"</td>
+          <td>
+            Multiple interviewers rate same candidate — do they agree?
+          </td>
+          <td>
+            <span class="threshold">Cohen's κ &gt; .60</span>
+            <div class="caveat">High agreement = reliable. Low = need rater training or clearer criteria.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">Face Validity</div></td>
+          <td class="purpose">Does the measure <strong>look legitimate</strong> on surface? Course: "how genuine a result appears based solely on its appearance"</td>
+          <td>Ask potential customers to rate a new logo's appearance on 1-10</td>
+          <td>
+            <div class="caveat">Subjective assessment. Weakest form of validity — necessary but not sufficient. No technical methods required.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">Internal Validity</div></td>
+          <td class="purpose">Can we establish <strong>cause and effect</strong>? Course: "whether a certain intervention can produce the intended outcome"</td>
+          <td>Training program → improved sales? Was it the training or other factors?</td>
+          <td>
+            <div class="caveat">Course threats: history/maturation, measurement error, regression to mean, attrition, environmental factors. Controlled by randomization + control groups.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">External Validity</div></td>
+          <td class="purpose"><strong>Generalizability</strong>. Course: "extent to which research findings can be extended to a larger, more diverse population"</td>
+          <td>Can results from 200 employees at one company apply to all companies?</td>
+          <td>
+            <div class="caveat">Requires representative sampling. Consider: sample demographics, setting similarity, time period.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">AVE</div><div class="method-aka">Average Variance Extracted</div></td>
+          <td class="purpose"><strong>Convergent validity</strong> in SEM — do items capture enough variance of the construct?</td>
+          <td>Do PS scale items converge on the "psychological safety" construct?</td>
+          <td>
+            <span class="threshold">AVE ≥ .50</span>
+            <div class="caveat">Used in SEM/PLS-SEM. AVE &lt; .50 = more error than signal. Course mentions this in SmartPLS steps.</div>
+          </td>
+        </tr>
+        <tr>
+          <td><div class="method-name">Discriminant Validity</div><div class="method-aka">Fornell-Larcker</div></td>
+          <td class="purpose">Are constructs <strong>truly distinct</strong> from each other?</td>
+          <td>Are "psychological safety" and "trust" measuring different things?</td>
+          <td>
+            <span class="threshold">√AVE &gt; inter-construct r</span>
+            <div class="caveat">Course (SEM section): compare √AVE of each construct against cross-loadings and squared correlations. HTMT &lt; .85 is a better modern alternative*.</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- FOOTNOTES -->
+<div class="footnotes">
+  <p><strong>Course framework reminder — the 3 model groups:</strong> (A) Test of Differences = T-test, ANOVA family · (B) Test of Relationships = Correlation, Chi-square, Regression, Logistic Regression, SEM · (C) Cluster Model = Cluster Analysis, Factor Analysis</p>
+  <p style="margin-top: 0.5rem;"><strong>Key concepts from course:</strong> True Score Theory: X = T + Er + Es (observed = true score + random error + systematic error). Reduce systematic error via literature review, training collectors, pilot tests, multiple measures.</p>
+  <p style="margin-top: 0.5rem;"><strong>Sample size rules of thumb:</strong> n ≥ 30 per group for parametric tests. Regression: n ≥ 50 + 8k (k = predictors). SEM: n ≥ 200. PLS-SEM: 10× max paths pointing at any construct.</p>
+  <p style="margin-top: 0.5rem;"><strong>Effect sizes matter more than p-values.</strong> Course: "Simply looking at a low p-value may not necessarily indicate meaningful results." Also: "Big data sets make p-values useless as almost every model will be significant."</p>
+  <p style="margin-top: 0.5rem;"><strong>Type I error</strong> = reject true H₀ (false positive). <strong>Type II error</strong> = fail to reject false H₀ (missed opportunity). α = .05 means 5% chance of Type I error.</p>
+  <p style="margin-top: 0.5rem;"><strong>The Likert debate:</strong> Single Likert item = ordinal → non-parametric tests (Mann-Whitney*, Spearman*). Mean of multiple Likert items = often treated as continuous → parametric OK (Norman, 2010).</p>
+  <p style="margin-top: 0.8rem;"><strong>(*) Methods not in DBA801 material</strong> but widely used: Paired t-test, Spearman ρ, Mann-Whitney U, Kruskal-Wallis, Hierarchical Regression. These are standard in published business research — safe to reference but be transparent about sourcing.</p>
+  <p style="margin-top: 0.8rem; color: var(--accent-blue);">Course tools: R Commander (ANOVA, Regression, Logistic Regression, Factor Analysis, Cluster) + SmartPLS (SEM) + Qualtrics (Survey design) + Excel/SPSS (Data entry)</p>
+</div>
+
+</body>
+</html>
