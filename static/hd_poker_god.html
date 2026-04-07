@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Poker Tracker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --bg: #0f0f0f;
+  --bg2: #1a1a1a;
+  --bg3: #242424;
+  --bg4: #2e2e2e;
+  --text: #f0ede8;
+  --text2: #888;
+  --text3: #555;
+  --accent: #c9a84c;
+  --accent2: #8b6914;
+  --red: #e05252;
+  --green: #52c484;
+  --blue: #5294e0;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --r: 12px; --rs: 8px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 15px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.screen { display: none; flex-direction: column; min-height: 100vh; }
+.screen.active { display: flex; }
+
+.hdr {
+  background: var(--bg);
+  padding: 52px 18px 14px;
+  border-bottom: 0.5px solid var(--border);
+  position: sticky; top: 0; z-index: 10;
+}
+.hdr-row { display: flex; align-items: center; justify-content: space-between; }
+.hdr h1 { font-size: 17px; font-weight: 500; letter-spacing: 0.02em; }
+.hdr .sub { font-size: 12px; color: var(--text2); margin-top: 2px; font-family: var(--mono); }
+
+.content { flex: 1; padding: 16px; overflow-y: auto; padding-bottom: 32px; }
+
+.btn {
+  display: flex; align-items: center; justify-content: center;
+  padding: 13px 20px; border-radius: var(--r);
+  font-family: var(--font); font-size: 15px; font-weight: 500;
+  border: none; cursor: pointer; transition: all 0.15s; width: 100%;
+}
+.btn-primary { background: var(--accent); color: #000; }
+.btn-primary:active { background: var(--accent2); transform: scale(0.97); }
+.btn-ghost { background: var(--bg3); color: var(--text); border: 0.5px solid var(--border2); }
+.btn-ghost:active { background: var(--bg4); transform: scale(0.97); }
+.btn-danger { background: rgba(224,82,82,0.15); color: var(--red); border: 0.5px solid rgba(224,82,82,0.3); }
+.btn-sm { padding: 8px 14px; font-size: 13px; border-radius: var(--rs); width: auto; }
+
+/* COMMITMENTS BANNER */
+.commitments {
+  border-radius: var(--r);
+  border: 1px solid rgba(201,168,76,0.35);
+  background: linear-gradient(135deg, rgba(201,168,76,0.08) 0%, rgba(201,168,76,0.04) 100%);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+}
+.commitments::before {
+  content: '';
+  position: absolute; top: 0; left: 0;
+  width: 3px; height: 100%;
+  background: linear-gradient(180deg, var(--accent), rgba(201,168,76,0.3));
+}
+.commitments-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px; cursor: pointer;
+}
+.commitments-hdr .title {
+  font-size: 10px; font-weight: 500; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--accent);
+}
+.commitments-hdr .chevron {
+  font-size: 11px; color: var(--text3); transition: transform 0.2s;
+}
+.commitments-hdr .chevron.open { transform: rotate(180deg); }
+.commitment-list { display: flex; flex-direction: column; gap: 9px; }
+.commitment-item { display: flex; align-items: flex-start; gap: 10px; }
+.c-icon {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: rgba(201,168,76,0.15); border: 1px solid rgba(201,168,76,0.3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; flex-shrink: 0; margin-top: 1px;
+}
+.c-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.c-text em { color: var(--accent); font-style: normal; font-weight: 500; }
+
+/* STAT CARDS */
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.stat-card { background: var(--bg2); border-radius: var(--r); padding: 14px; }
+.stat-card .val { font-size: 26px; font-weight: 500; font-family: var(--mono); line-height: 1.1; }
+.stat-card .lbl { font-size: 11px; color: var(--text2); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+.stat-card.accent .val { color: var(--accent); }
+.stat-card.green .val { color: var(--green); }
+.stat-card.red .val { color: var(--red); }
+
+/* DISCIPLINE TOKENS */
+.discipline-bar { background: var(--bg2); border-radius: var(--r); padding: 14px; margin-bottom: 12px; }
+.disc-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text2); margin-bottom: 6px; }
+.disc-count { font-size: 20px; font-weight: 500; font-family: var(--mono); color: var(--accent); margin-bottom: 10px; }
+.disc-track { display: flex; flex-wrap: wrap; gap: 5px; }
+.disc-token {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1.5px solid var(--border2); background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; cursor: pointer; transition: all 0.12s;
+  user-select: none;
+}
+.disc-token.earned { background: rgba(201,168,76,0.18); border-color: var(--accent); color: var(--accent); }
+.disc-token:active { transform: scale(0.85); }
+
+/* HAND LIST */
+.hand-list { display: flex; flex-direction: column; gap: 6px; }
+.hand-item {
+  background: var(--bg2); border-radius: var(--r);
+  padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+  border: 0.5px solid var(--border);
+}
+.hand-num { font-size: 11px; color: var(--text3); font-family: var(--mono); min-width: 22px; }
+.hand-cards { display: flex; gap: 4px; }
+.card-mini {
+  width: 28px; height: 38px; border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500; font-family: var(--mono);
+  flex-direction: column; line-height: 1.1;
+  border: 0.5px solid rgba(255,255,255,0.12);
+}
+.card-mini.red-suit { background: #2a1515; color: #e05252; }
+.card-mini.black-suit { background: #1a1a2a; color: #8899ee; }
+.hand-meta { flex: 1; }
+.hand-meta .played { font-size: 13px; font-weight: 500; }
+.hand-meta .chips { font-size: 11px; color: var(--text2); font-family: var(--mono); margin-top: 2px; }
+
+/* CARD PICKER */
+.card-picker { background: var(--bg2); border-radius: var(--r); padding: 14px; margin-bottom: 12px; }
+.picker-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text2); margin-bottom: 10px; }
+.rank-grid { display: grid; grid-template-columns: repeat(13, 1fr); gap: 4px; margin-bottom: 10px; }
+.suit-row { display: flex; gap: 8px; justify-content: center; }
+.pick-btn {
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: 6px; padding: 8px 2px; text-align: center;
+  font-size: 13px; font-family: var(--mono); font-weight: 500;
+  cursor: pointer; transition: all 0.12s; color: var(--text);
+}
+.pick-btn:active { transform: scale(0.92); }
+.pick-btn.selected-red { background: #3a1515; border-color: var(--red); color: var(--red); }
+.pick-btn.selected-black { background: #151530; border-color: var(--blue); color: #8899ee; }
+.pick-btn.used { opacity: 0.25; pointer-events: none; }
+.suit-btn {
+  width: 52px; height: 44px; border-radius: var(--rs);
+  border: 0.5px solid var(--border2); background: var(--bg3);
+  font-size: 22px; cursor: pointer; transition: all 0.12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.suit-btn:active { transform: scale(0.9); }
+.suit-btn.sel-hearts, .suit-btn.sel-diamonds { background: #3a1515; border-color: var(--red); }
+.suit-btn.sel-clubs, .suit-btn.sel-spades { background: #151530; border-color: var(--blue); }
+
+.selected-cards { display: flex; gap: 10px; justify-content: center; margin-bottom: 14px; }
+.card-large {
+  width: 56px; height: 76px; border-radius: 10px;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; font-size: 20px; font-weight: 500;
+  font-family: var(--mono); line-height: 1.1;
+  border: 1.5px solid rgba(255,255,255,0.15);
+}
+.card-large .rank { font-size: 22px; }
+.card-large .suit { font-size: 20px; }
+.card-large.red-suit { background: linear-gradient(145deg,#2e1212,#1e0e0e); color:#e05252; border-color:rgba(224,82,82,0.4); }
+.card-large.black-suit { background: linear-gradient(145deg,#12122e,#0e0e1e); color:#8899ee; border-color:rgba(136,153,238,0.4); }
+.card-large.empty { background: var(--bg3); border: 1.5px dashed var(--border2); }
+.card-large.empty .rank { font-size: 13px; color: var(--text3); }
+
+.rounds-section { background: var(--bg2); border-radius: var(--r); padding: 14px; margin-bottom: 12px; }
+.round-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
+.round-row:last-child { border-bottom: none; }
+.round-label { font-size: 12px; font-weight: 500; width: 64px; flex-shrink: 0; }
+.round-label.preflop { color: var(--accent); }
+.round-label.flop { color: #52b4c4; }
+.round-label.turn { color: #9452e0; }
+.round-label.river { color: var(--green); }
+.chip-input {
+  flex: 1; background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: var(--rs); padding: 9px 12px; color: var(--text);
+  font-family: var(--mono); font-size: 14px;
+  -webkit-appearance: none; appearance: none;
+}
+.chip-input:focus { outline: none; border-color: var(--accent); }
+.chip-input::placeholder { color: var(--text3); }
+.fold-toggle {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: var(--rs); padding: 9px 12px; cursor: pointer;
+  font-size: 12px; color: var(--text2); flex-shrink: 0; transition: all 0.15s;
+}
+.fold-toggle.folded { background: rgba(224,82,82,0.15); border-color: rgba(224,82,82,0.4); color: var(--red); }
+.fold-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
+.fold-toggle.folded .fold-dot { background: var(--red); }
+
+.result-row { background: var(--bg2); border-radius: var(--r); padding: 14px; margin-bottom: 12px; }
+.result-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+.result-btn {
+  padding: 11px 8px; border-radius: var(--rs); font-size: 13px; font-weight: 500;
+  border: 0.5px solid var(--border2); background: var(--bg3); color: var(--text2);
+  cursor: pointer; text-align: center; transition: all 0.12s;
+}
+.result-btn:active { transform: scale(0.95); }
+.result-btn.sel-won { background: rgba(82,196,132,0.2); border-color: var(--green); color: var(--green); }
+.result-btn.sel-lost { background: rgba(224,82,82,0.2); border-color: var(--red); color: var(--red); }
+.result-btn.sel-fold { background: rgba(200,200,200,0.1); border-color: #666; color: #aaa; }
+
+.summary-section { background: var(--bg2); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
+.summary-section h3 { font-size: 13px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
+.summary-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); }
+.summary-row:last-child { border-bottom: none; }
+.summary-row .key { font-size: 13px; color: var(--text2); }
+.summary-row .val { font-size: 14px; font-family: var(--mono); font-weight: 500; }
+
+.vpip-track { height: 8px; background: var(--bg3); border-radius: 4px; overflow: hidden; }
+.vpip-fill { height: 8px; border-radius: 4px; transition: width 0.5s; }
+.vpip-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 4px; font-family: var(--mono); }
+
+/* SESSION CARD in past sessions list */
+.session-card {
+  background: var(--bg2); border-radius: var(--r);
+  border: 0.5px solid var(--border);
+  margin-bottom: 8px; overflow: hidden;
+}
+.session-card-hdr {
+  padding: 14px 16px; display: flex; align-items: center;
+  justify-content: space-between; cursor: pointer;
+}
+.session-card-hdr:active { background: var(--bg3); }
+.session-card-body { padding: 0 16px 14px; display: none; }
+.session-card-body.open { display: block; }
+.session-delete-btn {
+  font-size: 12px; color: var(--red); background: rgba(224,82,82,0.1);
+  border: 0.5px solid rgba(224,82,82,0.25); border-radius: var(--rs);
+  padding: 6px 12px; cursor: pointer; margin-top: 10px;
+  display: inline-block;
+}
+.session-delete-btn:active { background: rgba(224,82,82,0.2); }
+
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--bg3); border: 0.5px solid var(--border2); border-radius: 20px;
+  padding: 10px 18px; font-size: 13px; z-index: 999;
+  transition: transform 0.3s; pointer-events: none; white-space: nowrap;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 100;
+  align-items: flex-end; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: var(--bg2); border-radius: 20px 20px 0 0;
+  padding: 24px 20px 40px; width: 100%; max-width: 480px;
+}
+.modal-box h3 { font-size: 17px; font-weight: 500; margin-bottom: 8px; }
+.modal-box p { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+.modal-btns { display: flex; flex-direction: column; gap: 8px; }
+
+.nav-bar {
+  position: sticky; bottom: 0;
+  background: var(--bg); border-top: 0.5px solid var(--border);
+  display: flex; padding: 8px 0 24px;
+}
+.nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  gap: 3px; padding: 8px; cursor: pointer;
+  font-size: 10px; color: var(--text3); transition: color 0.15s;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.nav-item.active { color: var(--accent); }
+.nav-icon { font-size: 20px; line-height: 1; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text3); }
+.empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+.empty-state p { font-size: 14px; line-height: 1.6; }
+
+.divider { height: 0.5px; background: var(--border); margin: 12px 0; }
+
+/* FACE-DOWN CARDS */
+.card-large.face-down {
+  background: var(--bg3);
+  border: 1.5px solid var(--border2);
+  position: relative; overflow: hidden;
+}
+.card-large.face-down::after {
+  content: '?';
+  font-size: 24px; color: var(--text3);
+}
+.card-mini.face-down {
+  background: var(--bg3);
+  border: 0.5px solid var(--border2);
+  color: var(--text3); font-size: 16px;
+}
+.hide-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; color: var(--text2);
+  background: var(--bg3); border: 0.5px solid var(--border2);
+  border-radius: var(--rs); padding: 5px 10px;
+  cursor: pointer; transition: all 0.15s; user-select: none;
+}
+.hide-toggle.hidden-on { color: var(--accent); border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.08); }
+.hide-toggle:active { transform: scale(0.95); }
+</style>
+</head>
+<body>
+
+<!-- SCREEN: SESSION -->
+<div class="screen active" id="screen-session">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div>
+        <h1>Poker Tracker</h1>
+        <div class="sub" id="session-sub">Session started</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="showEndSession()">End Session</button>
+    </div>
+  </div>
+  <div class="content">
+
+    <!-- Commitments Banner -->
+    <div class="commitments">
+      <div class="commitments-hdr" onclick="toggleCommitments()">
+        <span class="title">My commitments</span>
+        <span class="chevron open" id="comm-chevron">▲</span>
+      </div>
+      <div class="commitment-list" id="comm-body">
+        <div class="commitment-item">
+          <div class="c-icon">✋</div>
+          <div class="c-text"><em>Hands on table, 2 seconds</em> before every pre-flop action — no exceptions.</div>
+        </div>
+        <div class="commitment-item">
+          <div class="c-icon">🥂</div>
+          <div class="c-text">Every week I <em>win money</em> → I treat the table with drinks and food.</div>
+        </div>
+        <div class="commitment-item">
+          <div class="c-icon">♛</div>
+          <div class="c-text">I am building toward being <em>the most skilled</em> and <em>most generous</em> player at this table — winning well, giving back more.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Stats -->
+    <div class="stat-grid">
+      <div class="stat-card accent" id="vpip-card">
+        <div class="val" id="stat-vpip">0%</div>
+        <div class="lbl">VPIP</div>
+      </div>
+      <div class="stat-card">
+        <div class="val" id="stat-hands">0</div>
+        <div class="lbl">Hands</div>
+      </div>
+      <div class="stat-card green">
+        <div class="val" id="stat-played">0</div>
+        <div class="lbl">Played</div>
+      </div>
+      <div class="stat-card">
+        <div class="val" id="stat-folded">0</div>
+        <div class="lbl">Folded pre</div>
+      </div>
+    </div>
+
+    <!-- Discipline Tokens -->
+    <div class="discipline-bar">
+      <div class="disc-label">Discipline tokens — tap each time you fold a hand you'd normally play</div>
+      <div class="disc-count"><span id="disc-num">0</span> earned this session</div>
+      <div class="disc-track" id="disc-track"></div>
+    </div>
+
+    <!-- Log Hand -->
+    <button class="btn btn-primary" onclick="showAddHand()" style="margin-bottom:14px;">+ Log Hand</button>
+
+    <!-- Hand list header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;" id="hand-list-hdr" style="display:none;">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);">Hands this session</div>
+      <div class="hide-toggle hidden-on" id="list-hide-btn" onclick="toggleListCardsHidden()">🃏 Cards hidden</div>
+    </div>
+
+    <!-- Hand list -->
+    <div id="hand-list-empty" class="empty-state">
+      <div class="icon">♠</div>
+      <p>No hands logged yet.<br>Tap Log Hand after each deal.</p>
+    </div>
+    <div class="hand-list" id="hand-list"></div>
+  </div>
+  <div class="nav-bar">
+    <div class="nav-item active" onclick="showScreen('session')"><div class="nav-icon">♠</div><div>Session</div></div>
+    <div class="nav-item" onclick="showScreen('history')"><div class="nav-icon">▤</div><div>Hands</div></div>
+    <div class="nav-item" onclick="showScreen('sessions')"><div class="nav-icon">◑</div><div>Sessions</div></div>
+    <div class="nav-item" onclick="showScreen('stats')"><div class="nav-icon">◈</div><div>Stats</div></div>
+  </div>
+</div>
+
+<!-- SCREEN: ADD HAND -->
+<div class="screen" id="screen-add">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="btn btn-ghost btn-sm" onclick="cancelAddHand()">← Back</button>
+      <h1 id="hand-title">Hand #1</h1>
+      <button class="btn btn-primary btn-sm" onclick="saveHand()">Save</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card-picker">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="picker-label" style="margin-bottom:0;">Select your 2 hole cards</div>
+        <div class="hide-toggle" id="hole-hide-btn" onclick="toggleHoleCardsHidden()">👁 Show</div>
+      </div>
+      <div class="selected-cards">
+        <div class="card-large empty" id="card1-display"><span class="rank">Card 1</span></div>
+        <div class="card-large empty" id="card2-display"><span class="rank">Card 2</span></div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:var(--accent);margin-bottom:10px;" id="pick-hint">Tap rank, then suit → Card 1</div>
+      <div class="rank-grid" id="rank-grid"></div>
+      <div class="suit-row" id="suit-row" style="display:none;">
+        <div class="suit-btn" id="sb-hearts" onclick="selectSuit('♥','hearts')">♥</div>
+        <div class="suit-btn" id="sb-diamonds" onclick="selectSuit('♦','diamonds')">♦</div>
+        <div class="suit-btn" id="sb-clubs" onclick="selectSuit('♣','clubs')">♣</div>
+        <div class="suit-btn" id="sb-spades" onclick="selectSuit('♠','spades')">♠</div>
+      </div>
+      <div style="text-align:center;margin-top:10px;">
+        <button class="btn btn-ghost btn-sm" onclick="clearCards()" style="width:auto;padding:6px 16px;font-size:12px;">Clear cards</button>
+      </div>
+    </div>
+
+    <div class="rounds-section">
+      <div class="picker-label" style="margin-bottom:8px;">Chips put in per round</div>
+      <div class="round-row">
+        <div class="round-label preflop">Pre-flop</div>
+        <input class="chip-input" type="number" id="bet-preflop" placeholder="0" min="0" oninput="updateRoundSummary()">
+        <div class="fold-toggle" id="fold-preflop" onclick="toggleFold('preflop')"><div class="fold-dot"></div>Folded</div>
+      </div>
+      <div class="round-row">
+        <div class="round-label flop">Flop</div>
+        <input class="chip-input" type="number" id="bet-flop" placeholder="0" min="0" oninput="updateRoundSummary()">
+        <div class="fold-toggle" id="fold-flop" onclick="toggleFold('flop')"><div class="fold-dot"></div>Folded</div>
+      </div>
+      <div class="round-row">
+        <div class="round-label turn">Turn</div>
+        <input class="chip-input" type="number" id="bet-turn" placeholder="0" min="0" oninput="updateRoundSummary()">
+        <div class="fold-toggle" id="fold-turn" onclick="toggleFold('turn')"><div class="fold-dot"></div>Folded</div>
+      </div>
+      <div class="round-row">
+        <div class="round-label river">River</div>
+        <input class="chip-input" type="number" id="bet-river" placeholder="0" min="0" oninput="updateRoundSummary()">
+        <div class="fold-toggle" id="fold-river" onclick="toggleFold('river')"><div class="fold-dot"></div>Folded</div>
+      </div>
+      <div class="divider"></div>
+      <div class="summary-row">
+        <div class="key">Total chips in</div>
+        <div class="val" id="total-chips-in" style="color:var(--accent);">0</div>
+      </div>
+      <div class="summary-row">
+        <div class="key">Counts as VPIP?</div>
+        <div class="val" id="played-indicator" style="color:var(--text3);">No</div>
+      </div>
+    </div>
+
+    <div class="result-row">
+      <div class="picker-label">Outcome</div>
+      <div class="result-btns">
+        <div class="result-btn" id="rb-won" onclick="setResult('won')">Won</div>
+        <div class="result-btn" id="rb-lost" onclick="setResult('lost')">Lost</div>
+        <div class="result-btn sel-fold" id="rb-fold" onclick="setResult('fold')">Folded</div>
+      </div>
+    </div>
+    <div style="height:8px;"></div>
+  </div>
+</div>
+
+<!-- SCREEN: HAND HISTORY (current session) -->
+<div class="screen" id="screen-history">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><h1>Hands</h1><div class="sub" id="history-sub">This session</div></div>
+      <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export session</button>
+    </div>
+  </div>
+  <div class="content"><div id="history-list"></div></div>
+  <div class="nav-bar">
+    <div class="nav-item" onclick="showScreen('session')"><div class="nav-icon">♠</div><div>Session</div></div>
+    <div class="nav-item active" onclick="showScreen('history')"><div class="nav-icon">▤</div><div>Hands</div></div>
+    <div class="nav-item" onclick="showScreen('sessions')"><div class="nav-icon">◑</div><div>Sessions</div></div>
+    <div class="nav-item" onclick="showScreen('stats')"><div class="nav-icon">◈</div><div>Stats</div></div>
+  </div>
+</div>
+
+<!-- SCREEN: PAST SESSIONS -->
+<div class="screen" id="screen-sessions">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><h1>Sessions</h1><div class="sub" id="sessions-sub">All saved sessions</div></div>
+    </div>
+  </div>
+  <div class="content"><div id="sessions-list"></div></div>
+  <div class="nav-bar">
+    <div class="nav-item" onclick="showScreen('session')"><div class="nav-icon">♠</div><div>Session</div></div>
+    <div class="nav-item" onclick="showScreen('history')"><div class="nav-icon">▤</div><div>Hands</div></div>
+    <div class="nav-item active" onclick="showScreen('sessions')"><div class="nav-icon">◑</div><div>Sessions</div></div>
+    <div class="nav-item" onclick="showScreen('stats')"><div class="nav-icon">◈</div><div>Stats</div></div>
+  </div>
+</div>
+
+<!-- SCREEN: STATS -->
+<div class="screen" id="screen-stats">
+  <div class="hdr">
+    <div class="hdr-row">
+      <div><h1>Stats</h1><div class="sub">Lifetime</div></div>
+    </div>
+  </div>
+  <div class="content" id="stats-content"></div>
+  <div class="nav-bar">
+    <div class="nav-item" onclick="showScreen('session')"><div class="nav-icon">♠</div><div>Session</div></div>
+    <div class="nav-item" onclick="showScreen('history')"><div class="nav-icon">▤</div><div>Hands</div></div>
+    <div class="nav-item" onclick="showScreen('sessions')"><div class="nav-icon">◑</div><div>Sessions</div></div>
+    <div class="nav-item active" onclick="showScreen('stats')"><div class="nav-icon">◈</div><div>Stats</div></div>
+  </div>
+</div>
+
+<!-- END SESSION MODAL -->
+<div class="modal-overlay" id="modal-end">
+  <div class="modal-box">
+    <h3>End session?</h3>
+    <p>Enter your net P&L, then save. This session will be archived.</p>
+    <div style="margin-bottom:16px;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Net P&L (negative if lost)</div>
+      <input class="chip-input" type="number" id="session-pnl" placeholder="e.g. -200" style="width:100%;padding:12px;">
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" onclick="endSession()">Save & End Session</button>
+      <button class="btn btn-ghost" onclick="hideModal('modal-end')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const RANKS = ['A','K','Q','J','T','9','8','7','6','5','4','3','2'];
+const RED_SUITS = ['♥','♦'];
+
+let state = {
+  hands: [],
+  sessions: [],
+  discTokens: 0,
+  commOpen: true,
+  currentSession: { startTime: Date.now() },
+  pickingCard: 1,
+  pendingRank: null,
+  card1: null, card2: null,
+  folds: { preflop:false, flop:false, turn:false, river:false },
+  result: 'fold',
+  holeCardsHidden: false,  // on add-hand screen — visible by default while picking
+  listCardsHidden: true    // on session hand list — hidden by default
+};
+
+// ── PERSIST ──
+function save() {
+  localStorage.setItem('pt2_hands', JSON.stringify(state.hands));
+  localStorage.setItem('pt2_sessions', JSON.stringify(state.sessions));
+  localStorage.setItem('pt2_disc', state.discTokens);
+  localStorage.setItem('pt2_start', state.currentSession.startTime);
+  localStorage.setItem('pt2_comm', state.commOpen ? '1' : '0');
+}
+function load() {
+  try {
+    state.hands = JSON.parse(localStorage.getItem('pt2_hands') || '[]');
+    state.sessions = JSON.parse(localStorage.getItem('pt2_sessions') || '[]');
+    state.discTokens = parseInt(localStorage.getItem('pt2_disc') || '0');
+    const st = localStorage.getItem('pt2_start');
+    if (st) state.currentSession.startTime = parseInt(st);
+    state.commOpen = localStorage.getItem('pt2_comm') !== '0';
+  } catch(e) {}
+}
+
+// ── INIT ──
+function init() {
+  load();
+  buildRankGrid();
+  renderDiscTokens();
+  updateSessionSub();
+  updateLiveStats();
+  renderHandList();
+  setResult('fold');
+  applyCommitmentsState();
+}
+
+// ── COMMITMENTS ──
+function toggleCommitments() {
+  state.commOpen = !state.commOpen;
+  applyCommitmentsState();
+  save();
+}
+function applyCommitmentsState() {
+  document.getElementById('comm-body').style.display = state.commOpen ? 'flex' : 'none';
+  document.getElementById('comm-chevron').textContent = state.commOpen ? '▲' : '▼';
+  document.getElementById('comm-chevron').classList.toggle('open', state.commOpen);
+}
+
+// ── SCREENS ──
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'history') renderHistory();
+  if (name === 'sessions') renderSessionsList();
+  if (name === 'stats') renderStats();
+}
+
+// ── CARD PICKER ──
+function buildRankGrid() {
+  const g = document.getElementById('rank-grid');
+  g.innerHTML = '';
+  RANKS.forEach(r => {
+    const b = document.createElement('div');
+    b.className = 'pick-btn'; b.textContent = r; b.id = 'rank-' + r;
+    b.onclick = () => selectRank(r);
+    g.appendChild(b);
+  });
+}
+function selectRank(r) {
+  state.pendingRank = r;
+  document.getElementById('suit-row').style.display = 'flex';
+  document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('selected-red','selected-black'));
+  document.getElementById('rank-' + r).classList.add('selected-red');
+  updatePickHint('Choose suit for ' + r + ' → Card ' + state.pickingCard);
+}
+function selectSuit(suit, suitName) {
+  if (!state.pendingRank) return;
+  const card = { rank: state.pendingRank, suit, suitName };
+  const isRed = RED_SUITS.includes(suit);
+  const other = state.pickingCard === 1 ? state.card2 : state.card1;
+  if (other && other.rank === card.rank && other.suit === suit) { showToast('Already selected'); return; }
+  if (state.pickingCard === 1) { state.card1 = card; state.pickingCard = 2; updatePickHint('Tap rank, then suit → Card 2'); }
+  else { state.card2 = card; state.pickingCard = 1; updatePickHint('Both cards selected ✓'); document.getElementById('suit-row').style.display = 'none'; }
+  document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('selected-red','selected-black'));
+  document.querySelectorAll('.suit-btn').forEach(b => b.className = 'suit-btn');
+  state.pendingRank = null;
+  renderCardDisplays(); markUsedRanks();
+}
+function renderCardDisplays() {
+  renderCardEl('card1-display', state.card1, 'Card 1');
+  renderCardEl('card2-display', state.card2, 'Card 2');
+}
+function renderCardEl(id, card, ph) {
+  const el = document.getElementById(id);
+  if (state.holeCardsHidden && card) {
+    el.className = 'card-large face-down';
+    el.innerHTML = '';
+    return;
+  }
+  if (!card) { el.className='card-large empty'; el.innerHTML=`<span class="rank">${ph}</span>`; return; }
+  const isRed = RED_SUITS.includes(card.suit);
+  el.className = 'card-large ' + (isRed ? 'red-suit' : 'black-suit');
+  el.innerHTML = `<span class="rank">${card.rank}</span><span class="suit">${card.suit}</span>`;
+}
+
+function toggleHoleCardsHidden() {
+  state.holeCardsHidden = !state.holeCardsHidden;
+  const btn = document.getElementById('hole-hide-btn');
+  btn.textContent = state.holeCardsHidden ? '👁 Show' : '🙈 Hide';
+  btn.classList.toggle('hidden-on', state.holeCardsHidden);
+  renderCardDisplays();
+}
+
+function toggleListCardsHidden() {
+  state.listCardsHidden = !state.listCardsHidden;
+  const btn = document.getElementById('list-hide-btn');
+  btn.textContent = state.listCardsHidden ? '🃏 Cards hidden' : '👁 Cards visible';
+  btn.classList.toggle('hidden-on', state.listCardsHidden);
+  renderHandList();
+}
+function markUsedRanks() {
+  RANKS.forEach(r => document.getElementById('rank-'+r)?.classList.remove('used'));
+  if (state.card1 && state.card2 && state.card1.rank === state.card2.rank) return;
+  if (state.card1) document.getElementById('rank-'+state.card1.rank)?.classList.add('used');
+  if (state.card2) document.getElementById('rank-'+state.card2.rank)?.classList.add('used');
+}
+function clearCards() {
+  state.card1=null; state.card2=null; state.pendingRank=null; state.pickingCard=1;
+  document.getElementById('suit-row').style.display='none';
+  document.querySelectorAll('.pick-btn').forEach(b => b.classList.remove('selected-red','selected-black','used'));
+  document.querySelectorAll('.suit-btn').forEach(b => b.className='suit-btn');
+  renderCardDisplays(); updatePickHint('Tap rank, then suit → Card 1');
+}
+function updatePickHint(msg) { document.getElementById('pick-hint').textContent = msg; }
+
+// ── BETTING ──
+function toggleFold(round) {
+  state.folds[round] = !state.folds[round];
+  document.getElementById('fold-'+round).classList.toggle('folded', state.folds[round]);
+  updateRoundSummary();
+}
+function updateRoundSummary() {
+  let total = 0;
+  ['preflop','flop','turn','river'].forEach(r => { total += parseFloat(document.getElementById('bet-'+r).value)||0; });
+  document.getElementById('total-chips-in').textContent = total;
+  const preflopBet = parseFloat(document.getElementById('bet-preflop').value)||0;
+  const isVPIP = preflopBet > 0 && !state.folds.preflop;
+  const el = document.getElementById('played-indicator');
+  el.textContent = isVPIP ? 'Yes' : 'No';
+  el.style.color = isVPIP ? 'var(--green)' : 'var(--text3)';
+}
+
+// ── RESULT ──
+function setResult(r) {
+  state.result = r;
+  ['won','lost','fold'].forEach(k => document.getElementById('rb-'+k)?.classList.remove('sel-won','sel-lost','sel-fold'));
+  document.getElementById('rb-'+r)?.classList.add('sel-'+r);
+}
+
+// ── ADD HAND ──
+function showAddHand() {
+  clearCards();
+  ['preflop','flop','turn','river'].forEach(r => {
+    document.getElementById('bet-'+r).value='';
+    state.folds[r]=false;
+    document.getElementById('fold-'+r).classList.remove('folded');
+  });
+  setResult('fold'); updateRoundSummary();
+  document.getElementById('hand-title').textContent = 'Hand #'+(state.hands.length+1);
+  // Always start with cards visible on the picker screen
+  state.holeCardsHidden = false;
+  const holeBtn = document.getElementById('hole-hide-btn');
+  if (holeBtn) { holeBtn.textContent = '🙈 Hide'; holeBtn.classList.remove('hidden-on'); }
+  showScreen('add');
+}
+function cancelAddHand() { showScreen('session'); }
+function saveHand() {
+  const bets={};let total=0;
+  ['preflop','flop','turn','river'].forEach(r => {
+    const v=parseFloat(document.getElementById('bet-'+r).value)||0;
+    bets[r]={amount:v,folded:state.folds[r]}; total+=v;
+  });
+  const isVPIP = bets.preflop.amount>0 && !bets.preflop.folded;
+  const hand = { id:Date.now(), num:state.hands.length+1, card1:state.card1, card2:state.card2, bets, total, isVPIP, result:state.result, ts:Date.now() };
+  state.hands.push(hand);
+  save(); updateLiveStats(); renderHandList();
+  showScreen('session'); showToast('Hand #'+hand.num+' saved');
+}
+
+// ── LIVE STATS ──
+function updateLiveStats() {
+  const h=state.hands, total=h.length, played=h.filter(x=>x.isVPIP).length;
+  const folded=total-played, vpip=total>0?Math.round(played/total*100):0;
+  document.getElementById('stat-hands').textContent=total;
+  document.getElementById('stat-played').textContent=played;
+  document.getElementById('stat-folded').textContent=folded;
+  document.getElementById('stat-vpip').textContent=vpip+'%';
+  const card=document.getElementById('vpip-card');
+  card.className='stat-card';
+  card.classList.add(vpip<=30?'green':vpip<=50?'accent':'red');
+}
+
+// ── DISCIPLINE TOKENS (BUG FIXED) ──
+// Logic: tokens 0..39. Clicking token i:
+//   if i < discTokens → set discTokens = i (unearns from i onwards)
+//   if i >= discTokens → set discTokens = i+1 (earn up to and including i)
+function renderDiscTokens() {
+  const track = document.getElementById('disc-track');
+  const n = state.discTokens;
+  document.getElementById('disc-num').textContent = n;
+  track.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const t = document.createElement('div');
+    const earned = i < n;
+    t.className = 'disc-token' + (earned ? ' earned' : '');
+    t.textContent = earned ? '★' : '·';
+    const idx = i; // capture
+    t.onclick = () => {
+      if (idx < state.discTokens) {
+        state.discTokens = idx; // unearn from idx
+      } else {
+        state.discTokens = idx + 1; // earn up to idx inclusive
+      }
+      save();
+      renderDiscTokens();
+    };
+    track.appendChild(t);
+  }
+}
+
+// ── SESSION SUB ──
+function updateSessionSub() {
+  const d=new Date(state.currentSession.startTime);
+  document.getElementById('session-sub').textContent =
+    d.toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit'})+' · '+
+    d.toLocaleTimeString('vi-VN',{hour:'2-digit',minute:'2-digit'});
+}
+
+// ── HAND LIST ──
+function renderHandList() {
+  const list=document.getElementById('hand-list'), empty=document.getElementById('hand-list-empty');
+  const hdr=document.getElementById('hand-list-hdr');
+  const hands=[...state.hands].reverse();
+  if(!hands.length){
+    list.innerHTML=''; empty.style.display='block';
+    hdr.style.display='none';
+    empty.innerHTML='<div class="icon">♠</div><p>No hands logged yet.<br>Tap Log Hand after each deal.</p>';
+    return;
+  }
+  empty.style.display='none';
+  hdr.style.display='flex';
+  list.innerHTML=hands.map(h=>{
+    const c1 = state.listCardsHidden ? `<div class="card-mini face-down">?</div>` : cardMiniHTML(h.card1);
+    const c2 = state.listCardsHidden ? `<div class="card-mini face-down">?</div>` : cardMiniHTML(h.card2);
+    const outcome=h.result==='won'?`<span style="color:var(--green)">Won</span>`:h.result==='lost'?`<span style="color:var(--red)">Lost</span>`:`<span style="color:var(--text3)">Folded</span>`;
+    const badge=h.isVPIP?`<span style="color:var(--accent);font-size:10px;font-family:var(--mono)"> VPIP</span>`:`<span style="color:var(--text3);font-size:10px;font-family:var(--mono)"> fold</span>`;
+    return `<div class="hand-item"><div class="hand-num">#${h.num}</div><div class="hand-cards">${c1}${c2}</div><div class="hand-meta"><div class="played">${outcome}${badge}</div><div class="chips">${h.total>0?h.total+' chips in':'no chips'}</div></div></div>`;
+  }).join('');
+}
+
+function cardMiniHTML(card) {
+  if(!card) return `<div class="card-mini" style="background:var(--bg3);color:var(--text3)">?</div>`;
+  const isRed=RED_SUITS.includes(card.suit);
+  return `<div class="card-mini ${isRed?'red-suit':'black-suit'}">${card.rank}<br>${card.suit}</div>`;
+}
+
+// ── END SESSION ──
+function showEndSession() { document.getElementById('modal-end').classList.add('show'); }
+function hideModal(id) { document.getElementById(id).classList.remove('show'); }
+function endSession() {
+  const pnl=parseFloat(document.getElementById('session-pnl').value)||0;
+  const h=state.hands, total=h.length, played=h.filter(x=>x.isVPIP).length;
+  const vpip=total>0?Math.round(played/total*100):0;
+  const session={
+    id:state.currentSession.startTime,
+    date:new Date(state.currentSession.startTime).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}),
+    dateMs:state.currentSession.startTime,
+    hands:[...state.hands], totalHands:total, vpip, played, pnl, discTokens:state.discTokens
+  };
+  state.sessions.push(session);
+  state.hands=[]; state.discTokens=0; state.currentSession={startTime:Date.now()};
+  localStorage.removeItem('pt2_start');
+  save(); hideModal('modal-end');
+  updateSessionSub(); updateLiveStats(); renderHandList(); renderDiscTokens();
+  document.getElementById('session-pnl').value='';
+  showToast('Session saved!');
+}
+
+// ── HISTORY (current session hands) ──
+function renderHistory() {
+  const el=document.getElementById('history-list');
+  const hands=[...state.hands].reverse();
+  document.getElementById('history-sub').textContent=state.hands.length+' hands this session';
+  if(!hands.length){el.innerHTML='<div class="empty-state"><div class="icon">♠</div><p>No hands yet this session.</p></div>';return;}
+  const roundColors={preflop:'var(--accent)',flop:'#52b4c4',turn:'#9452e0',river:'var(--green)'};
+  const roundLabels={preflop:'Pre',flop:'Flop',turn:'Turn',river:'River'};
+  el.innerHTML=hands.map(h=>{
+    const betsHtml=['preflop','flop','turn','river'].map(r=>{
+      const b=h.bets[r]; if(!b)return'';
+      const amt=b.amount>0?b.amount:'—'; const fld=b.folded?' (fold)':'';
+      return `<span style="color:${roundColors[r]};font-size:11px;font-family:var(--mono)">${roundLabels[r]}:${amt}${fld} </span>`;
+    }).join('');
+    const c1=h.card1?`${h.card1.rank}${h.card1.suit}`:'?', c2=h.card2?`${h.card2.rank}${h.card2.suit}`:'?';
+    const badge=h.isVPIP?`<span style="background:rgba(201,168,76,0.2);color:var(--accent);border-radius:6px;padding:1px 6px;font-size:10px">VPIP</span>`:`<span style="background:var(--bg3);color:var(--text3);border-radius:6px;padding:1px 6px;font-size:10px">fold</span>`;
+    return `<div class="hand-item" style="flex-direction:column;align-items:flex-start;gap:8px">
+      <div style="display:flex;align-items:center;gap:10px;width:100%">
+        <div class="hand-num">#${h.num}</div>
+        <div class="hand-cards">${cardMiniHTML(h.card1)}${cardMiniHTML(h.card2)}</div>
+        <div style="flex:1;font-family:var(--mono);font-size:14px">${c1} ${c2}</div>${badge}
+      </div>
+      <div style="padding-left:32px;display:flex;flex-wrap:wrap;gap:4px">${betsHtml}</div>
+      <div style="padding-left:32px;font-size:12px;color:var(--text3)">Total: ${h.total} chips · ${h.result}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── SESSIONS LIST (view & delete) ──
+function renderSessionsList() {
+  const el=document.getElementById('sessions-list');
+  const sub=document.getElementById('sessions-sub');
+  const sessions=[...state.sessions].reverse();
+  sub.textContent=sessions.length+' saved session'+(sessions.length!==1?'s':'');
+  if(!sessions.length){
+    el.innerHTML='<div class="empty-state"><div class="icon">◑</div><p>No past sessions yet.<br>End a session to archive it here.</p></div>';
+    return;
+  }
+  el.innerHTML=sessions.map((s,i)=>{
+    const realIdx=state.sessions.length-1-i;
+    const vpipColor=s.vpip<=30?'var(--green)':s.vpip<=50?'var(--accent)':'var(--red)';
+    const pnlColor=s.pnl>=0?'var(--green)':'var(--red)';
+    const pnlStr=(s.pnl>0?'+':'')+s.pnl;
+    const roundColors={preflop:'var(--accent)',flop:'#52b4c4',turn:'#9452e0',river:'var(--green)'};
+    const roundLabels={preflop:'Pre',flop:'Flop',turn:'Turn',river:'River'};
+    const handsHtml=(s.hands||[]).slice(0,8).map(h=>{
+      const betsHtml=['preflop','flop','turn','river'].map(r=>{
+        const b=h.bets?.[r]; if(!b||b.amount===0)return'';
+        return `<span style="color:${roundColors[r]};font-size:10px;font-family:var(--mono)">${roundLabels[r]}:${b.amount}${b.folded?' fd':''} </span>`;
+      }).join('');
+      const c1=h.card1?`${h.card1.rank}${h.card1.suit}`:'?', c2=h.card2?`${h.card2.rank}${h.card2.suit}`:'?';
+      const badge=h.isVPIP?`<span style="color:var(--accent);font-size:10px">VPIP</span>`:`<span style="color:var(--text3);font-size:10px">fold</span>`;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border)">
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);min-width:20px">#${h.num}</span>
+        <span style="font-family:var(--mono);font-size:12px;min-width:60px">${c1} ${c2}</span>
+        ${badge}
+        <span style="flex:1;font-size:10px;color:var(--text2)">${betsHtml}</span>
+      </div>`;
+    }).join('');
+    const moreHands=s.totalHands>8?`<div style="font-size:11px;color:var(--text3);padding-top:6px">...and ${s.totalHands-8} more hands</div>`:'';
+    return `<div class="session-card">
+      <div class="session-card-hdr" onclick="toggleSessionCard(${realIdx})">
+        <div>
+          <div style="font-size:14px;font-weight:500">${s.date}</div>
+          <div style="font-size:11px;color:var(--text2);font-family:var(--mono);margin-top:2px">${s.totalHands} hands · ★${s.discTokens||0} discipline</div>
+        </div>
+        <div style="display:flex;gap:14px;align-items:center">
+          <span style="color:${vpipColor};font-family:var(--mono);font-size:13px">VPIP ${s.vpip}%</span>
+          <span style="color:${pnlColor};font-family:var(--mono);font-size:13px">${pnlStr}</span>
+          <span style="color:var(--text3);font-size:11px" id="schevron-${realIdx}">▼</span>
+        </div>
+      </div>
+      <div class="session-card-body" id="sbody-${realIdx}">
+        <div style="margin-bottom:8px">
+          ${handsHtml}${moreHands}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <div class="session-delete-btn" onclick="deleteSession(${realIdx})">Delete this session</div>
+          <div style="font-size:11px;color:var(--text3)">Cannot be undone</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSessionCard(idx) {
+  const body=document.getElementById('sbody-'+idx);
+  const chev=document.getElementById('schevron-'+idx);
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  if(chev) chev.textContent=isOpen?'▼':'▲';
+}
+
+function deleteSession(idx) {
+  if(!confirm('Delete this session? All hand data will be lost.')) return;
+  state.sessions.splice(idx,1);
+  save(); renderSessionsList();
+  showToast('Session deleted');
+}
+
+// ── STATS ──
+function renderStats() {
+  const el=document.getElementById('stats-content');
+  const all=state.sessions;
+  const curHands=state.hands;
+  if(!all.length && !curHands.length){
+    el.innerHTML='<div class="empty-state"><div class="icon">◈</div><p>No data yet. Complete a session to see lifetime stats.</p></div>';return;
+  }
+  const totalHands=all.reduce((a,s)=>a+s.totalHands,0)+curHands.length;
+  const totalPlayed=all.reduce((a,s)=>a+s.played,0)+curHands.filter(h=>h.isVPIP).length;
+  const lifetimeVPIP=totalHands>0?Math.round(totalPlayed/totalHands*100):0;
+  const lifetimePnl=all.reduce((a,s)=>a+s.pnl,0);
+  const totalDisc=all.reduce((a,s)=>a+(s.discTokens||0),0)+state.discTokens;
+  const vpipColor=lifetimeVPIP<=30?'var(--green)':lifetimeVPIP<=50?'var(--accent)':'var(--red)';
+  const vpipMsg=lifetimeVPIP<=30?'On target ✓':lifetimeVPIP<=50?'Getting there':lifetimeVPIP<=70?'Needs work':'Too high';
+
+  el.innerHTML=`
+    <div class="stat-grid">
+      <div class="stat-card"><div class="val" style="color:${vpipColor}">${lifetimeVPIP}%</div><div class="lbl">Lifetime VPIP</div></div>
+      <div class="stat-card"><div class="val">${totalHands}</div><div class="lbl">Total hands</div></div>
+      <div class="stat-card ${lifetimePnl>=0?'green':'red'}"><div class="val">${lifetimePnl>0?'+':''}${lifetimePnl}</div><div class="lbl">Lifetime P&L</div></div>
+      <div class="stat-card accent"><div class="val">${totalDisc}</div><div class="lbl">★ Discipline</div></div>
+    </div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:500">VPIP — target ≤30%</div>
+        <div style="font-size:12px;color:${vpipColor}">${vpipMsg}</div>
+      </div>
+      <div class="vpip-track"><div class="vpip-fill" style="width:${Math.min(lifetimeVPIP,100)}%;background:${vpipColor}"></div></div>
+      <div class="vpip-labels"><span>0%</span><span>30% target</span><span>100%</span></div>
+    </div>
+    ${all.length?`
+    <div class="summary-section">
+      <h3>Session history</h3>
+      ${all.slice().reverse().map(s=>{
+        const vc=s.vpip<=30?'var(--green)':s.vpip<=50?'var(--accent)':'var(--red)';
+        const pc=s.pnl>=0?'var(--green)':'var(--red)';
+        return `<div class="summary-row">
+          <div class="key">${s.date}<span style="display:block;font-size:11px;font-family:var(--mono);color:var(--text3)">${s.totalHands} hands · ★${s.discTokens||0}</span></div>
+          <div style="display:flex;gap:10px;align-items:center">
+            <span style="color:${vc};font-family:var(--mono);font-size:12px">VPIP ${s.vpip}%</span>
+            <span style="color:${pc};font-family:var(--mono);font-size:13px;font-weight:500">${s.pnl>0?'+':''}${s.pnl}</span>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+    <div style="height:12px"></div>
+    <div style="background:var(--bg2);border-radius:var(--r);padding:16px;margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--text2);margin-bottom:12px;">Export & backup</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-ghost" onclick="exportAllCSV()" style="justify-content:flex-start;gap:10px;font-size:14px;">
+          <span style="font-size:16px;">📊</span>
+          <div style="text-align:left;">
+            <div style="font-weight:500;">Export all data — CSV</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px;">All sessions + every hand. Open in Excel / Google Sheets.</div>
+          </div>
+        </button>
+        <button class="btn btn-ghost" onclick="exportBackupJSON()" style="justify-content:flex-start;gap:10px;font-size:14px;">
+          <span style="font-size:16px;">💾</span>
+          <div style="text-align:left;">
+            <div style="font-weight:500;">Full backup — JSON</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px;">Everything, restorable. Use when switching devices or browsers.</div>
+          </div>
+        </button>
+        <button class="btn btn-ghost" onclick="importBackupJSON()" style="justify-content:flex-start;gap:10px;font-size:14px;">
+          <span style="font-size:16px;">📂</span>
+          <div style="text-align:left;">
+            <div style="font-weight:500;">Restore from backup</div>
+            <div style="font-size:11px;color:var(--text2);margin-top:1px;">Load a .json backup file. Replaces all current data.</div>
+          </div>
+        </button>
+      </div>
+    </div>
+    <button class="btn btn-danger" onclick="confirmClearAll()">Clear all data</button>
+    <div style="height:20px"></div>`;
+}
+
+// ── EXPORT ──
+function exportCSV() {
+  // Export current live session only
+  const h=state.hands;
+  if(!h.length){showToast('No hands in current session');return;}
+  const rows=[['Session','Date','Hand','Card1','Card2','VPIP','Preflop','PreflopFold','Flop','FlopFold','Turn','TurnFold','River','RiverFold','TotalChips','Result']];
+  const date=new Date(state.currentSession.startTime).toLocaleDateString('vi-VN');
+  h.forEach(x=>rows.push(['current',date,x.num,x.card1?x.card1.rank+x.card1.suit:'',x.card2?x.card2.rank+x.card2.suit:'',x.isVPIP?'Y':'N',x.bets.preflop?.amount||0,x.bets.preflop?.folded?'Y':'N',x.bets.flop?.amount||0,x.bets.flop?.folded?'Y':'N',x.bets.turn?.amount||0,x.bets.turn?.folded?'Y':'N',x.bets.river?.amount||0,x.bets.river?.folded?'Y':'N',x.total,x.result]));
+  downloadText(rows.map(r=>r.join(',')).join('\n'), 'poker_session_current.csv', 'text/csv');
+  showToast('Current session exported');
+}
+
+function exportAllCSV() {
+  // All sessions + all hands as one big CSV
+  const allSessions = [...state.sessions];
+  // Also include current live session as a pseudo-session
+  if (state.hands.length) {
+    allSessions.push({
+      id: state.currentSession.startTime,
+      date: new Date(state.currentSession.startTime).toLocaleDateString('vi-VN'),
+      hands: state.hands,
+      totalHands: state.hands.length,
+      vpip: state.hands.length ? Math.round(state.hands.filter(h=>h.isVPIP).length/state.hands.length*100) : 0,
+      played: state.hands.filter(h=>h.isVPIP).length,
+      pnl: 0,
+      discTokens: state.discTokens,
+      isCurrent: true
+    });
+  }
+  if (!allSessions.length) { showToast('No data to export'); return; }
+
+  // Sheet 1: Sessions summary
+  const sessRows = [['SessionID','Date','Status','TotalHands','VPIP%','Played','PnL','DisciplineTokens']];
+  allSessions.forEach(s => sessRows.push([
+    s.id, s.date, s.isCurrent?'current':'archived',
+    s.totalHands, s.vpip, s.played, s.pnl, s.discTokens||0
+  ]));
+
+  // Sheet 2: All hands
+  const handRows = [['SessionID','SessionDate','Hand','Card1','Card2','VPIP','Preflop','PreflopFold','Flop','FlopFold','Turn','TurnFold','River','RiverFold','TotalChips','Result']];
+  allSessions.forEach(s => {
+    (s.hands||[]).forEach(x => handRows.push([
+      s.id, s.date, x.num,
+      x.card1?x.card1.rank+x.card1.suit:'', x.card2?x.card2.rank+x.card2.suit:'',
+      x.isVPIP?'Y':'N',
+      x.bets?.preflop?.amount||0, x.bets?.preflop?.folded?'Y':'N',
+      x.bets?.flop?.amount||0,   x.bets?.flop?.folded?'Y':'N',
+      x.bets?.turn?.amount||0,   x.bets?.turn?.folded?'Y':'N',
+      x.bets?.river?.amount||0,  x.bets?.river?.folded?'Y':'N',
+      x.total, x.result
+    ]));
+  });
+
+  const csv =
+    '=== SESSIONS ===\n' +
+    sessRows.map(r=>r.join(',')).join('\n') +
+    '\n\n=== ALL HANDS ===\n' +
+    handRows.map(r=>r.join(',')).join('\n');
+
+  const ts = new Date().toISOString().slice(0,10);
+  downloadText(csv, `poker_all_data_${ts}.csv`, 'text/csv');
+  showToast('All data exported to CSV');
+}
+
+function exportBackupJSON() {
+  // Full JSON backup — can be re-imported to restore everything
+  const backup = {
+    exportedAt: new Date().toISOString(),
+    version: 2,
+    sessions: state.sessions,
+    currentSession: {
+      startTime: state.currentSession.startTime,
+      hands: state.hands,
+      discTokens: state.discTokens
+    }
+  };
+  const ts = new Date().toISOString().slice(0,10);
+  downloadText(JSON.stringify(backup, null, 2), `poker_backup_${ts}.json`, 'application/json');
+  showToast('Full backup exported');
+}
+
+function importBackupJSON() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const backup = JSON.parse(ev.target.result);
+        if (!backup.version || !backup.sessions) { showToast('Invalid backup file'); return; }
+        if (!confirm(`Restore backup from ${backup.exportedAt?.slice(0,10)}?\n\nThis will REPLACE all current data. Your existing data will be lost.`)) return;
+        state.sessions = backup.sessions || [];
+        state.hands = backup.currentSession?.hands || [];
+        state.discTokens = backup.currentSession?.discTokens || 0;
+        state.currentSession.startTime = backup.currentSession?.startTime || Date.now();
+        save();
+        updateLiveStats(); renderHandList(); renderDiscTokens(); updateSessionSub();
+        showToast('Backup restored!');
+      } catch(err) { showToast('Could not read file'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function downloadText(content, filename, type) {
+  const a = document.createElement('a');
+  a.href = 'data:' + type + ';charset=utf-8,' + encodeURIComponent(content);
+  a.download = filename; a.click();
+}
+
+// ── CLEAR ALL ──
+function confirmClearAll() {
+  if(confirm('Clear ALL data including all sessions? Cannot be undone.')) {
+    localStorage.clear(); state.hands=[]; state.sessions=[]; state.discTokens=0;
+    state.currentSession={startTime:Date.now()};
+    updateLiveStats(); renderHandList(); renderDiscTokens(); renderStats();
+    showToast('All data cleared');
+  }
+}
+
+// ── TOAST ──
+let toastTimer;
+function showToast(msg) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+init();
+</script>
+</body>
+</html>
