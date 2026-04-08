@@ -430,10 +430,7 @@ body {
   </div>
   <div class="content">
     <div class="card-picker">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="picker-label" style="margin-bottom:0;">Select your 2 hole cards</div>
-        <div class="hide-toggle" id="hole-hide-btn" onclick="toggleHoleCardsHidden()">👁 Show</div>
-      </div>
+      <div class="picker-label">Select your 2 hole cards</div>
       <div class="selected-cards">
         <div class="card-large empty" id="card1-display"><span class="rank">Card 1</span></div>
         <div class="card-large empty" id="card2-display"><span class="rank">Card 2</span></div>
@@ -446,8 +443,9 @@ body {
         <div class="suit-btn" id="sb-clubs" onclick="selectSuit('♣','clubs')">♣</div>
         <div class="suit-btn" id="sb-spades" onclick="selectSuit('♠','spades')">♠</div>
       </div>
-      <div style="text-align:center;margin-top:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
         <button class="btn btn-ghost btn-sm" onclick="clearCards()" style="width:auto;padding:6px 16px;font-size:12px;">Clear cards</button>
+        <div class="hide-toggle" id="hole-hide-btn" onclick="toggleHoleCardsHidden()">🙈 Hide</div>
       </div>
     </div>
 
@@ -699,9 +697,16 @@ function toggleListCardsHidden() {
 }
 function markUsedRanks() {
   RANKS.forEach(r => document.getElementById('rank-'+r)?.classList.remove('used'));
-  if (state.card1 && state.card2 && state.card1.rank === state.card2.rank) return;
-  if (state.card1) document.getElementById('rank-'+state.card1.rank)?.classList.add('used');
-  if (state.card2) document.getElementById('rank-'+state.card2.rank)?.classList.add('used');
+  // Only block ranks once BOTH cards are placed (and they differ).
+  // While picking card 2, no rank is blocked — pocket pairs must be possible.
+  if (state.card1 && state.card2) {
+    if (state.card1.rank !== state.card2.rank) {
+      document.getElementById('rank-'+state.card1.rank)?.classList.add('used');
+      document.getElementById('rank-'+state.card2.rank)?.classList.add('used');
+    }
+    // same rank = pocket pair = nothing blocked
+  }
+  // If only card1 placed (card2 not yet picked), block nothing.
 }
 function clearCards() {
   state.card1=null; state.card2=null; state.pendingRank=null; state.pickingCard=1;
@@ -894,6 +899,50 @@ function renderHistory() {
 }
 
 // ── SESSIONS LIST (view & delete) ──
+function handColor(h) {
+  // Returns color for heatmap cell
+  if (!h.isVPIP) return { bg:'#1a1a3a', border:'#2a2a5a', label:'fold' }; // blue/magenta — preflop fold
+  if (h.result === 'won')  return { bg:'#0d2e1a', border:'#1a5c32', label:'won' };  // green — VPIP won
+  if (h.result === 'lost') return { bg:'#2e0d0d', border:'#5c1a1a', label:'lost' }; // red — VPIP lost
+  // VPIP but folded post-flop (no showdown)
+  return { bg:'#2a1a00', border:'#5a3a00', label:'played' }; // amber — played, no result
+}
+
+function buildHeatmap(hands) {
+  if (!hands || !hands.length) return '<div style="font-size:12px;color:var(--text3);padding:8px 0;">No hands recorded.</div>';
+  const cells = hands.map(h => {
+    const c = handColor(h);
+    const c1 = h.card1 ? h.card1.rank+h.card1.suit : '?';
+    const c2 = h.card2 ? h.card2.rank+h.card2.suit : '?';
+    const tooltip = `#${h.num} ${c1}${c2} · ${c.label} · ${h.total?h.total+' chips':''}`;
+    return `<div title="${tooltip}" style="
+      width:18px;height:18px;border-radius:3px;
+      background:${c.bg};border:1px solid ${c.border};
+      flex-shrink:0;cursor:default;
+    "></div>`;
+  }).join('');
+  return `
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">${cells}</div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:2px;background:#0d2e1a;border:1px solid #1a5c32;"></div>
+        <span style="font-size:11px;color:var(--text2);">VPIP won</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:2px;background:#2e0d0d;border:1px solid #5c1a1a;"></div>
+        <span style="font-size:11px;color:var(--text2);">VPIP lost</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:2px;background:#2a1a00;border:1px solid #5a3a00;"></div>
+        <span style="font-size:11px;color:var(--text2);">VPIP folded</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:5px;">
+        <div style="width:10px;height:10px;border-radius:2px;background:#1a1a3a;border:1px solid #2a2a5a;"></div>
+        <span style="font-size:11px;color:var(--text2);">Pre-flop fold</span>
+      </div>
+    </div>`;
+}
+
 function renderSessionsList() {
   const el=document.getElementById('sessions-list');
   const sub=document.getElementById('sessions-sub');
@@ -908,23 +957,7 @@ function renderSessionsList() {
     const vpipColor=s.vpip<=30?'var(--green)':s.vpip<=50?'var(--accent)':'var(--red)';
     const pnlColor=s.pnl>=0?'var(--green)':'var(--red)';
     const pnlStr=(s.pnl>0?'+':'')+s.pnl;
-    const roundColors={preflop:'var(--accent)',flop:'#52b4c4',turn:'#9452e0',river:'var(--green)'};
-    const roundLabels={preflop:'Pre',flop:'Flop',turn:'Turn',river:'River'};
-    const handsHtml=(s.hands||[]).slice(0,8).map(h=>{
-      const betsHtml=['preflop','flop','turn','river'].map(r=>{
-        const b=h.bets?.[r]; if(!b||b.amount===0)return'';
-        return `<span style="color:${roundColors[r]};font-size:10px;font-family:var(--mono)">${roundLabels[r]}:${b.amount}${b.folded?' fd':''} </span>`;
-      }).join('');
-      const c1=h.card1?`${h.card1.rank}${h.card1.suit}`:'?', c2=h.card2?`${h.card2.rank}${h.card2.suit}`:'?';
-      const badge=h.isVPIP?`<span style="color:var(--accent);font-size:10px">VPIP</span>`:`<span style="color:var(--text3);font-size:10px">fold</span>`;
-      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid var(--border)">
-        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);min-width:20px">#${h.num}</span>
-        <span style="font-family:var(--mono);font-size:12px;min-width:60px">${c1} ${c2}</span>
-        ${badge}
-        <span style="flex:1;font-size:10px;color:var(--text2)">${betsHtml}</span>
-      </div>`;
-    }).join('');
-    const moreHands=s.totalHands>8?`<div style="font-size:11px;color:var(--text3);padding-top:6px">...and ${s.totalHands-8} more hands</div>`:'';
+    const heatmap = buildHeatmap(s.hands||[]);
     return `<div class="session-card">
       <div class="session-card-hdr" onclick="toggleSessionCard(${realIdx})">
         <div>
@@ -938,10 +971,8 @@ function renderSessionsList() {
         </div>
       </div>
       <div class="session-card-body" id="sbody-${realIdx}">
-        <div style="margin-bottom:8px">
-          ${handsHtml}${moreHands}
-        </div>
-        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        ${heatmap}
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
           <div class="session-delete-btn" onclick="deleteSession(${realIdx})">Delete this session</div>
           <div style="font-size:11px;color:var(--text3)">Cannot be undone</div>
         </div>
