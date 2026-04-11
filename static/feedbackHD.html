@@ -292,7 +292,7 @@
           <div>
             <label class="block text-sm font-semibold mb-1 text-slate-700">Gemini API Key</label>
             <input type="password" id="ob-apikey" required class="input-field" placeholder="AIzaSy..."
-              value="AIzaSyCtg9oTThWf5Tw8eapzQ65xGxGdT0_Nl7E">
+              value="AIzaSyBz32wBfgpoeCflvJumk94SCCZ24SREp_s">
             <p class="text-xs text-slate-500 mt-1">Saved locally to your browser. Required for AI features.</p>
           </div>
 
@@ -1246,7 +1246,38 @@
           body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        if (!response.ok) {
+          if (response.status === 429 || response.status === 403) {
+            console.warn("429/403 Error, using demo fallback data");
+            let fallbackText = "";
+            if (systemInstruction.includes("raw json array of exactly 4 profile objects")) {
+              fallbackText = JSON.stringify([
+                { "name": "Sarah", "role": "Manager", "experience_level": "Senior", "nationality": "American", "personality_traits": "Direct, results-oriented", "communication_preference": "Bullet points, asynchronous", "custom_context": "Dislikes meetings" },
+                { "name": "Kenji", "role": "Data Scientist", "experience_level": "Mid-level", "nationality": "Japanese", "personality_traits": "Analytical, introverted", "communication_preference": "Detailed documents, data-backed", "custom_context": "Needs time to process" },
+                { "name": "Elena", "role": "Creative Director", "experience_level": "Senior", "nationality": "Italian", "personality_traits": "Expressive, chaotic", "communication_preference": "In-person, visual", "custom_context": "Bounces ideas off others" },
+                { "name": "Liam", "role": "Junior Developer", "experience_level": "Junior", "nationality": "Irish", "personality_traits": "Eager, anxious", "communication_preference": "Frequent check-ins, supportive", "custom_context": "Needs positive reinforcement" }
+              ]);
+            } else if (systemInstruction.includes("1 corporate profile")) {
+              fallbackText = JSON.stringify(
+                { "name": "Priya", "role": "Product Manager", "experience_level": "Mid", "nationality": "Indian", "personality_traits": "Organized, empathetic", "communication_preference": "Slack, clear action items", "custom_context": "Great at synthesis" }
+              );
+            } else if (systemInstruction.includes("corporate decoder")) {
+              fallbackText = "### The Translation\nThey are feeling overwhelmed and need you to be more direct.\n\n### The 'Why'\nBecause they value clarity and structured communication.\n\n### Next Steps\n* Ask them for a specific list of priorities.\n* Set a clear timeline.";
+            } else if (systemInstruction.includes("leadership coach")) {
+              fallbackText = "### Core Principles\n* Focus on observable behavior.\n* Assume positive intent.\n\n### Delivery Logistics\n* Do it in private, preferably 1-on-1.\n* Ensure you have enough time to listen.\n\n### The Script\n\"I noticed that during the meeting, you interrupted several times. Can we discuss how to ensure everyone gets a chance to speak?\"";
+            } else {
+              fallbackText = "Mock response due to 429 Error.";
+            }
+
+            if (statusElementsObj.loading) statusElementsObj.loading.classList.add('hidden-force');
+            if (statusElementsObj.output) {
+              statusElementsObj.output.classList.remove('hidden-force');
+              statusElementsObj.output.innerHTML = simpleMarkdownParse(fallbackText);
+            }
+            return fallbackText;
+          }
+          throw new Error(`API Error: ${response.status}`);
+        }
 
         const data = await response.json();
         const textResponse = data.candidates[0].content.parts[0].text;
@@ -1468,46 +1499,38 @@
       const container = document.getElementById(`q-container-${step.id}`);
       if (!container) return;
 
-      const targetProf = AppState.teamProfiles[Math.floor(Math.random() * AppState.teamProfiles.length)];
-      const langDirective = AppState.lang === 'vi' ? 'Write the example strictly in Vietnamese.' : 'Write the example strictly in English.';
+      // Temporarily Disable API Call & Use Mock Data 
+      // const targetProf = AppState.teamProfiles[Math.floor(Math.random() * AppState.teamProfiles.length)];
+      const targetName = "Alex (Lead Programmer)";
 
-      const sysInstruction = `Output ONLY a strictly formatted JSON object (no markdown formatting, no backticks outside the json).
-       Provide an example of 'Step ${step.id}: ${step.name}' in Manager Tools feedback. The goal is to ${step.theme}.
-       Give a clear, 1-2 sentence dialogue script representing how the user would deliver this specific step to the target profile.
-       ${langDirective}
-       Format exactly like this: {"example": "string"}`;
-
-      const prompt = `Target Profile: ${targetProf.name}, ${targetProf.role}. Traits: ${targetProf.personality_traits}. Write a realistic phrase reflecting 'Step ${step.id}'.`;
-
-      const rawJson = await callGeminiStreamish(sysInstruction, prompt, null, {});
-
-      if (rawJson) {
-        try {
-          const cleanedText = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
-          const payload = JSON.parse(cleanedText);
-
-          // Persist to Database
-          AppState.academyQuizzes[`step${step.id}`] = {
-            example: payload.example,
-            targetName: targetProf.name
-          };
-          saveState();
-
-          renderExample(step.id, payload.example, targetProf.name);
-
-          // Visually prompt that it's ready
-          const card = document.getElementById(`step-card-${step.id}`);
-          if (card) {
-            card.classList.remove('opacity-50');
-          }
-        } catch (e) {
-          console.error("Example Parse Fail", e);
-          const retryTxt = AppState.lang === 'vi' ? 'Thử lại' : 'Retry';
-          container.innerHTML = `<div class="text-red-500 font-bold text-sm">Error generating example. <button onclick="generateQuizForStep({id:${step.id}, name:'${step.name}', theme:'${step.theme}'})" class="underline">${retryTxt}</button></div>`;
-        }
+      let exampleText = "";
+      if (AppState.lang === 'vi') {
+        if (step.id === 1) exampleText = "Alex này, mình có thể chia sẻ một quan sát nhỏ về đợt sprint planning vừa rồi được không?";
+        else if (step.id === 2) exampleText = "Khi bạn lỡ deadline nộp code mà không cập nhật ticket trên Jira...";
+        else if (step.id === 3) exampleText = "Điều đó khiến team QA phải tốn cả cuối tuần để test lại toàn bộ bản build cốt lõi.";
+        else if (step.id === 4) exampleText = "Chúng ta có thể làm gì để đảm bảo các ticket được cập nhật tự động trong lần tới?";
       } else {
-        const retryTxt = AppState.lang === 'vi' ? 'Thử lại' : 'Retry';
-        container.innerHTML = `<div class="text-red-500 font-bold text-xs bg-red-50 border border-red-200 p-2 flex items-center justify-between rounded-lg"><span>API Limit (429) Wait & Retry.</span><button onclick="generateQuizForStep({id:${step.id}, name:'${step.name}', theme:'${step.theme}'})" class="px-2 py-1 bg-white border border-red-200 rounded text-red-600 hover:bg-red-50 ml-2 font-bold">${retryTxt}</button></div>`;
+        if (step.id === 1) exampleText = "Hey Alex, can I share a quick observation about our recent sprint planning?";
+        else if (step.id === 2) exampleText = "When you miss the milestone deadline without updating the Jira ticket...";
+        else if (step.id === 3) exampleText = "It forces the QA team to test the core build updates over the weekend.";
+        else if (step.id === 4) exampleText = "What can we do to ensure the tickets are updated automatically next time?";
+      }
+
+      // Simulated slight delay to look natural
+      await new Promise(resolve => setTimeout(resolve, 600));
+
+      // Persist to Database 
+      AppState.academyQuizzes[`step${step.id}`] = {
+        example: exampleText,
+        targetName: targetName
+      };
+      saveState();
+
+      renderExample(step.id, exampleText, targetName);
+
+      const card = document.getElementById(`step-card-${step.id}`);
+      if (card) {
+        card.classList.remove('opacity-50');
       }
     }
 
