@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feedback Forge - Corporate Decoder</title>
+  
+  <!-- Fonts: Merriweather for headings, Be Vietnam Pro for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            google: {
+              blue: '#4285F4',
+              red: '#EA4335',
+              yellow: '#FBBC04',
+              green: '#34A853',
+            }
+          },
+          fontFamily: {
+            body: ['"Be Vietnam Pro"', 'sans-serif'],
+            heading: ['"Merriweather"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      background-color: #f0f4f8; /* Soft subtle background */
+      color: #1e293b;
+      margin: 0;
+    }
+    h1, h2, h3, h4, h5, h6, .font-heading {
+      font-family: 'Merriweather', serif;
+    }
+    
+    /* Utilities */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+    }
+    .fade-in {
+      animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .slide-in-right {
+      animation: slideInRight 0.3s ease-out forwards;
+    }
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .hidden-force {
+      display: none !important;
+    }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .btn:active {
+      transform: scale(0.98);
+    }
+    .btn-primary {
+      background-color: #4285F4;
+      color: white;
+    }
+    .btn-primary:hover {
+      background-color: #3367d6;
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+    .btn-secondary {
+      background-color: white;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+    }
+    .btn-secondary:hover {
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+    }
+    .btn-danger {
+      background-color: #fff1f2;
+      color: #EA4335;
+      border: 1px solid #fecdd3;
+    }
+    .btn-danger:hover {
+      background-color: #ffe4e6;
+    }
+
+    /* Loader */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #4285F4;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Form Inputs */
+    .input-field {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #cbd5e1;
+      background-color: #f8fafc;
+      transition: border-color 0.2s;
+    }
+    .input-field:focus {
+      outline: none;
+      border-color: #4285F4;
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+    }
+
+    /* Markdown output styling */
+    .md-content h3 { font-size: 1.25rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #1e293b; }
+    .md-content p { margin-bottom: 0.75rem; line-height: 1.6; }
+    .md-content ul { list-style-type: disc; padding-left: 1.5rem; margin-bottom: 0.75rem; }
+    .md-content li { margin-bottom: 0.25rem; }
+    .md-content strong { font-weight: 600; color: #0f172a; }
+
+    /* Language System */
+    body[data-lang="vi"] .en-text { display: none !important; }
+    body[data-lang="en"] .vi-text { display: none !important; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col" data-lang="vi">
+
+  <!-- ===============================
+       ONBOARDING FLOW
+       =============================== -->
+  <div id="view-onboarding" class="flex-grow flex flex-col items-center justify-center p-6 hidden-force relative overflow-hidden">
+    <!-- Decorative background elements -->
+    <div class="absolute top-0 left-0 w-64 h-64 bg-google-blue rounded-full mix-blend-multiply filter blur-3xl opacity-10 transform -translate-x-1/2 -translate-y-1/2"></div>
+    <div class="absolute bottom-0 right-0 w-80 h-80 bg-google-red rounded-full mix-blend-multiply filter blur-3xl opacity-10 transform translate-x-1/3 translate-y-1/3"></div>
+
+    <div class="w-full max-w-2xl glass-panel rounded-2xl p-8 md:p-12 relative z-10 fade-in">
+      
+      <!-- Logo/Header -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white shadow-sm border border-slate-100 mb-4">
+          <svg class="w-8 h-8 text-google-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-bold font-heading text-slate-900 tracking-tight">Feedback Forge</h1>
+        <p class="text-slate-500 mt-2 text-lg">Your corporate psychological whisperer.</p>
+      </div>
+
+      <!-- Step 1: User Context -->
+      <div id="onboarding-step-1" class="">
+        <h2 class="text-2xl font-bold mb-6 font-heading">
+          <span class="en-text">Step 1: Your Context</span>
+          <span class="vi-text">Bước 1: Ngữ Cảnh Của Bạn</span>
+        </h2>
+        <p class="text-sm text-slate-600 mb-6">
+          <span class="en-text">Before we help you decode others, tell us about yourself. This context shapes all the AI coaching you receive.</span>
+          <span class="vi-text">Trước khi chúng tôi giúp bạn giải mã người khác, hãy cho chúng tôi biết về bạn. Ngữ cảnh này sẽ định hình các hướng dẫn AI bạn nhận được.</span>
+        </p>
+        
+        <form id="form-onboarding-1" class="space-y-5">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-sm font-semibold mb-1 text-slate-700">Your Role / Title</label>
+              <input type="text" id="ob-role" required class="input-field" placeholder="e.g. Product Manager" value="Project Manager">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold mb-1 text-slate-700">Years of Experience</label>
+              <input type="number" id="ob-yoe" required class="input-field" placeholder="e.g. 5" value="5">
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-slate-700">Industry</label>
+            <input type="text" id="ob-industry" required class="input-field" placeholder="e.g. Tech, Finance, Healthcare" value="Video Game">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-slate-700">Your Style & Challenges</label>
+            <textarea id="ob-context" required class="input-field min-h-[120px]" placeholder="Tell us more about yourself.">Introverted, used to be Programmer for 3 years, Vietnamese, Proactive, Direct, Logical</textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold mb-1 text-slate-700">Gemini API Key</label>
+            <input type="password" id="ob-apikey" required class="input-field" placeholder="AIzaSy..." value="AIzaSyCtg9oTThWf5Tw8eapzQ65xGxGdT0_Nl7E">
+            <p class="text-xs text-slate-500 mt-1">Saved locally to your browser. Required for AI features.</p>
+          </div>
+          
+          <div class="pt-4 flex justify-end">
+            <button type="submit" class="btn btn-primary px-8 py-3 text-lg w-full md:w-auto shadow-lg shadow-google-blue/30">
+              Next: Build Your Team <span class="ml-2">→</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Step 2: Team Roster -->
+      <div id="onboarding-step-2" class="hidden-force">
+        <h2 class="text-2xl font-bold mb-6 font-heading">Step 2: Team Roster</h2>
+        <p class="text-sm text-slate-600 mb-8">Who are you working with? Create profiles manually, or generate a realistic demo team based on your industry to test the app.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full mb-8">
+          <!-- Option A -->
+          <div class="border-2 border-slate-200 bg-white rounded-xl p-6 text-center hover:border-google-blue hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between" onclick="completeOnboarding(false)">
+            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2">Option A</h3>
+            <p class="text-slate-500 text-sm mb-4">I want to add my team manually later.</p>
+            <button class="btn btn-secondary w-full mt-auto">Start Empty</button>
+          </div>
+
+          <!-- Option B -->
+          <div id="btn-generate-team" class="border-2 border-google-blue bg-blue-50/30 rounded-xl p-6 text-center hover:shadow-md transition-all cursor-pointer flex flex-col items-center justify-between group" onclick="generateDemoTeam()">
+            <div class="w-12 h-12 bg-google-blue rounded-full flex items-center justify-center mb-4 text-white shadow-sm group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+            </div>
+            <h3 class="font-bold text-lg mb-2 text-google-blue">Option B (AI Magic)</h3>
+            <p class="text-slate-600 text-sm mb-4">Generate a 4-person Demo Team to start instantly.</p>
+            <div id="demo-team-status" class="w-full mt-auto">
+              <button class="btn btn-primary w-full shadow-md shadow-google-blue/20">Generate Profiles</button>
+            </div>
+          </div>
+        </div>
+        
+        <button class="text-slate-400 hover:text-slate-600 text-sm flex items-center transition-colors" onclick="document.getElementById('onboarding-step-2').classList.add('hidden-force'); document.getElementById('onboarding-step-1').classList.remove('hidden-force');">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> Back
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ===============================
+       MAIN APP INTERFACE
+       =============================== -->
+  <div id="view-app" class="flex-grow flex flex-col md:flex-row hidden-force w-full">
+    
+    <!-- Sidebar / Topbar Navigation -->
+    <nav class="bg-white border-b md:border-b-0 md:border-r border-slate-200 w-full md:w-64 flex-shrink-0 z-20 sticky top-0 flex flex-col">
+      <div class="p-6 hidden md:flex justify-between items-center gap-3 bg-slate-50 border-b border-slate-200">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-google-blue text-white flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+          </div>
+          <h2 class="font-bold font-heading text-lg text-slate-800 tracking-tight">Feedback Forge</h2>
+        </div>
+        <button onclick="toggleLang()" class="text-xs font-bold bg-white text-slate-600 border border-slate-300 rounded px-2 py-1 shadow-sm hover:bg-slate-100 transition-colors" id="btn-lang-toggle">EN</button>
+      </div>
+      
+      <div class="flex overflow-x-auto md:flex-col md:p-4 gap-1 flex-grow scrollbar-hide py-2 px-2 md:py-0 md:px-0">
+        <button class="nav-btn w-auto md:w-full text-left px-4 py-3 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-50 transition-colors whitespace-nowrap md:whitespace-normal flex items-center gap-3" data-target="tab-profiles">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+          Team Profiles
+        </button>
+        <button class="nav-btn w-auto md:w-full text-left px-4 py-3 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-50 transition-colors whitespace-nowrap md:whitespace-normal flex items-center gap-3" data-target="tab-understand">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path></svg>
+          Understand Feedback
+        </button>
+        <button class="nav-btn w-auto md:w-full text-left px-4 py-3 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-50 transition-colors whitespace-nowrap md:whitespace-normal flex items-center gap-3" data-target="tab-give">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+          Give Feedback
+        </button>
+        <button class="nav-btn w-auto md:w-full text-left px-4 py-3 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-50 transition-colors whitespace-nowrap md:whitespace-normal flex items-center gap-3" data-target="tab-learn">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+          Learn
+        </button>
+        <button class="nav-btn w-auto md:w-full text-left px-4 py-3 rounded-lg font-medium text-sm text-slate-600 hover:bg-slate-50 transition-colors whitespace-nowrap md:whitespace-normal flex items-center gap-3" data-target="tab-coach">
+          <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+          Coach
+        </button>
+      </div>
+
+      <!-- User context simple footer -->
+      <div class="hidden md:block mt-auto p-4 border-t border-slate-200">
+        <div class="text-xs text-slate-500 mb-1">Signed in as</div>
+        <div id="nav-user-label" class="font-semibold text-sm truncate text-slate-800"></div>
+        <div id="nav-role-label" class="text-xs text-slate-400 truncate mb-3"></div>
+        <div class="mb-4">
+          <label class="text-[10px] uppercase font-bold text-slate-400 block mb-1">API Key</label>
+          <input type="password" id="nav-api-key" class="w-full text-xs p-2 border border-slate-200 rounded text-slate-600 bg-slate-50 focus:border-google-blue focus:outline-none" placeholder="AIza..." onchange="updateApiKey(this.value)">
+        </div>
+        <button onclick="clearData()" class="text-xs text-red-500 hover:text-red-700 flex items-center opacity-70 hover:opacity-100 transition-opacity">
+          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+          Clear Data & Restart
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow p-4 md:p-8 overflow-y-auto relative w-full main-bg">
+      <div class="max-w-5xl mx-auto pb-20">
+
+        <!-- TAB 1: PROFILES -->
+        <div id="tab-profiles" class="tab-view fade-in hidden-force">
+          <div class="flex justify-between items-end mb-8">
+            <div>
+              <h1 class="text-3xl font-bold font-heading mb-2 text-slate-900">Team Profiles</h1>
+              <p class="text-slate-500">The Context Engine. Your team's psychological blueprint.</p>
+            </div>
+            <button onclick="generateRandomProfile()" class="btn btn-primary gap-2 hidden md:inline-flex" id="btn-add-ai-profile">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+              Generate AI Profile
+            </button>
+          </div>
+
+          <!-- The Grid -->
+          <div id="profiles-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Rendered via JS -->
+          </div>
+          
+          <div class="mt-8 text-center md:hidden">
+            <button onclick="generateRandomProfile()" class="btn btn-primary w-full gap-2" id="btn-add-ai-profile-mobile">
+              Generate AI Profile
+            </button>
+            <button onclick="clearData()" class="mt-6 text-sm text-red-500 underline">Clear Data & Restart</button>
+          </div>
+        </div>
+
+        <!-- TAB 2: UNDERSTAND FEEDBACK -->
+        <div id="tab-understand" class="tab-view fade-in hidden-force">
+          <div class="mb-8 border-b-4 border-google-yellow pb-4 inline-block">
+            <h1 class="text-3xl font-bold font-heading mb-2 text-slate-900">Understand Feedback</h1>
+            <p class="text-slate-500">The Decoder. Translate corporate ambiguity into actionable intent.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-panel rounded-2xl p-6 h-fit border-t-4 border-t-google-yellow">
+              <form id="form-understand" class="space-y-6">
+                <div>
+                  <label class="block text-sm font-bold text-slate-800 mb-2">Who gave you this feedback?</label>
+                  <select id="understand-target" required class="input-field bg-white shadow-sm border-slate-200 focus:border-google-yellow focus:ring-google-yellow" style="box-shadow: 0 0 0 0 transparent;">
+                    <!-- Filled by JS -->
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold text-slate-800 mb-2">What did they *actually* say or do?</label>
+                  <textarea id="understand-input" required class="input-field min-h-[160px] bg-white shadow-sm border-slate-200" placeholder="e.g. 'You need to be more strategic' or 'The presentation was a bit tactical.'"></textarea>
+                  
+                  <div class="mt-3">
+                    <p class="text-xs text-slate-500 mb-2">Quick fill vague feedback:</p>
+                    <div class="flex flex-wrap gap-2">
+                      <button type="button" onclick="document.getElementById('understand-input').value='You need to be more strategic.' " class="text-[11px] bg-slate-100 hover:bg-google-yellow hover:text-yellow-900 border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">"Be more strategic"</button>
+                      <button type="button" onclick="document.getElementById('understand-input').value='I feel like you lack executive presence in meetings.' " class="text-[11px] bg-slate-100 hover:bg-google-yellow hover:text-yellow-900 border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">"Lack executive presence"</button>
+                      <button type="button" onclick="document.getElementById('understand-input').value='We need you to operate at a 30,000-foot view instead of being in the weeds.' " class="text-[11px] bg-slate-100 hover:bg-google-yellow hover:text-yellow-900 border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">"You are too in the weeds"</button>
+                      <button type="button" onclick="document.getElementById('understand-input').value='You need to manage your stakeholders better.' " class="text-[11px] bg-slate-100 hover:bg-google-yellow hover:text-yellow-900 border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">"Manage stakeholders better"</button>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" id="btn-understand-submit" class="btn btn-primary w-full bg-google-yellow hover:bg-yellow-500 hover:shadow-lg hover:shadow-yellow-500/30 text-slate-900 font-bold py-3 shadow-md shadow-yellow-500/20">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                  Translate from Corporate
+                </button>
+              </form>
+            </div>
+
+            <!-- Output Panel -->
+            <div id="understand-output-container" class="glass-panel rounded-2xl p-6 md:p-8 relative min-h-[400px]">
+              <div id="understand-idle" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center pointer-events-none">
+                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <p>Select a person, enter the raw feedback, and let the AI decode the hidden meaning.</p>
+              </div>
+              <div id="understand-loading" class="absolute inset-0 flex flex-col items-center justify-center hidden-force bg-white/80 rounded-2xl z-10">
+                <div class="loader mb-4" style="border-top-color: #FBBC04"></div>
+                <span class="text-google-yellow font-bold text-sm tracking-widest uppercase">Consulting the Oracle...</span>
+              </div>
+              <div id="understand-output" class="md-content hidden-force relative z-20">
+                <!-- Inner HTML populated by Gemini formatting -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: GIVE FEEDBACK -->
+        <div id="tab-give" class="tab-view fade-in hidden-force">
+          <div class="mb-8 border-b-4 border-google-red pb-4 inline-block">
+            <h1 class="text-3xl font-bold font-heading mb-2 text-slate-900">Give Feedback</h1>
+            <p class="text-slate-500">The Crafter. Tailor your message perfectly to the recipient's psyche.</p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div class="glass-panel rounded-2xl p-6 h-fit border-t-4 border-t-google-red">
+              <form id="form-give" class="space-y-6">
+                <div>
+                  <label class="block text-sm font-bold text-slate-800 mb-2">Who is this feedback for?</label>
+                  <select id="give-target" required class="input-field bg-white drop-shadow-sm border-slate-200 focus:border-google-red">
+                    <!-- Filled by JS -->
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-bold text-slate-800 mb-2">
+                    <span class="en-text">What is the raw issue observed?</span>
+                    <span class="vi-text">Vấn đề thực tế bạn quan sát là gì?</span>
+                  </label>
+                  <textarea id="give-input" required class="input-field min-h-[160px] bg-white drop-shadow-sm border-slate-200" placeholder="e.g. 'They keep talking over me in meetings and ignoring my design proposals.'"></textarea>
+                  
+                  <div class="mt-3">
+                    <p class="text-xs text-slate-500 mb-2">
+                      <span class="en-text">Quick fill templates:</span><span class="vi-text">Điền nhanh:</span>
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                      <button type="button" onclick="document.getElementById('give-input').value='Your code reviews are too nitpicky and slow down the team.' " class="text-[11px] bg-slate-100 hover:bg-google-red hover:text-white border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">Technical</button>
+                      <button type="button" onclick="document.getElementById('give-input').value='Your design choices feel outdated and subjective.' " class="text-[11px] bg-slate-100 hover:bg-google-red hover:text-white border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">Subjective</button>
+                      <button type="button" onclick="document.getElementById('give-input').value='You have consistently bad body odor / breath in the office and it distracts others.' " class="text-[11px] bg-slate-100 hover:bg-google-red hover:text-white border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">Physical Issue</button>
+                      <button type="button" onclick="document.getElementById('give-input').value='You constantly interrupt me during presentations.' " class="text-[11px] bg-slate-100 hover:bg-google-red hover:text-white border border-slate-200 rounded-full px-3 py-1.5 transition-colors font-medium">Behavioral</button>
+                    </div>
+                  </div>
+                </div>
+                <button type="submit" id="btn-give-submit" class="btn btn-primary w-full bg-google-red hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/30 text-white font-bold py-3 shadow-md shadow-red-500/20">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                  Forge the Feedback
+                </button>
+              </form>
+            </div>
+
+            <!-- Output Panel -->
+            <div id="give-output-container" class="glass-panel rounded-2xl p-6 md:p-8 relative min-h-[400px]">
+              <div id="give-idle" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 text-center pointer-events-none">
+                <svg class="w-16 h-16 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                <p>Dump your raw frustration here, we'll forge it into constructive, tailored feedback.</p>
+              </div>
+              <div id="give-loading" class="absolute inset-0 flex flex-col items-center justify-center hidden-force bg-white/80 rounded-2xl z-10">
+                <div class="loader mb-4" style="border-top-color: #EA4335"></div>
+                <span class="text-google-red font-bold text-sm tracking-widest uppercase">Synthesizing Script...</span>
+              </div>
+              <div id="give-output" class="md-content hidden-force relative z-20">
+                <!-- Inner HTML populated by Gemini -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: LEARN -->
+        <div id="tab-learn" class="tab-view fade-in hidden-force w-full">
+          <div class="mb-6 border-b-4 border-google-green pb-4 inline-block">
+            <h1 class="text-3xl font-bold font-heading mb-2 text-slate-900">
+              <span class="en-text">The Academy</span>
+              <span class="vi-text">Học Viện (The Academy)</span>
+            </h1>
+            <p class="text-slate-500 text-sm">
+              <span class="en-text">Master communication frameworks with interactive context.</span>
+              <span class="vi-text">Làm chủ các phương pháp giao tiếp.</span>
+            </p>
+          </div>
+
+          <!-- Course Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+            <!-- Locked Module 1 -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-4 relative overflow-hidden group">
+              <div class="absolute inset-0 bg-slate-900/5 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                <div class="bg-white px-3 py-1 rounded-full text-[10px] font-bold shadow flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg> <span class="en-text">Locked</span><span class="vi-text">Đã khóa</span></div>
+              </div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Module 1</div>
+              <h3 class="font-bold font-heading text-sm text-slate-700 opacity-60">Non-Violent Comm.</h3>
+            </div>
+            
+            <!-- Active Module 2 -->
+            <div class="border-2 border-google-green bg-white rounded-xl p-4 shadow-sm relative z-10">
+              <div class="absolute top-0 right-0 bg-google-green text-white text-[9px] font-bold px-2 py-0.5 rounded-bl-lg">ACTIVE</div>
+              <div class="text-[10px] font-bold text-google-green uppercase mb-1">Module 2</div>
+              <h3 class="font-bold font-heading text-sm text-slate-900 mb-1">Giving Feedback</h3>
+            </div>
+
+            <!-- Locked Module 3 -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-4 relative overflow-hidden">
+              <div class="absolute inset-0 bg-slate-900/5 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                <div class="bg-white px-3 py-1 rounded-full text-[10px] font-bold shadow flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg> <span class="en-text">Locked</span><span class="vi-text">Đã khóa</span></div>
+              </div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Module 3</div>
+              <h3 class="font-bold font-heading text-sm text-slate-700 opacity-60">The Culture Map</h3>
+            </div>
+
+            <!-- Locked Module 4 -->
+            <div class="border border-slate-200 bg-slate-50 rounded-xl p-4 relative overflow-hidden">
+              <div class="absolute inset-0 bg-slate-900/5 z-10 flex items-center justify-center backdrop-blur-[1px]">
+                <div class="bg-white px-3 py-1 rounded-full text-[10px] font-bold shadow flex items-center"><svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg> <span class="en-text">Locked</span><span class="vi-text">Đã khóa</span></div>
+              </div>
+              <div class="text-[10px] font-bold text-slate-400 uppercase mb-1">Module 4</div>
+              <h3 class="font-bold font-heading text-sm text-slate-700 opacity-60">Radical Candor</h3>
+            </div>
+          </div>
+
+          <!-- Active Course Content -->
+          <div class="glass-panel rounded-2xl overflow-hidden shadow-default space-y-6 bg-slate-100/50 pb-4">
+            
+            <!-- STEP 1 -->
+            <div class="border border-slate-200 rounded-xl m-4 overflow-hidden shadow-sm bg-white">
+              <div class="p-6 border-b border-slate-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="w-8 h-8 rounded-full bg-google-green text-white flex items-center justify-center font-bold">1</span>
+                  <h2 class="text-xl font-bold font-heading">
+                    <span class="en-text">Step 1: The Ask</span>
+                    <span class="vi-text">Bước 1: Xin Phép (The Ask)</span>
+                  </h2>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                  <span class="en-text">Always ask for permission before giving feedback. It establishes psychological safety. Avoid ominous statements ("We need to talk"). Keep it light and structural. Key words: "May I...?" or "Can I share an observation?"</span>
+                  <span class="vi-text">Luôn xin phép trước khi đưa ra phản hồi để tạo sự an toàn tâm lý. Tránh những câu đe dọa ("Chúng ta cần nói chuyện"). Từ khóa: "Mình có thể...?" hoặc "Mình chia sẻ một góc nhìn nhé?"</span>
+                </p>
+                <div class="bg-green-50/50 border border-green-100 p-4 rounded-lg text-sm text-slate-700 md-content relative min-h-[60px]" id="q-container-1">
+                   <div class="animate-pulse flex items-center text-slate-400 absolute inset-0 pl-4 py-4"><div class="loader mr-3 w-4 h-4" style="border-top-color: #34A853"></div> Generating example...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="border border-slate-200 rounded-xl m-4 overflow-hidden shadow-sm bg-white opacity-50 transition-opacity" id="step-card-2">
+              <div class="p-6 border-b border-slate-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="w-8 h-8 rounded-full bg-google-yellow text-white flex items-center justify-center font-bold">2</span>
+                  <h2 class="text-xl font-bold font-heading">
+                    <span class="en-text">Step 2: Describe Behavior</span>
+                    <span class="vi-text">Bước 2: Mô Tả Hành Vi</span>
+                  </h2>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                  <span class="en-text">Don't guess motivation. Tell them what you saw, heard, or read. Avoid labels ("lazy", "poor attitude"). Key words: "When you..."</span>
+                  <span class="vi-text">Đừng đoán động cơ. Hãy nói những gì bạn nghe, thấy, hoặc đọc được. Tránh dán nhãn ("lười biếng", "thái độ kém"). Từ khóa: "Khi bạn..."</span>
+                </p>
+                <div class="bg-yellow-50/50 border border-yellow-100 p-4 rounded-lg text-sm text-slate-700 md-content relative min-h-[60px]" id="q-container-2">
+                   <div class="animate-pulse flex items-center text-slate-400 absolute inset-0 pl-4 py-4"><div class="loader mr-3 w-4 h-4" style="border-top-color: #FBBC04"></div> Generating example...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="border border-slate-200 rounded-xl m-4 overflow-hidden shadow-sm bg-white opacity-50 transition-opacity" id="step-card-3">
+              <div class="p-6 border-b border-slate-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="w-8 h-8 rounded-full bg-google-blue text-white flex items-center justify-center font-bold">3</span>
+                  <h2 class="text-xl font-bold font-heading">
+                    <span class="en-text">Step 3: Describe Impact</span>
+                    <span class="vi-text">Bước 3: Mô Tả Tác Động</span>
+                  </h2>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                  <span class="en-text">Adults understand behavior has consequences. Tell them what impact it had on the project, team, or you. Key words: "Here's what happens..."</span>
+                  <span class="vi-text">Hành vi có hậu quả. Hãy nói với họ tác động đối với dự án, team, hoặc bạn. Từ khóa: "Hậu quả là..."</span>
+                </p>
+                <div class="bg-blue-50/50 border border-blue-100 p-4 rounded-lg text-sm text-slate-700 md-content relative min-h-[60px]" id="q-container-3">
+                   <div class="animate-pulse flex items-center text-slate-400 absolute inset-0 pl-4 py-4"><div class="loader mr-3 w-4 h-4" style="border-top-color: #4285F4"></div> Generating example...</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 4 -->
+            <div class="border border-slate-200 rounded-xl m-4 overflow-hidden shadow-sm bg-white opacity-50 transition-opacity" id="step-card-4">
+              <div class="p-6 border-b border-slate-100">
+                <div class="flex items-center gap-3 mb-3">
+                  <span class="w-8 h-8 rounded-full bg-google-red text-white flex items-center justify-center font-bold">4</span>
+                  <h2 class="text-xl font-bold font-heading">
+                    <span class="en-text">Step 4: Discuss Next Steps</span>
+                    <span class="vi-text">Bước 4: Bàn Bước Tiếp Theo</span>
+                  </h2>
+                </div>
+                <p class="text-slate-600 text-sm leading-relaxed mb-4">
+                  <span class="en-text">Ask open-ended questions to work out how to change behavior. If you impose a change, they won't own it. Key words: "What are you going to do about this?"</span>
+                  <span class="vi-text">Dùng câu hỏi mở để thảo luận cách thay đổi. Mệnh lệnh sẽ giảm sự tự chủ. Từ khóa: "Bạn định cải thiện việc này bằng cách nào?"</span>
+                </p>
+                <div class="bg-red-50/50 border border-red-100 p-4 rounded-lg text-sm text-slate-700 md-content relative min-h-[60px]" id="q-container-4">
+                   <div class="animate-pulse flex items-center text-slate-400 absolute inset-0 pl-4 py-4"><div class="loader mr-3 w-4 h-4" style="border-top-color: #EA4335"></div> Generating example...</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 5: COACH -->
+        <div id="tab-coach" class="tab-view fade-in hidden-force h-[70vh] flex flex-col items-center justify-center w-full">
+          <div class="relative max-w-lg text-center p-8">
+            <div class="absolute inset-0 bg-gradient-to-tr from-google-blue/10 via-purple-500/10 to-google-red/10 rounded-full blur-3xl -z-10"></div>
+            
+            <div class="w-24 h-24 mx-auto mb-8 bg-slate-900 rounded-3xl flex items-center justify-center shadow-2xl relative overflow-hidden border border-slate-700">
+              <div class="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent"></div>
+              <svg class="w-12 h-12 text-white drop-shadow-md relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
+            </div>
+            
+            <h1 class="text-4xl md:text-5xl font-bold font-heading mb-4 text-slate-900 drop-shadow-sm">Voice Dojo</h1>
+            <div class="inline-block bg-slate-900 text-white font-bold text-xs px-3 py-1 rounded-full uppercase tracking-widest mb-6 shadow-md">Coming in V2</div>
+            
+            <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+              Step into the voice-activated feedback simulator. Speak your feedback aloud, and get real-time coaching against your team's simulated psychological profiles.
+            </p>
+            
+            <button class="bg-white border-2 border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white transition-colors font-bold py-3 px-8 rounded-xl shadow-lg">
+              Join the Waitlist
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal for Manual Add (Hidden initially) -->
+  <div id="modal-add-profile" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden-force p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto slide-in-right">
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+        <h3 class="text-xl font-bold font-heading text-slate-800">Add Team Profile</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-slate-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <form id="form-add-profile" class="p-6 space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Name</label>
+            <input type="text" id="add-name" required class="input-field py-2" placeholder="Jane Doe">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Role</label>
+            <input type="text" id="add-role" required class="input-field py-2" placeholder="UX Designer">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Experience Level</label>
+            <input type="text" id="add-exp" required class="input-field py-2" placeholder="Junior">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Nationality/Culture</label>
+            <input type="text" id="add-nat" required class="input-field py-2" placeholder="e.g. Japanese">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Personality Traits</label>
+          <input type="text" id="add-traits" required class="input-field py-2" placeholder="Introverted, methodical, defensive">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Communication Pref.</label>
+          <input type="text" id="add-comm" required class="input-field py-2" placeholder="Asynchronous text, highly factual">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 uppercase tracking-wide mb-1">Custom Context</label>
+          <textarea id="add-context" class="input-field py-2 min-h-[80px]" placeholder="Anything else? (e.g. they hate being put on the spot)"></textarea>
+        </div>
+        <div class="pt-4 flex justify-end gap-3 border-t border-slate-100 mt-6">
+          <button type="button" onclick="closeModal()" class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- ===============================
+       JAVASCRIPT LOGIC
+       =============================== -->
+  <script>
+    // --- 1. Configuration & Constants ---
+    const STORAGE_KEY = "feedbackForgeAppState";
+
+    // Defaults
+    let AppState = {
+      userContext: null, // { role, yoe, industry, context }
+      teamProfiles: [], // Array of objects
+      isOnboardingComplete: false,
+      geminiApiKey: "",
+      lang: "vi",
+      academyQuizzes: { step1: null, step2: null, step3: null, step4: null }
+    };
+
+    // --- 2. State & Storage Logic ---
+    function loadState() {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        try { AppState = JSON.parse(stored); } catch (e) { console.error("Corrupt state", e); }
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(AppState));
+      updateUIBasedOnState();
+    }
+
+    function toggleLang() {
+      AppState.lang = AppState.lang === 'vi' ? 'en' : 'vi';
+      saveState();
+      document.body.setAttribute('data-lang', AppState.lang);
+      const btn = document.getElementById('btn-lang-toggle');
+      if (btn) btn.innerText = AppState.lang.toUpperCase();
+    }
+
+    function clearData() {
+      if(confirm("Are you sure you want to delete all profiles and restart?")) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+    }
+
+    function updateApiKey(val) {
+      AppState.geminiApiKey = val.trim();
+      saveState();
+    }
+
+    // --- 3. UI Navigation Logic ---
+    function initApp() {
+      loadState();
+      
+      // Hydrate Lang Toggle
+      document.body.setAttribute('data-lang', AppState.lang || 'vi');
+      const btn = document.getElementById('btn-lang-toggle');
+      if (btn) btn.innerText = (AppState.lang || 'vi').toUpperCase();
+      
+      // Populate sidebar api key input if it exists
+      if(AppState.geminiApiKey && document.getElementById('nav-api-key')) {
+        document.getElementById('nav-api-key').value = AppState.geminiApiKey;
+      }
+
+      if (!AppState.isOnboardingComplete) {
+        document.getElementById('view-onboarding').classList.remove('hidden-force');
+        document.getElementById('view-app').classList.add('hidden-force');
+      } else {
+        document.getElementById('view-onboarding').classList.add('hidden-force');
+        document.getElementById('view-app').classList.remove('hidden-force');
+        switchTab('tab-profiles'); // Default tab
+        updateUIBasedOnState();
+        generateBackgroundAcademy(); // Restore or Generate modules
+      }
+      
+      // Bind Nav Buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const target = e.currentTarget.getAttribute('data-target');
+          switchTab(target);
+        });
+      });
+      
+      // Bind Forms
+      document.getElementById('form-onboarding-1').addEventListener('submit', handleOnboarding1);
+      document.getElementById('form-add-profile').addEventListener('submit', handleAddProfile);
+      document.getElementById('form-understand').addEventListener('submit', handleUnderstandSubmit);
+      document.getElementById('form-give').addEventListener('submit', handleGiveSubmit);
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden-force'));
+      document.getElementById(tabId).classList.remove('hidden-force');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if(btn.getAttribute('data-target') === tabId) {
+          btn.classList.add('bg-slate-100', 'font-bold', 'text-google-blue');
+          // Update SVG color
+          btn.querySelector('svg').classList.add('text-google-blue');
+          btn.querySelector('svg').classList.remove('text-slate-400');
+        } else {
+          btn.classList.remove('bg-slate-100', 'font-bold', 'text-google-blue');
+          btn.querySelector('svg').classList.remove('text-google-blue');
+          btn.querySelector('svg').classList.add('text-slate-400');
+        }
+      });
+      
+      // Refresh dropdowns if hitting feedback tabs
+      if(tabId === 'tab-understand' || tabId === 'tab-give') {
+        populateDropdowns();
+      }
+    }
+
+    function updateUIBasedOnState() {
+      if(!AppState.userContext) return;
+      document.getElementById('nav-user-label').innerText = "Me";
+      document.getElementById('nav-role-label').innerText = `${AppState.userContext.role} • ${AppState.userContext.industry}`;
+      renderProfiles();
+    }
+
+    // --- 4. Core Features ---
+
+    // Generate simple ID
+    const genId = () => Math.random().toString(36).substr(2, 9);
+
+    function handleOnboarding1(e) {
+      e.preventDefault();
+      AppState.userContext = {
+        role: document.getElementById('ob-role').value,
+        yoe: document.getElementById('ob-yoe').value,
+        industry: document.getElementById('ob-industry').value,
+        context: document.getElementById('ob-context').value,
+      };
+      AppState.geminiApiKey = document.getElementById('ob-apikey').value.trim();
+      
+      // Update sidebar input just in case
+      if(document.getElementById('nav-api-key')) {
+         document.getElementById('nav-api-key').value = AppState.geminiApiKey;
+      }
+      
+      document.getElementById('onboarding-step-1').classList.add('hidden-force');
+      document.getElementById('onboarding-step-2').classList.remove('hidden-force');
+    }
+
+    function completeOnboarding(saveAndRender = true) {
+      AppState.isOnboardingComplete = true;
+      if(saveAndRender) saveState();
+      
+      document.getElementById('view-onboarding').classList.add('hidden-force');
+      document.getElementById('view-app').classList.remove('hidden-force');
+      switchTab('tab-profiles');
+      
+      // Preload Academy modules implicitly
+      generateBackgroundAcademy();
+    }
+
+    // Profile CRUD
+    function openModal() {
+      document.getElementById('form-add-profile').reset();
+      document.getElementById('modal-add-profile').classList.remove('hidden-force');
+    }
+    
+    function closeModal() {
+      document.getElementById('modal-add-profile').classList.add('hidden-force');
+    }
+
+    function handleAddProfile(e) {
+      e.preventDefault();
+      const newProfile = {
+        id: genId(),
+        name: document.getElementById('add-name').value,
+        role: document.getElementById('add-role').value,
+        experience_level: document.getElementById('add-exp').value,
+        nationality: document.getElementById('add-nat').value,
+        personality_traits: document.getElementById('add-traits').value,
+        communication_preference: document.getElementById('add-comm').value,
+        custom_context: document.getElementById('add-context').value,
+      };
+      AppState.teamProfiles.push(newProfile);
+      closeModal();
+      saveState();
+    }
+
+    function deleteProfile(id) {
+       if(confirm("Delete this profile?")) {
+         AppState.teamProfiles = AppState.teamProfiles.filter(p => p.id !== id);
+         saveState();
+       }
+    }
+
+    function renderProfiles() {
+      const grid = document.getElementById('profiles-grid');
+      // Add 'Add Manually' card first
+      let html = `
+        <div onclick="openModal()" class="border-2 border-dashed border-slate-300 rounded-2xl flex flex-col justify-center items-center text-slate-500 hover:text-google-blue hover:border-google-blue hover:bg-blue-50/20 cursor-pointer min-h-[220px] transition-all group p-6 text-center">
+            <div class="w-12 h-12 rounded-full bg-slate-100 group-hover:bg-blue-100 flex items-center justify-center mb-3 transition-colors">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            </div>
+            <span class="font-bold font-heading">Add Profile</span>
+            <span class="text-xs mt-1 opacity-70">Create a context card manually</span>
+        </div>
+      `;
+
+      AppState.teamProfiles.forEach(p => {
+        // Simple avatar initial
+        const initial = p.name ? p.name.charAt(0).toUpperCase() : '?';
+        
+        // Randomize accent color slightly for visual variety based on id string length
+        const colors = ['bg-google-blue', 'bg-google-red', 'bg-google-yellow', 'bg-google-green', 'bg-purple-500', 'bg-orange-500'];
+        const accent = colors[p.id.charCodeAt(0) % colors.length] || colors[0];
+
+        html += `
+          <div class="bg-white border text-sm border-slate-200 rounded-2xl p-6 shadow-sm relative group hover:shadow-md transition-shadow flex flex-col">
+            <button onclick="deleteProfile('${p.id}')" class="absolute top-4 right-4 text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+            
+            <div class="flex items-center gap-4 mb-4">
+               <div class="w-12 h-12 rounded-xl text-white ${accent} flex items-center justify-center font-bold text-xl shadow-sm shrink-0">
+                  ${initial}
+               </div>
+               <div class="min-w-0">
+                 <h3 class="font-bold font-heading text-lg text-slate-900 truncate">${p.name}</h3>
+                 <p class="text-xs text-slate-500 truncate">${p.role} • ${p.experience_level}</p>
+               </div>
+            </div>
+            
+            <div class="space-y-3 mt-2 flex-grow">
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Culture</div>
+                <div class="text-slate-800 line-clamp-1">${p.nationality}</div>
+              </div>
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Traits</div>
+                <div class="text-slate-800 line-clamp-2">${p.personality_traits}</div>
+              </div>
+              <div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Communication</div>
+                <div class="text-slate-800 line-clamp-2">${p.communication_preference}</div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      grid.innerHTML = html;
+    }
+
+    function populateDropdowns() {
+      const lists = [document.getElementById('understand-target'), document.getElementById('give-target')];
+      
+      lists.forEach(select => {
+        if(!select) return;
+        select.innerHTML = '<option value="" disabled selected>Select a team member...</option>';
+        AppState.teamProfiles.forEach(p => {
+          select.innerHTML += `<option value="${p.id}">${p.name} (${p.role})</option>`;
+        });
+      });
+    }
+
+    // --- 5. Gemini Integration Core ---
+    
+    // Very basic markdown parser for the output display since we don't have libraries
+    function simpleMarkdownParse(text) {
+      if(!text) return "";
+      let html = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        // Simple lists
+        .replace(/^\s*\*\s+(.*)/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+        // Headers - H3 mainly 
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        // Newlines to br
+        .replace(/\n\n/g, '<p></p>');
+      return html;
+    }
+
+    async function callGeminiStreamish(systemInstruction, userPrompt, outputElement, statusElementsObj) {
+      const apiKey = AppState.geminiApiKey;
+      if (!apiKey) {
+        alert("Please set your Gemini API Key in the sidebar.");
+        return null;
+      }
+
+      // UI States
+      if(statusElementsObj.idle) statusElementsObj.idle.classList.add('hidden-force');
+      if(statusElementsObj.output) statusElementsObj.output.classList.add('hidden-force');
+      if(statusElementsObj.loading) statusElementsObj.loading.classList.remove('hidden-force');
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+      
+      const payload = {
+        system_instruction: { parts: [{ text: systemInstruction}] },
+        contents: [{ parts: [{text: userPrompt }]}]
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error(`API Error: ${response.status}`);
+        
+        const data = await response.json();
+        const textResponse = data.candidates[0].content.parts[0].text;
+        
+        if(statusElementsObj.loading) statusElementsObj.loading.classList.add('hidden-force');
+        if(statusElementsObj.output) {
+          statusElementsObj.output.classList.remove('hidden-force');
+          statusElementsObj.output.innerHTML = simpleMarkdownParse(textResponse);
+        }
+        
+        return textResponse; // For raw data use
+
+      } catch (error) {
+        console.error(error);
+        if(statusElementsObj.loading) statusElementsObj.loading.classList.add('hidden-force');
+        if(statusElementsObj.output) {
+           statusElementsObj.output.classList.remove('hidden-force');
+           statusElementsObj.output.innerHTML = `<div class="text-red-500 font-bold p-4 bg-red-50 rounded">Error: ${error.message}</div>`;
+        }
+        return null;
+      }
+    }
+
+
+    // --- 6. Specific AI Prompts ---
+
+    async function generateDemoTeam() {
+      const btnStatus = document.getElementById('demo-team-status');
+      btnStatus.innerHTML = `<button class="btn btn-primary w-full shadow-md bg-slate-400 cursor-not-allowed border-none text-white"><div class="loader border-t-white mr-2"></div> Generating Team...</button>`;
+      
+      const sysInstruction = `You are an AI generating realistic json data. Output ONLY a raw json array of exactly 4 profile objects. No markdown formatting, no backticks, no comments. Just the array.
+      Object keys strictly: "name", "role", "experience_level", "nationality", "personality_traits", "communication_preference", "custom_context".`;
+      
+      const prompt = `Generate a realistic 4-person corporate team for a User who is a ${AppState.userContext.role} in the ${AppState.userContext.industry} industry. Make them distinct: 1 manager type, 1 highly technical/analytical type, 1 creative/chaotic type, 1 junior eager type. Vary the nationalities and ensure personality_traits and communication_preference are highly specific and helpful for a psychological tool.`;
+
+      const rawJson = await callGeminiStreamish(sysInstruction, prompt, null, { loading: null, idle: null, output: null });
+      
+      if(rawJson) {
+         try {
+           // Strip markdown codeblocks if AI disobeyed
+           const cleanedText = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
+           const profiles = JSON.parse(cleanedText);
+           
+           profiles.forEach(p => {
+             p.id = genId();
+             AppState.teamProfiles.push(p);
+           });
+           
+           completeOnboarding(true); // Saves and transitions
+
+         } catch(e) {
+             alert("Failed to parse AI response. " + e.message);
+             console.log("Raw output:", rawJson);
+             btnStatus.innerHTML = `<button class="btn btn-primary w-full shadow-md shadow-google-blue/20">Generate Profiles</button>`;
+         }
+      } else {
+         btnStatus.innerHTML = `<button class="btn btn-primary w-full shadow-md shadow-google-blue/20">Generate Profiles</button>`;
+      }
+    }
+
+    async function generateRandomProfile() {
+      const btn = document.getElementById('btn-add-ai-profile');
+      btn.innerHTML = `<div class="loader border-t-white w-4 h-4 mr-2"></div> Processing...`;
+      btn.disabled = true;
+
+      const sysInstruction = `Output ONLY a raw json object (no markdown, no backticks) representing 1 corporate profile. Keys: "name", "role", "experience_level", "nationality", "personality_traits", "communication_preference", "custom_context".`;
+      const prompt = `Generate 1 random realistic colleague profile for someone working in ${AppState.userContext.industry}. Make them highly idiosyncratic and unique.`;
+
+      const rawJson = await callGeminiStreamish(sysInstruction, prompt, null, {});
+      
+      if(rawJson) {
+         try {
+           const cleanedText = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
+           const profile = JSON.parse(cleanedText);
+           profile.id = genId();
+           AppState.teamProfiles.push(profile);
+           saveState();
+         } catch(e) {
+           alert("Failed: " + e.message);
+         }
+      }
+      
+      btn.innerHTML = `<svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg> Generate AI Profile`;
+      btn.disabled = false;
+    }
+
+    async function handleUnderstandSubmit(e) {
+       e.preventDefault();
+       const targetId = document.getElementById('understand-target').value;
+       const input = document.getElementById('understand-input').value;
+       
+       if(!targetId) { alert("Please select a target."); return; }
+       
+       const targetProf = AppState.teamProfiles.find(p => p.id === targetId);
+       
+       const langDirective = AppState.lang === 'vi' ? 'Respond strictly in Vietnamese.' : 'Respond strictly in English.';
+       const sysInstruction = `You are a helpful career coach and corporate decoder. 
+       Format your output beautifully using Markdown headers (###). 
+       Do not use intro/outro fluff.
+       CRITICAL: Be extremely direct, personal, short, concise, and use bullet points heavily.
+       ${langDirective}
+       
+       Structure exactly as:
+       ### The Translation
+       (Plain breakdown of what they actually mean)
+       
+       ### The 'Why'
+       (Contextual reasoning based heavily on the target's unique traits)
+       
+       ### Next Steps
+       (2-3 bulleted clarification questions to ask them)`;
+
+       const prompt = `
+       Target Context:
+       Name: ${targetProf.name}
+       Role: ${targetProf.role}
+       Traits: ${targetProf.personality_traits}
+       Culture: ${targetProf.nationality}
+       Communication: ${targetProf.communication_preference}
+       User Context: ${AppState.userContext.role}, ${AppState.userContext.context}
+       
+       Raw Feedback from Target: "${input}"
+       
+       Decode this.`;
+
+       await callGeminiStreamish(
+         sysInstruction, 
+         prompt, 
+         document.getElementById('understand-output'),
+         {
+           idle: document.getElementById('understand-idle'),
+           loading: document.getElementById('understand-loading'),
+           output: document.getElementById('understand-output')
+         }
+       );
+    }
+
+    async function handleGiveSubmit(e) {
+       e.preventDefault();
+       const targetId = document.getElementById('give-target').value;
+       const input = document.getElementById('give-input').value;
+       
+       if(!targetId) { alert("Please select a target."); return; }
+       
+       const targetProf = AppState.teamProfiles.find(p => p.id === targetId);
+       
+       const langDirective = AppState.lang === 'vi' ? 'Respond strictly in Vietnamese.' : 'Respond strictly in English.';
+       const sysInstruction = `You are an expert leadership coach. Synthesize an optimal feedback script.
+       Format output using Markdown headers (###).
+       CRITICAL: Be extremely direct, personal, short, concise, and use bullet points heavily.
+       ${langDirective}
+       
+       Structure exactly as:
+       ### Core Principles
+       (Brief bulleted summary of what we are trying to achieve)
+       
+       ### Delivery Logistics
+       (Specific bulleted advice on when/where/how to deliver this based on target's profile)
+       
+       ### The Script
+       (A tailored draft using constructive, exact phrasing. Put the script in quotes.)`;
+
+       const prompt = `
+       Target: ${targetProf.name} (${targetProf.role})
+       Traits: ${targetProf.personality_traits}
+       Communication Style: ${targetProf.communication_preference}
+       
+       Raw issue user wants to bring up: "${input}"
+       
+       Create the feedback strategy.`;
+
+       await callGeminiStreamish(
+         sysInstruction, 
+         prompt, 
+         document.getElementById('give-output'),
+         {
+           idle: document.getElementById('give-idle'),
+           loading: document.getElementById('give-loading'),
+           output: document.getElementById('give-output')
+         }
+       );
+    }
+
+    async function generateBackgroundAcademy() {
+       if(AppState.teamProfiles.length === 0) return;
+       
+       // 4 Steps from Manager Tools
+       const steps = [
+         { id: 1, name: "The Ask", theme: "ask for permission lightly and quickly" },
+         { id: 2, name: "Describe Behavior", theme: "describe observable behavior without guessing intention or using labels" },
+         { id: 3, name: "Describe Impact", theme: "describe the natural consequence or impact of the behavior" },
+         { id: 4, name: "Discuss Next Steps", theme: "ask open-ended questions to invite them to propose a solution" }
+       ];
+       
+       if (!AppState.academyQuizzes) AppState.academyQuizzes = {};
+       
+       // Run sequentially for safety with generic fetch
+       for (const step of steps) {
+         const cached = AppState.academyQuizzes[`step${step.id}`];
+         if (cached && cached.example && cached.targetName) {
+            // Restore from Database
+            renderExample(step.id, cached.example, cached.targetName);
+            const card = document.getElementById(`step-card-${step.id}`);
+            if(card) card.classList.remove('opacity-50');
+         } else {
+            await generateQuizForStep(step);
+         }
+       }
+    }
+
+    async function generateQuizForStep(step) {
+       const container = document.getElementById(`q-container-${step.id}`);
+       if(!container) return;
+       
+       const targetProf = AppState.teamProfiles[Math.floor(Math.random() * AppState.teamProfiles.length)];
+       const langDirective = AppState.lang === 'vi' ? 'Write the example strictly in Vietnamese.' : 'Write the example strictly in English.';
+
+       const sysInstruction = `Output ONLY a strictly formatted JSON object (no markdown formatting, no backticks outside the json).
+       Provide an example of 'Step ${step.id}: ${step.name}' in Manager Tools feedback. The goal is to ${step.theme}.
+       Give a clear, 1-2 sentence dialogue script representing how the user would deliver this specific step to the target profile.
+       ${langDirective}
+       Format exactly like this: {"example": "string"}`;
+
+       const prompt = `Target Profile: ${targetProf.name}, ${targetProf.role}. Traits: ${targetProf.personality_traits}. Write a realistic phrase reflecting 'Step ${step.id}'.`;
+
+       const rawJson = await callGeminiStreamish(sysInstruction, prompt, null, {});
+
+       if(rawJson) {
+         try {
+           const cleanedText = rawJson.replace(/```json/g, '').replace(/```/g, '').trim();
+           const payload = JSON.parse(cleanedText);
+           
+           // Persist to Database
+           AppState.academyQuizzes[`step${step.id}`] = {
+               example: payload.example,
+               targetName: targetProf.name
+           };
+           saveState();
+           
+           renderExample(step.id, payload.example, targetProf.name);
+           
+           // Visually prompt that it's ready
+           const card = document.getElementById(`step-card-${step.id}`);
+           if(card) {
+               card.classList.remove('opacity-50');
+           }
+         } catch(e) {
+           console.error("Example Parse Fail", e);
+           const retryTxt = AppState.lang === 'vi' ? 'Thử lại' : 'Retry';
+           container.innerHTML = `<div class="text-red-500 font-bold text-sm">Error generating example. <button onclick="generateQuizForStep({id:${step.id}, name:'${step.name}', theme:'${step.theme}'})" class="underline">${retryTxt}</button></div>`;
+         }
+       }
+    }
+
+    function renderExample(stepId, exampleText, targetName) {
+      const container = document.getElementById(`q-container-${stepId}`);
+      if(!container) return;
+      
+      const ctxLabel = AppState.lang === 'vi' ? 'Ví dụ với' : 'Example with';
+      
+      // Inject with a nice fade in
+      container.innerHTML = `
+        <div class="animate-fade-in">
+          <div class="text-[10px] font-bold uppercase tracking-wider mb-1 opacity-70 flex items-center">
+             <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"></path></svg>
+             ${ctxLabel} ${targetName}
+          </div>
+          <p class="font-medium text-slate-800 text-sm md:text-base leading-relaxed italic">"${exampleText}"</p>
+        </div>
+      `;
+    }
+
+
+    // INIT
+    window.addEventListener('DOMContentLoaded', initApp);
+
+  </script>
+</body>
+</html>
