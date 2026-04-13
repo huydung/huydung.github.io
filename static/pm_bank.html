@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quản lý Dự án cho Người Không Có Chức Danh PM — Case Study Ngân hàng B</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0a1628;
+  --ink2:#0f2040;
+  --gold:#b8841e;
+  --gold-light:#e8b84b;
+  --red:#a32d2d;
+  --green:#1a5c35;
+  --blue:#185fa5;
+  --purple:#3c3489;
+  --bg:#ffffff;
+  --bg2:#f6f5f1;
+  --bg3:#edecea;
+  --fg:#1a1916;
+  --fg2:#55534e;
+  --fg3:#8a8880;
+  --border:rgba(0,0,0,0.11);
+  --border2:rgba(0,0,0,0.2);
+  --r:8px;
+  --rl:12px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1a1917;--bg2:#232220;--bg3:#2c2b28;
+    --fg:#e4e2dc;--fg2:#9e9c96;--fg3:#676560;
+    --border:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);
+    --gold:#d4a03a;--gold-light:#f0c060;
+    --red:#d05050;--green:#2e9458;--blue:#4a90d0;--purple:#7060d0;
+  }
+  .slide-header{background:#0d1e36!important}
+  .tag-story .slide-header{background:#1a2a1a!important}
+  .badge-warn{background:rgba(180,120,20,0.25)!important;color:#d4a03a!important}
+  .badge-ok{background:rgba(20,120,50,0.2)!important;color:#2e9458!important}
+  .badge-err{background:rgba(160,40,40,0.2)!important;color:#d05050!important}
+  .badge-info{background:rgba(30,80,160,0.2)!important;color:#4a90d0!important}
+  .badge-story{background:rgba(60,80,40,0.25)!important;color:#6aaa60!important}
+  .rule-box{background:rgba(180,140,20,0.08)!important;border-color:rgba(180,140,20,0.25)!important}
+  .story-box{background:rgba(30,80,30,0.08)!important;border-color:rgba(30,100,40,0.22)!important}
+  .warn-box{background:rgba(160,40,40,0.08)!important;border-color:rgba(160,40,40,0.22)!important}
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  background:var(--bg3);
+  min-height:100vh;
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:24px 16px 60px;
+  color:var(--fg);
+}
+#app{width:100%;max-width:860px}
+
+.deck-label{
+  text-align:center;
+  font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--fg3);padding:0 0 14px;font-weight:500;
+}
+
+.prog-wrap{height:3px;border-radius:2px;overflow:hidden;background:rgba(184,132,30,0.15)}
+.prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 0.35s ease}
+
+.counter{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 14px 6px;font-size:11px;color:var(--fg3);letter-spacing:0.04em;
+}
+.dots{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;max-width:280px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border2);cursor:pointer;transition:all 0.2s}
+.dot.on{background:var(--gold);transform:scale(1.45)}
+.dot:hover{background:var(--gold-light)}
+
+.slide{
+  display:none;
+  border-radius:var(--rl);overflow:hidden;
+  border:0.5px solid var(--border);
+  background:var(--bg);
+  animation:up 0.28s ease;
+}
+.slide.on{display:block}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+.slide-header{
+  background:var(--ink);
+  padding:22px 28px 18px;
+  position:relative;overflow:hidden;
+}
+.slide-header::after{
+  content:'';position:absolute;inset:0;
+  background:repeating-linear-gradient(-45deg,transparent,transparent 14px,rgba(184,132,30,0.035) 14px,rgba(184,132,30,0.035) 15px);
+}
+.tag-story .slide-header{background:#1a3320}
+
+.stag{
+  font-size:10px;letter-spacing:0.13em;text-transform:uppercase;
+  font-weight:500;margin-bottom:6px;position:relative;z-index:1;
+}
+.stag-theory{color:var(--gold-light)}
+.stag-story{color:#74cc80}
+
+.stitle{font-size:21px;font-weight:500;color:#fff;line-height:1.28;position:relative;z-index:1}
+.ssub{font-size:13px;color:rgba(255,255,255,0.48);margin-top:5px;line-height:1.5;position:relative;z-index:1}
+
+.sbody{padding:20px 28px 26px;background:var(--bg)}
+
+.nav-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 16px;border-top:0.5px solid var(--border);
+  background:var(--bg);
+}
+button{
+  font-family:inherit;font-size:12px;padding:6px 16px;
+  border-radius:var(--r);border:0.5px solid var(--border2);
+  background:var(--bg2);color:var(--fg);cursor:pointer;transition:all 0.14s;
+}
+button:hover{background:var(--bg3)}
+button:disabled{opacity:0.3;cursor:default}
+button.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+button.primary:hover{background:var(--ink2)}
+
+p{font-size:13.5px;line-height:1.75;color:var(--fg2);margin:0 0 10px}
+p:last-child{margin-bottom:0}
+p strong{font-weight:500;color:var(--fg)}
+p em{font-style:italic}
+
+h3{font-size:13px;font-weight:500;color:var(--fg);margin:16px 0 8px}
+h3:first-child{margin-top:0}
+
+ul{list-style:none;padding:0;margin:0 0 10px}
+ul li{font-size:13px;line-height:1.7;color:var(--fg2);padding:3px 0 3px 18px;position:relative}
+ul li::before{content:'–';position:absolute;left:0;color:var(--gold);font-weight:500}
+
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+
+.card{
+  background:var(--bg2);border-radius:var(--r);
+  padding:13px 15px;border:0.5px solid var(--border);
+}
+.cl-gold{border-left:2.5px solid var(--gold)}
+.cl-red{border-left:2.5px solid var(--red)}
+.cl-green{border-left:2.5px solid var(--green)}
+.cl-blue{border-left:2.5px solid var(--blue)}
+.cl-purple{border-left:2.5px solid var(--purple)}
+.cl-gray{border-left:2.5px solid var(--fg3)}
+
+.clabel{font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--fg3);font-weight:500;margin-bottom:5px}
+.ctitle{font-size:13.5px;font-weight:500;color:var(--fg);margin-bottom:4px}
+.ctext{font-size:12.5px;line-height:1.65;color:var(--fg2)}
+
+.badge{display:inline-block;font-size:10.5px;padding:2px 9px;border-radius:20px;font-weight:500;letter-spacing:0.03em}
+.badge-warn{background:rgba(184,132,30,0.13);color:#7a5800}
+.badge-ok{background:rgba(26,92,53,0.1);color:#1a5c35}
+.badge-err{background:rgba(163,45,45,0.1);color:#a32d2d}
+.badge-info{background:rgba(24,95,165,0.1);color:#185fa5}
+.badge-story{background:rgba(30,80,30,0.1);color:#1a5c35}
+
+.rule-box{
+  background:rgba(184,132,30,0.06);
+  border:0.5px solid rgba(184,132,30,0.22);
+  border-radius:var(--r);padding:13px 16px;margin:12px 0;
+}
+.story-box{
+  background:rgba(26,92,53,0.05);
+  border:0.5px solid rgba(26,92,53,0.18);
+  border-radius:var(--r);padding:13px 16px;margin:12px 0;
+}
+.warn-box{
+  background:rgba(163,45,45,0.05);
+  border:0.5px solid rgba(163,45,45,0.18);
+  border-radius:var(--r);padding:13px 16px;margin:12px 0;
+}
+
+.chars{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.char{
+  display:flex;align-items:center;gap:9px;
+  background:var(--bg2);border:0.5px solid var(--border);
+  border-radius:var(--r);padding:8px 12px;flex:1;min-width:160px;
+}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:500;flex-shrink:0;
+}
+.av-gold{background:rgba(184,132,30,0.15);color:var(--gold)}
+.av-blue{background:rgba(24,95,165,0.12);color:var(--blue)}
+.av-green{background:rgba(26,92,53,0.12);color:var(--green)}
+.av-red{background:rgba(163,45,45,0.1);color:var(--red)}
+.av-purple{background:rgba(60,52,137,0.1);color:var(--purple)}
+.av-gray{background:rgba(100,100,90,0.1);color:var(--fg3)}
+
+.char-name{font-size:13px;font-weight:500;color:var(--fg)}
+.char-role{font-size:11.5px;color:var(--fg3)}
+
+.tl{display:flex;flex-direction:column;position:relative}
+.tl::before{content:'';position:absolute;left:14px;top:22px;bottom:22px;width:1px;background:var(--border2)}
+.tl-row{display:flex;gap:14px;padding:8px 0;align-items:flex-start;position:relative}
+.tl-dot{
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:500;color:#fff;background:var(--ink);
+  border:2px solid var(--gold);position:relative;z-index:1;
+}
+.tl-body{flex:1;padding-top:3px}
+.tl-t{font-size:13px;font-weight:500;color:var(--fg);margin-bottom:2px}
+.tl-s{font-size:12px;line-height:1.55;color:var(--fg2)}
+
+table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+table.t th{
+  background:var(--ink);color:rgba(255,255,255,0.85);
+  padding:8px 11px;font-weight:500;text-align:left;font-size:11.5px;letter-spacing:0.04em;
+}
+table.t td{padding:8px 11px;border-bottom:0.5px solid var(--border);color:var(--fg);vertical-align:top;line-height:1.5}
+table.t tr:last-child td{border-bottom:none}
+table.t tr:nth-child(even) td{background:var(--bg2)}
+
+.hint{text-align:center;font-size:11px;color:var(--fg3);padding:9px 0 0;letter-spacing:0.04em}
+
+.scene-label{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:11px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;
+  color:#1a5c35;margin-bottom:10px;
+}
+.scene-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="deck-label">Quản lý Dự án · Ngân hàng B · 16 slides</div>
+  <div class="prog-wrap"><div class="prog-fill" id="pf" style="width:6.25%"></div></div>
+  <div class="counter">
+    <span id="snum" style="font-weight:500">1 / 16</span>
+    <div class="dots" id="dots"></div>
+    <span id="ssec" style="text-align:right;max-width:140px">Dẫn nhập</span>
+  </div>
+
+  <!-- ===================== SLIDE 1 — COVER ===================== -->
+  <div class="slide on" data-sec="Dẫn nhập">
+    <div class="slide-header">
+      <div class="stag stag-theory">Dẫn nhập</div>
+      <div class="stitle">Bạn đang chạy một dự án. Chưa ai gọi bạn là "PM".</div>
+      <div class="ssub">Những nguyên tắc thiết yếu từ sách <em>Project Management for Unofficial Project Managers</em> — minh họa qua câu chuyện thực tế tại một ngân hàng Việt Nam</div>
+    </div>
+    <div class="sbody">
+      <p>Trong thực tế ở các ngân hàng Việt Nam, phần lớn dự án nội bộ không do một người có chức danh "Project Manager" dẫn dắt. Người chịu trách nhiệm thường là trưởng phòng nghiệp vụ, chuyên viên cao cấp, hay một kỹ sư được tin tưởng giao việc. Họ không có quyền điều phối nhân sự từ phòng khác, không kiểm soát được ngân sách, nhưng vẫn phải chịu trách nhiệm khi dự án trễ hay thất bại.</p>
+      <p>Cuốn sách <strong>Project Management for Unofficial Project Managers</strong> của Kory Kogon, Suzette Blakemore và James Wood ra đời để giúp đúng nhóm người này — những người "vô tình trở thành PM" mà không được trang bị công cụ phù hợp.</p>
+      <div class="rule-box">
+        <span class="badge badge-warn" style="margin-bottom:7px;display:inline-block">Luận điểm cốt lõi</span>
+        <p style="margin:0">Quản lý dự án không đòi hỏi chứng chỉ hay chức danh. Nó đòi hỏi <strong>sự rõ ràng, kỷ luật giao tiếp và khả năng xây dựng niềm tin</strong> — ba thứ ai cũng có thể học được.</p>
+      </div>
+      <p style="margin-top:10px">Bộ tài liệu này trình bày lý thuyết từ cuốn sách, xen kẽ với câu chuyện hư cấu về một dự án có thật ở Ngân hàng B — để bạn thấy mỗi khái niệm hiện ra như thế nào trong thực tế.</p>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 2 — CHARACTERS ===================== -->
+  <div class="slide" data-sec="Nhân vật">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Bối cảnh</div>
+      <div class="stitle">Gặp gỡ những nhân vật trong câu chuyện của chúng ta</div>
+      <div class="ssub">Công ty tài chính Ngân hàng B — một công ty con của Ngân hàng B, đang cần xây dựng hệ thống báo cáo quản trị mới</div>
+    </div>
+    <div class="sbody">
+      <p>Tháng 10 năm 2024. Ban lãnh đạo Ngân hàng B nhận ra rằng đội tài chính đang mất trung bình <strong>năm ngày mỗi tháng</strong> chỉ để tổng hợp số liệu báo cáo bằng tay trong Excel. Mỗi lần ngân hàng mẹ yêu cầu số liệu gấp, cả phòng lại rơi vào hỗn loạn. Quyết định được đưa ra: cần một hệ thống báo cáo tự động.</p>
+      <p>Người được giao dẫn dắt dự án này là <strong>Lan</strong> — trưởng phòng Kế hoạch Tài chính, người hiểu rõ yêu cầu nghiệp vụ nhất. Nhưng Lan chưa bao giờ quản lý một dự án công nghệ trước đây.</p>
+      <div class="chars">
+        <div class="char">
+          <div class="avatar av-gold">L</div>
+          <div><div class="char-name">Nguyễn Thị Lan</div><div class="char-role">Trưởng phòng TC — project lead (unofficial PM)</div></div>
+        </div>
+        <div class="char">
+          <div class="avatar av-blue">H</div>
+          <div><div class="char-name">Trần Minh Hùng</div><div class="char-role">Developer senior — mượn từ phòng IT</div></div>
+        </div>
+        <div class="char">
+          <div class="avatar av-green">Ph</div>
+          <div><div class="char-name">Lê Thị Phương</div><div class="char-role">Giám đốc Tài chính — người dùng chính, "khách hàng" của Lan</div></div>
+        </div>
+        <div class="char">
+          <div class="avatar av-red">M</div>
+          <div><div class="char-name">Đinh Quốc Minh</div><div class="char-role">Tổng Giám đốc Ngân hàng B — người phê duyệt và bảo trợ</div></div>
+        </div>
+        <div class="char">
+          <div class="avatar av-purple">T</div>
+          <div><div class="char-name">Phạm Thanh Tú</div><div class="char-role">Chuyên viên IT bảo mật — đại diện yêu cầu tuân thủ</div></div>
+        </div>
+        <div class="char">
+          <div class="avatar av-gray">Đ</div>
+          <div><div class="char-name">Vũ Thị Đào</div><div class="char-role">DBA — quản trị cơ sở dữ liệu</div></div>
+        </div>
+      </div>
+      <p style="margin-top:4px">Dự án kéo dài <strong>ba tháng</strong>, từ tháng 11/2024 đến hết tháng 1/2025. Ngân sách 450 triệu đồng. Deadline cứng: phải đi vào vận hành trước khi chốt số liệu quý I năm 2025.</p>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 3 — THEORY: 4 PHASES ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Quy trình">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Quy trình</div>
+      <div class="stitle">Bốn giai đoạn của một dự án được quản lý tốt</div>
+      <div class="ssub">Cuốn sách chia mọi dự án thành bốn bước lớn — dù dự án to hay nhỏ, ngắn hay dài</div>
+    </div>
+    <div class="sbody">
+      <p>Hầu hết người quản lý dự án không chính thức đều bắt đầu từ bước <em>lập kế hoạch</em> — tức là bỏ qua bước đầu tiên và quan trọng nhất. Cuốn sách chỉ ra rằng có bốn giai đoạn cần đi qua theo thứ tự, và việc bỏ sót bất kỳ giai đoạn nào cũng đều gây ra vấn đề sau này.</p>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card cl-gold">
+          <div class="clabel">Giai đoạn 1 · Tuần 1–2</div>
+          <div class="ctitle">Xác định phạm vi công việc (Scope)</div>
+          <div class="ctext">Trả lời câu hỏi: dự án này tồn tại để làm gì, kết quả cuối cùng trông như thế nào, và quan trọng không kém — điều gì <em>không</em> thuộc về dự án này. Đây là bước hay bị bỏ qua nhất và cũng là nguyên nhân phổ biến nhất khiến dự án thất bại.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">Giai đoạn 2 · Tuần 2–3</div>
+          <div class="ctitle">Lập kế hoạch thực thi (Plan)</div>
+          <div class="ctext">Sau khi biết cần làm gì, mới bắt đầu phân công: công việc nào, ai chịu trách nhiệm, hết hạn khi nào, cần bao nhiêu ngày. Một kế hoạch tốt không cần phần mềm phức tạp — chỉ cần đủ cụ thể để ai cũng hiểu phần việc của mình.</div>
+        </div>
+        <div class="card cl-purple">
+          <div class="clabel">Giai đoạn 3 · Tuần 3–11</div>
+          <div class="ctitle">Dẫn dắt và giữ nhịp (Engage)</div>
+          <div class="ctext">Đây là giai đoạn dài nhất và đòi hỏi nhiều kỹ năng "người" nhất. Kiểm tra tiến độ thường xuyên, xử lý vấn đề phát sinh, quản lý thay đổi yêu cầu, và giữ cho nhóm không mất phương hướng hay mất động lực.</div>
+        </div>
+        <div class="card cl-green">
+          <div class="clabel">Giai đoạn 4 · Tuần 12</div>
+          <div class="ctitle">Đóng dự án đúng cách (Close)</div>
+          <div class="ctext">Hệ thống chạy được chưa phải là dự án xong. Bàn giao tài liệu, đào tạo người dùng, lấy xác nhận chính thức từ các bên liên quan và đúc kết bài học kinh nghiệm — những việc này quyết định dự án có để lại giá trị lâu dài hay không.</div>
+        </div>
+      </div>
+      <div class="rule-box" style="margin-top:14px">
+        <p style="margin:0"><strong>Nguyên tắc quan trọng:</strong> Đừng bao giờ nhảy thẳng vào lập kế hoạch khi chưa xác định xong phạm vi. Cái bẫy phổ biến nhất là nhóm bắt tay làm việc ngay, rồi nửa đường mới phát hiện mọi người đang hiểu dự án theo những hướng hoàn toàn khác nhau.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 4 — STORY: CHAOS WITHOUT SCOPE ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Hỗn loạn">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Tuần 1</div>
+      <div class="stitle">Lan bắt đầu mà không có phạm vi rõ ràng — và điều đó gần như phá hỏng tất cả</div>
+      <div class="ssub">Điều gì xảy ra khi nhóm lao vào làm việc trước khi thống nhất được "làm cái gì"</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>Tháng 11, Tuần 1 — Cuộc họp kickoff đầu tiên</div>
+      <p>Lan tổ chức họp khởi động với đủ mặt sáu người. Không khí hào hứng. Tổng Giám đốc Minh phát biểu mở đầu: <em>"Chúng ta cần hệ thống báo cáo hiện đại, tự động hóa, dễ dùng."</em> Mọi người gật đầu. Ai cũng nghĩ mình hiểu.</p>
+      <p>Sau cuộc họp, Hùng bắt tay viết code cho một giao diện cho phép người dùng tự kéo thả tạo báo cáo theo ý muốn. Đào bắt đầu thiết kế cơ sở dữ liệu cho chức năng phân tích nâng cao. Trong khi đó, Phương — người sẽ dùng hệ thống này hàng ngày — cứ nghĩ dự án chỉ đơn giản là <em>tự động chạy đúng 12 báo cáo cố định</em> mà phòng cô đang làm tay mỗi tháng.</p>
+      <div class="warn-box">
+        <span class="badge badge-err" style="margin-bottom:7px;display:inline-block">Vấn đề phát sinh</span>
+        <p style="margin:0">Cuối tuần 2, Lan phát hiện Hùng đã dành ba ngày xây tính năng "tự tạo báo cáo linh hoạt" — một thứ không ai trong nhóm đồng ý làm, nhưng cũng không ai nói rõ là <em>không</em> làm. Đào đang thiết kế hệ thống phức tạp gấp đôi so với nhu cầu thực tế của Phương. Ba ngày công sức sắp trở thành rác.</p>
+      </div>
+      <p>Lan nhận ra mình đã mắc đúng cái lỗi mà nhiều người mới quản lý dự án hay mắc: <strong>bắt đầu làm trước khi thống nhất được "làm cái gì"</strong>. Cô dừng tất cả lại và triệu tập một cuộc họp chỉ với một mục đích duy nhất: viết ra phạm vi dự án.</p>
+      <div class="story-box">
+        <p style="margin:0"><strong>Bài học từ tình huống này:</strong> Sự hào hứng ban đầu không thay thế được sự rõ ràng. Hai ngày đầu tiên dành để viết ra <em>chính xác</em> dự án làm gì và không làm gì sẽ tiết kiệm được hai tuần sửa chữa sau đó.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 5 — THEORY: PROJECT CHARTER ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Tài liệu xác định dự án">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Xác định phạm vi</div>
+      <div class="stitle">Tài liệu xác định dự án: tờ giấy quan trọng nhất bạn sẽ viết</div>
+      <div class="ssub">Cuốn sách gọi đây là "Project Charter" — một trang duy nhất, mọi người ký tên, và từ đó trở đi đây là nguồn sự thật duy nhất của dự án</div>
+    </div>
+    <div class="sbody">
+      <p>Tài liệu xác định dự án không phải văn bản hành chính phức tạp. Nó trả lời năm câu hỏi cốt lõi mà bất kỳ ai trong nhóm cũng phải có cùng câu trả lời. Quan trọng hơn, nó được viết ra, được ký bởi người có quyền quyết định, và được dùng làm căn cứ mỗi khi có tranh cãi về việc "chúng ta có cần làm điều này không?"</p>
+      <table class="t" style="margin-top:12px">
+        <tr><th style="width:22%">Câu hỏi</th><th style="width:30%">Ý nghĩa</th><th>Câu trả lời của Ngân hàng B</th></tr>
+        <tr>
+          <td><strong>Tại sao</strong> dự án này tồn tại?</td>
+          <td>Vấn đề kinh doanh cần giải quyết</td>
+          <td>Tự động hóa 12 báo cáo quản trị tháng đang làm tay, rút ngắn thời gian chốt từ 5 ngày xuống còn 1 ngày</td>
+        </tr>
+        <tr>
+          <td><strong>Kết quả</strong> bàn giao là gì?</td>
+          <td>Cụ thể hóa "done" trông như thế nào</td>
+          <td>12 báo cáo chạy tự động theo lịch, hướng dẫn sử dụng, một buổi đào tạo cho phòng Tài chính, xác nhận nghiệm thu từ Giám đốc Tài chính</td>
+        </tr>
+        <tr>
+          <td><strong>Không</strong> làm gì?</td>
+          <td>Ranh giới rõ ràng để tránh phình dự án</td>
+          <td>Không xây tính năng tự tạo báo cáo tùy ý, không tích hợp với hệ thống GL phiên bản mới của ngân hàng mẹ, không có ứng dụng di động</td>
+        </tr>
+        <tr>
+          <td><strong>Thành công</strong> trông như thế nào?</td>
+          <td>Tiêu chí đo lường khách quan</td>
+          <td>Toàn bộ 12 báo cáo chạy đúng lịch trong 3 tháng liên tiếp, không cần can thiệp thủ công, được Giám đốc Tài chính ký nghiệm thu</td>
+        </tr>
+        <tr>
+          <td><strong>Giới hạn</strong> là gì?</td>
+          <td>Ràng buộc cần ghi nhận từ đầu</td>
+          <td>Go-live trước 31/1/2025, ngân sách 450 triệu đồng, Hùng và Đào chỉ có thể dành 60% thời gian vì còn việc khác</td>
+        </tr>
+      </table>
+      <div class="rule-box" style="margin-top:12px">
+        <p style="margin:0"><strong>Vì sao cần chữ ký?</strong> Vì khi ai đó nói "Tôi nghĩ chúng ta cũng nên làm thêm tính năng X" vào tuần 7, bạn có thể mở tài liệu này ra và nói: "Chúng ta đã thống nhất từ đầu rằng X không thuộc phạm vi dự án này. Nếu muốn thêm, chúng ta cần thảo luận lại về thời gian và ngân sách." Điều đó không thể làm được nếu mọi thứ chỉ là thỏa thuận miệng.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 6 — STORY: CHARTER SAVES THE DAY ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Tài liệu xác định">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Tuần 2</div>
+      <div class="stitle">Lan viết tài liệu xác định dự án — và ngay lập tức nó phát huy tác dụng</div>
+      <div class="ssub">Một cuộc họp hai giờ giúp cả nhóm nhìn cùng về một hướng</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>Tháng 11, Tuần 2 — Cuộc họp xác định phạm vi</div>
+      <p>Lan dành nửa ngày chuẩn bị một bản nháp trả lời năm câu hỏi cốt lõi, rồi triệu tập cuộc họp hai giờ. Lần đầu tiên, cả nhóm phải trả lời thành tiếng: <em>"Dự án này để làm gì? Làm xong trông như thế nào? Điều gì chúng ta sẽ không làm?"</em></p>
+      <p>Phát hiện quan trọng nhất của cuộc họp: Hùng và Đào đều hiểu "hệ thống báo cáo hiện đại" có nghĩa là xây công cụ phân tích linh hoạt. Phương thì chỉ cần đúng 12 báo cáo cố định chạy tự động. Hai cách hiểu này nếu không được làm rõ sẽ dẫn đến hai hệ thống hoàn toàn khác nhau.</p>
+      <div class="story-box">
+        <span class="badge badge-story" style="margin-bottom:7px;display:inline-block">Khoảnh khắc quan trọng</span>
+        <p style="margin:0">Tổng Giám đốc Minh tham gia 30 phút cuối cuộc họp. Lan đặt câu hỏi thẳng: <em>"Anh ưu tiên giao nhanh 12 báo cáo cố định, hay ưu tiên một nền tảng linh hoạt hơn nhưng cần thêm 6 tuần?"</em> Ông Minh không do dự: <em>"Giao nhanh. Báo cáo cố định trước. Tính năng linh hoạt tính sau."</em> Câu này được ghi vào tài liệu, ông ký tên.</p>
+      </div>
+      <p>Ba ngày sau, Hùng xin bổ sung thêm tính năng lọc dữ liệu nâng cao vào phạm vi dự án vì anh nghĩ "sẽ rất hữu ích". Lan mở tài liệu xác định ra, chỉ vào phần "không làm gì" và nói: <em>"Anh Hùng, chúng ta đã thống nhất điều này rồi. Nếu sau khi go-live anh vẫn thấy cần, chúng ta lên kế hoạch cho Phase 2."</em> Hùng gật đầu — không vui lắm, nhưng không có gì để tranh luận.</p>
+      <div class="rule-box">
+        <p style="margin:0">Chỉ trong tuần đầu tiên, tài liệu xác định dự án đã cứu nhóm khỏi một lần phình phạm vi. Đây không phải may mắn — đây là thiết kế. Tài liệu này tồn tại chính để làm việc đó.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 7 — THEORY: STAKEHOLDERS ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Các bên liên quan">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Các bên liên quan</div>
+      <div class="stitle">Nhận diện tất cả những người có thể làm dự án thành công — hoặc phá hỏng nó</div>
+      <div class="ssub">Cuốn sách gọi đây là "stakeholder" — tất cả những ai bị ảnh hưởng bởi dự án hoặc có thể ảnh hưởng đến dự án</div>
+    </div>
+    <div class="sbody">
+      <p>Sai lầm điển hình: nhiều người chỉ nghĩ đến "khách hàng" (người dùng cuối) và "sếp" (người phê duyệt) khi lập danh sách các bên liên quan. Họ bỏ qua những người không trực tiếp dùng sản phẩm nhưng lại có quyền dừng dự án lại bất cứ lúc nào.</p>
+      <p>Cuốn sách phân loại các bên liên quan theo hai trục: <strong>mức độ ảnh hưởng</strong> (họ có quyền ra quyết định không?) và <strong>mức độ quan tâm</strong> (họ có theo dõi dự án không?). Từ đó có bốn nhóm với cách xử lý khác nhau.</p>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card cl-red">
+          <div class="clabel">Ảnh hưởng cao · Quan tâm cao</div>
+          <div class="ctitle">Quản lý chặt chẽ</div>
+          <div class="ctext">Đây là những người bạn cần "bán" ý tưởng trước khi đưa ra quyết định. Gặp họ thường xuyên, cập nhật sớm, không để bất ngờ. Trong ngân hàng, đây thường là người bảo trợ dự án và người dùng chính.</div>
+        </div>
+        <div class="card cl-gold">
+          <div class="clabel">Ảnh hưởng cao · Quan tâm thấp</div>
+          <div class="ctitle">Giữ cho họ được thông tin</div>
+          <div class="ctext">Họ không theo dõi hàng ngày, nhưng một cuộc điện thoại từ họ có thể dừng dự án lại. Gửi tóm tắt định kỳ ngắn gọn, đặc biệt khi có rủi ro hoặc thay đổi lớn.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">Ảnh hưởng thấp · Quan tâm cao</div>
+          <div class="ctitle">Giữ họ hài lòng</div>
+          <div class="ctext">Họ không có quyền dừng dự án, nhưng họ là người sẽ dùng sản phẩm hàng ngày và phản hồi của họ ảnh hưởng đến việc sản phẩm có thực sự được dùng hay không.</div>
+        </div>
+        <div class="card cl-gray">
+          <div class="clabel">Ảnh hưởng thấp · Quan tâm thấp</div>
+          <div class="ctitle">Theo dõi định kỳ</div>
+          <div class="ctext">Không cần đầu tư nhiều thời gian, nhưng đừng bỏ họ ra khỏi danh sách hoàn toàn. Họ có thể chuyển sang nhóm khác nếu có thay đổi về tổ chức.</div>
+        </div>
+      </div>
+      <div class="warn-box" style="margin-top:12px">
+        <span class="badge badge-err" style="margin-bottom:7px;display:inline-block">Bẫy phổ biến trong ngân hàng</span>
+        <p style="margin:0">Tại các tổ chức tài chính ở Việt Nam, bộ phận kiểm soát tuân thủ và đội công nghệ thông tin của ngân hàng mẹ thường là những "bên liên quan ẩn" — họ không có mặt trong cuộc họp kickoff nhưng lại có thể yêu cầu dừng dự án để kiểm tra vào bất kỳ lúc nào. Phát hiện ra điều này vào tuần thứ 8 của dự án là một trong những tình huống tồi tệ nhất có thể xảy ra.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 8 — STORY: HIDDEN STAKEHOLDER ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Bên liên quan bị bỏ sót">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Tuần 3</div>
+      <div class="stitle">Tú xuất hiện — và Lan nhận ra mình đã bỏ sót một bên liên quan quan trọng</div>
+      <div class="ssub">Phạm Thanh Tú, chuyên viên bảo mật IT, chưa một lần được mời họp</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>Tháng 11, Tuần 3 — Email bất ngờ</div>
+      <p>Ngày thứ hai của tuần thứ ba, Lan nhận được email từ Tú — người mà cô chưa bao giờ gặp mặt. Tú là đại diện bảo mật công nghệ từ ngân hàng mẹ Ngân hàng B, chịu trách nhiệm phê duyệt mọi hệ thống mới có kết nối với cơ sở dữ liệu lõi (core banking).</p>
+      <p>Nội dung email rất ngắn gọn, nhưng nghe rất nặng: <em>"Tôi vừa nghe có một hệ thống mới đang được xây dựng có kết nối với dữ liệu core banking. Hệ thống này chưa qua quy trình đánh giá bảo mật của chúng tôi. Đề nghị tạm dừng phát triển cho đến khi hoàn tất đánh giá."</em></p>
+      <div class="warn-box">
+        <span class="badge badge-err" style="margin-bottom:7px;display:inline-block">Khủng hoảng tuần 3</span>
+        <p style="margin:0">Nếu Lan tuân thủ yêu cầu tạm dừng, dự án có thể trễ ba đến bốn tuần — đủ để lỡ deadline 31/1. Nhưng nếu cô tiếp tục không có phê duyệt bảo mật, rủi ro pháp lý và vận hành còn lớn hơn nhiều.</p>
+      </div>
+      <p>Lan nhận ra sai lầm của mình: khi lập danh sách các bên liên quan từ đầu, cô chỉ nghĩ đến những người <em>bên trong</em> công ty con Ngân hàng B. Cô đã không hỏi: <em>"Quy trình phê duyệt từ ngân hàng mẹ là gì? Ai cần được thông báo?"</em></p>
+      <div class="story-box">
+        <span class="badge badge-story" style="margin-bottom:7px;display:inline-block">Cách Lan xử lý</span>
+        <p style="margin:0">Thay vì tranh luận qua email, Lan xin gặp trực tiếp Tú trong ngày hôm đó. Cô mang theo tài liệu xác định phạm vi dự án và kiến trúc kỹ thuật mà Hùng đã phác thảo. Sau một giờ họp, Tú xác nhận rủi ro bảo mật thực sự không lớn vì hệ thống chỉ đọc dữ liệu, không ghi. Quá trình đánh giá chỉ cần một tuần thay vì bốn tuần như Lan lo lắng. Từ đó, Tú trở thành một phần của nhóm — được thêm vào danh sách cập nhật hàng tuần.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 9 — THEORY: PLANNING ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Lập kế hoạch">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Lập kế hoạch</div>
+      <div class="stitle">Kế hoạch tốt không cần phần mềm phức tạp — chỉ cần đủ cụ thể để không ai còn mơ hồ</div>
+      <div class="ssub">Hai nguyên tắc cốt lõi: phân rã công việc đủ nhỏ, và mỗi việc chỉ có đúng một người chịu trách nhiệm</div>
+    </div>
+    <div class="sbody">
+      <p>Cuốn sách giới thiệu khái niệm <strong>phân rã công việc</strong> — tức là chia nhỏ các deliverable (kết quả bàn giao) thành các công việc cụ thể đến mức có thể ước tính được thời gian hoàn thành. Nguyên tắc đơn giản: nếu một hạng mục công việc mất hơn ba ngày, nó vẫn còn quá lớn và cần chia nhỏ hơn nữa.</p>
+      <div class="grid2" style="margin-top:10px;margin-bottom:14px">
+        <div class="card cl-red">
+          <div class="clabel">Cách viết sai</div>
+          <div class="ctitle">Quá chung chung</div>
+          <div class="ctext">"Xây dựng hệ thống báo cáo" — không ai biết công việc này bắt đầu từ đâu, kết thúc khi nào, và ai chịu trách nhiệm phần nào.</div>
+        </div>
+        <div class="card cl-green">
+          <div class="clabel">Cách viết đúng</div>
+          <div class="ctitle">Đủ cụ thể để bắt tay vào làm</div>
+          <div class="ctext">"Hùng xây báo cáo Lãi Lỗ theo chi nhánh, bao gồm kiểm thử đơn vị — deadline 22/11." Câu này trả lời được: ai, làm gì, xong khi nào, và định nghĩa "xong" là gì.</div>
+        </div>
+      </div>
+      <p>Nguyên tắc thứ hai: <strong>mỗi công việc phải có đúng một người chịu trách nhiệm</strong>. "Cả nhóm cùng làm" trong thực tế có nghĩa là không ai làm. Không phải vì mọi người lười biếng — mà vì khi không có tên cụ thể, ai cũng có lý do chính đáng để nghĩ người khác đang lo phần đó.</p>
+      <div class="rule-box">
+        <p style="margin:0"><strong>Vấn đề về thời gian dự phòng:</strong> Khi ước tính thời gian, cuốn sách khuyến nghị cộng thêm ít nhất 20% vào tổng thời gian. Trong môi trường ngân hàng, con số này nên cao hơn vì còn có các vòng phê duyệt nội bộ, yêu cầu đánh giá tuân thủ, và khả năng thành viên nhóm bị điều sang xử lý sự cố vận hành bất ngờ — tất cả đều là những điều có thể dự đoán được nhưng khó biết chính xác khi nào xảy ra.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 10 — STORY: PLANNING IN PRACTICE ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Kế hoạch">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Cuối Tháng 11</div>
+      <div class="stitle">Lan lập kế hoạch ba tháng — và buộc mọi người phải ký tên vào phần việc của mình</div>
+      <div class="ssub">Lịch trình chi tiết, từng công việc gắn với một tên người cụ thể</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>Cuối Tháng 11 — Họp lập kế hoạch chi tiết</div>
+      <div class="tl">
+        <div class="tl-row">
+          <div class="tl-dot">T11</div>
+          <div class="tl-body">
+            <div class="tl-t">Tháng 11 — Nền tảng</div>
+            <div class="tl-s">Tài liệu xác định dự án được ký (tuần 2). Đào khảo sát chất lượng dữ liệu trong hệ thống core banking và lập báo cáo vấn đề. Hùng thiết kế kiến trúc kỹ thuật và trình Tú phê duyệt. Lan thu thập danh sách 12 báo cáo cần xây từ Phương, bao gồm định nghĩa rõ từng chỉ tiêu.</div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-dot">T12</div>
+          <div class="tl-body">
+            <div class="tl-t">Tháng 12 — Xây dựng đợt 1</div>
+            <div class="tl-s">Hùng xây 7 báo cáo đầu tiên (ưu tiên cao). Đào xây luồng lấy dữ liệu tự động từ core banking. Cuối tuần 6: review giữa dự án với Giám đốc Tài chính Phương — demo trực tiếp 3 báo cáo đã xây xong. Phương ký xác nhận đợt 1 đúng yêu cầu.</div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-dot">T1</div>
+          <div class="tl-body">
+            <div class="tl-t">Tháng 1 — Hoàn thiện và bàn giao</div>
+            <div class="tl-s">Hùng xây 5 báo cáo còn lại. Kiểm thử toàn bộ hệ thống với dữ liệu thực tháng 12. Sửa lỗi. Buổi đào tạo người dùng cho phòng Tài chính (dự kiến 22/1). Lan viết tài liệu vận hành. Go-live 27/1. Họp đúc kết bài học 31/1.</div>
+          </div>
+        </div>
+      </div>
+      <div class="story-box" style="margin-top:10px">
+        <p style="margin:0"><strong>Chi tiết quan trọng:</strong> Lan phát hiện Hùng đang tham gia một dự án khác của phòng IT. Thay vì giả định anh có đủ thời gian, cô đặt lịch gặp trực tiếp với IT Manager và yêu cầu xác nhận bằng email rằng Hùng được dành 60% thời gian cho dự án này trong ba tháng. Đây là điều cô học được từ việc đọc cuốn sách: <em>những điều "hiển nhiên" nhất thường là những điều ít được nói ra nhất — và gây ra vấn đề lớn nhất sau này.</em></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 11 — THEORY: RISK ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Rủi ro">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Quản lý rủi ro</div>
+      <div class="stitle">Lo lắng trên giấy tờ, không phải trong các cuộc họp lúc nửa đêm</div>
+      <div class="ssub">Xác định rủi ro từ sớm, đánh giá mức độ, giao người chịu trách nhiệm theo dõi — và có sẵn phương án dự phòng</div>
+    </div>
+    <div class="sbody">
+      <p>Cuốn sách phân biệt rõ hai khái niệm mà nhiều người hay nhầm lẫn: <strong>rủi ro</strong> là điều <em>chưa xảy ra</em> nhưng có thể xảy ra và sẽ gây ảnh hưởng xấu nếu không có biện pháp phòng ngừa. <strong>Vấn đề</strong> là điều <em>đang xảy ra</em> ngay bây giờ và cần quyết định trong vòng 48 giờ. Cách quản lý hai loại này hoàn toàn khác nhau.</p>
+      <p>Với rủi ro, nhiệm vụ của người quản lý dự án là <em>nhìn về phía trước</em> và hỏi: "Điều gì có thể cản trở chúng ta?" Sau đó đánh giá từng rủi ro theo hai chiều: khả năng xảy ra và mức độ ảnh hưởng nếu xảy ra. Những rủi ro có cả hai chỉ số đều cao cần được theo dõi chặt nhất.</p>
+      <table class="t" style="margin-top:10px">
+        <tr><th>Rủi ro trong dự án Ngân hàng B</th><th style="width:14%">Mức độ</th><th>Biện pháp phòng ngừa</th></tr>
+        <tr>
+          <td>Hùng bị rút sang xử lý sự cố vận hành, mất thời gian làm dự án</td>
+          <td><span class="badge badge-warn">Trung bình</span></td>
+          <td>Thỏa thuận bằng email với IT Manager về tỷ lệ thời gian dành cho dự án. Có đường báo cáo lên TGĐ Minh nếu vi phạm.</td>
+        </tr>
+        <tr>
+          <td>Yêu cầu báo cáo từ phòng Tài chính thay đổi sau khi đã xây xong</td>
+          <td><span class="badge badge-warn">Trung bình</span></td>
+          <td>Phương ký xác nhận danh sách 12 báo cáo và định nghĩa từng chỉ tiêu ngay từ đầu. Mọi thay đổi sau tuần 3 phải đi qua quy trình xem xét tác động.</td>
+        </tr>
+        <tr>
+          <td>Dữ liệu trong core banking thiếu nhất quán, ảnh hưởng đến độ chính xác báo cáo</td>
+          <td><span class="badge badge-warn">Trung bình</span></td>
+          <td>Đào hoàn thành khảo sát dữ liệu trong tháng 11 trước khi bắt đầu xây báo cáo. Phát hiện vấn đề sớm hơn là khi đang kiểm thử.</td>
+        </tr>
+        <tr>
+          <td>Phòng bảo mật ngân hàng mẹ yêu cầu thêm thay đổi kỹ thuật sau khi đã xây xong</td>
+          <td><span class="badge badge-err">Cao</span></td>
+          <td>Tú được mời tham gia từ tuần 3. Kiến trúc kỹ thuật được phê duyệt trước khi viết code. Đây là bài học từ tuần 3 đã được áp dụng.</td>
+        </tr>
+        <tr>
+          <td>Deadline 31/1 bị phá vỡ vì nhiều rủi ro nhỏ cộng dồn</td>
+          <td><span class="badge badge-err">Cao</span></td>
+          <td>Kế hoạch đặt go-live ngày 27/1 — dự phòng bốn ngày trước deadline cứng. Không làm thêm tính năng mới kể từ tuần 8.</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 12 — THEORY: COMMUNICATION ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Giao tiếp">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Giao tiếp dự án</div>
+      <div class="stitle">Giao tiếp không phải việc phụ của người quản lý dự án — đó là việc chính</div>
+      <div class="ssub">Đúng thông tin, đúng người, đúng tần suất — và luôn nói thật dù tin tức không tốt</div>
+    </div>
+    <div class="sbody">
+      <p>Cuốn sách nhấn mạnh: phần lớn dự án thất bại không phải vì vấn đề kỹ thuật, mà vì <strong>các bên liên quan không được cập nhật đúng lúc và đúng cách</strong>. Người quản lý dự án không chính thức thường mắc một trong hai lỗi: hoặc không báo cáo đủ (vì sợ bị đánh giá là chậm trễ), hoặc báo cáo quá nhiều (những cuộc họp dài mà không ai muốn dự).</p>
+      <div class="grid2" style="margin-top:10px">
+        <div class="card cl-gold">
+          <div class="clabel">Nguyên tắc 1</div>
+          <div class="ctitle">Bắt đầu bằng kết luận</div>
+          <div class="ctext">Mỗi lần cập nhật, câu đầu tiên phải là trạng thái tổng thể: dự án đang tiến triển bình thường, có rủi ro cần chú ý, hoặc đang gặp vấn đề cần quyết định ngay. Người nhận báo cáo cần biết ngay họ cần đọc kỹ hay chỉ cần lướt qua.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">Nguyên tắc 2</div>
+          <div class="ctitle">Màu tín hiệu: Xanh / Vàng / Đỏ</div>
+          <div class="ctext">Đây là cách đơn giản nhất để loại bỏ sự mơ hồ trong báo cáo. Xanh: đang đúng kế hoạch. Vàng: có rủi ro cần theo dõi nhưng chưa nghiêm trọng. Đỏ: cần quyết định hoặc hỗ trợ ngay. Báo cáo màu đỏ không phải thất bại — che giấu màu đỏ mới là thất bại.</div>
+        </div>
+        <div class="card cl-purple">
+          <div class="clabel">Nguyên tắc 3</div>
+          <div class="ctitle">Một nguồn thông tin duy nhất</div>
+          <div class="ctext">Tất cả mọi người trong dự án cần xem cùng một bảng theo dõi tiến độ — dù chỉ là một file Google Sheet đơn giản. Khi có nhiều nguồn thông tin, mọi người sẽ không bao giờ đồng ý với nhau về thực trạng dự án.</div>
+        </div>
+        <div class="card cl-green">
+          <div class="clabel">Nguyên tắc 4</div>
+          <div class="ctitle">Ghi lại mọi quyết định</div>
+          <div class="ctext">Mỗi quyết định được ghi lại: quyết định gì, ai ra quyết định, ngày bao nhiêu. Khi ai đó sau này nói "Tôi chưa đồng ý điều đó", bạn có bằng chứng cụ thể. Trong văn hóa tổ chức Việt Nam, điều này đặc biệt quan trọng vì thỏa thuận miệng rất dễ bị hiểu theo nhiều cách khác nhau.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 13 — STORY: MID-PROJECT CRISIS ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Khủng hoảng giữa dự án">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Tuần 7</div>
+      <div class="stitle">Hùng bị rút đi xử lý sự cố — và Lan phải dùng đến tín hiệu màu đỏ lần đầu tiên</div>
+      <div class="ssub">Đây là thời điểm mà sự minh bạch trong giao tiếp quyết định dự án sống hay chết</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>Tháng 12, Tuần 7 — Thứ Hai buổi sáng</div>
+      <p>Thứ Hai đầu tuần 7, IT Manager gọi điện cho Lan: hệ thống thanh toán của Ngân hàng B gặp sự cố nghiêm trọng, cần Hùng hỗ trợ toàn thời gian trong tuần này. <em>"Chỉ một tuần thôi, Lan ơi."</em></p>
+      <p>Lan tính toán nhanh: mất Hùng một tuần vào thời điểm này đồng nghĩa với việc đợt 1 sẽ trễ tám ngày, đẩy lùi kiểm thử vào giữa tháng Một — ngay sát deadline 31/1. Dự phòng bốn ngày của cô vừa biến mất.</p>
+      <div class="warn-box">
+        <span class="badge badge-err" style="margin-bottom:7px;display:inline-block">Quyết định phải đưa ra trong 24 giờ</span>
+        <p style="margin:0">Lan viết báo cáo tuần với tín hiệu màu <strong>đỏ</strong> lần đầu tiên. Cô không che giấu, không làm nhẹ vấn đề. Câu đầu tiên trong email gửi TGĐ Minh: <em>"Dự án đang gặp rủi ro trễ deadline do mất nguồn lực kỹ thuật đột xuất. Tôi cần quyết định của anh trong hôm nay."</em></p>
+      </div>
+      <p>Cô đưa ra hai phương án kèm phân tích tác động: cho Hùng đi xử lý sự cố và chấp nhận trễ hai tuần, hoặc thuê thêm một developer tự do trong vòng một tuần để thay thế Hùng trong dự án báo cáo. Phương án 2 tốn thêm 15 triệu đồng nằm trong phần dự phòng ngân sách.</p>
+      <div class="story-box">
+        <span class="badge badge-story" style="margin-bottom:7px;display:inline-block">Kết quả</span>
+        <p style="margin:0">TGĐ Minh phản hồi trong hai giờ: chọn phương án 2 — thuê thêm developer tự do. Ông cũng nhân tiện gửi email xác nhận lại cam kết thời gian của Hùng với dự án sau khi sự cố được giải quyết. Dự án giữ nguyên được kế hoạch. Điều quan trọng hơn: ông Minh tin tưởng Lan hơn vì cô đã nói thẳng thay vì cố gắng tự xử lý một mình.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 14 — THEORY: CHANGE CONTROL ===================== -->
+  <div class="slide" data-sec="Lý thuyết: Quản lý thay đổi">
+    <div class="slide-header">
+      <div class="stag stag-theory">Lý thuyết — Quản lý thay đổi yêu cầu</div>
+      <div class="stitle">Thay đổi yêu cầu không phải điều xấu — điều xấu là không có quy trình để xử lý nó</div>
+      <div class="ssub">Mỗi thay đổi bổ sung đều có giá — và người bảo trợ dự án phải là người quyết định có trả giá đó hay không</div>
+    </div>
+    <div class="sbody">
+      <p>Cuốn sách không nói rằng bạn phải từ chối mọi thay đổi yêu cầu. Nó nói rằng <strong>mỗi thay đổi cần được xem xét một cách có ý thức</strong>, với đủ thông tin về tác động trước khi quyết định. Vấn đề không phải là "có thay đổi hay không" — vấn đề là ai quyết định, dựa trên thông tin gì.</p>
+      <p>Quy trình xử lý thay đổi yêu cầu có bốn bước:</p>
+      <div class="tl">
+        <div class="tl-row">
+          <div class="tl-dot" style="font-size:10px">1</div>
+          <div class="tl-body">
+            <div class="tl-t">Ghi nhận yêu cầu thay đổi</div>
+            <div class="tl-s">Bất kỳ ai cũng có thể đề xuất thay đổi — nhưng phải ghi thành văn bản: thay đổi gì, lý do tại sao cần, ai đề xuất, cần có trước khi nào. Không có cuộc trò chuyện hành lang hay "tiện thể thêm vào một chút" mà không qua bước này.</div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-dot" style="font-size:10px">2</div>
+          <div class="tl-body">
+            <div class="tl-t">Đánh giá tác động một cách trung thực</div>
+            <div class="tl-s">Project lead cùng nhóm kỹ thuật ước tính: thay đổi này cần thêm bao nhiêu ngày công? Có làm trễ deadline không? Tốn thêm bao nhiêu ngân sách? Câu trả lời phải khách quan — không cố tình làm nhẹ để được duyệt, cũng không thổi phồng để được từ chối.</div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-dot" style="font-size:10px">3</div>
+          <div class="tl-body">
+            <div class="tl-t">Người bảo trợ ra quyết định — bằng văn bản</div>
+            <div class="tl-s">Chỉ người bảo trợ dự án (trong trường hợp Ngân hàng B là TGĐ Minh) mới có quyền đồng ý kéo dài thời gian hoặc tăng ngân sách. Quyết định phải được xác nhận bằng email hoặc văn bản. Thỏa thuận miệng trong cuộc họp không đủ.</div>
+          </div>
+        </div>
+        <div class="tl-row">
+          <div class="tl-dot" style="font-size:10px">4</div>
+          <div class="tl-body">
+            <div class="tl-t">Cập nhật kế hoạch hoặc lưu vào danh sách Phase 2</div>
+            <div class="tl-s">Nếu được duyệt: cập nhật kế hoạch, thông báo cho cả nhóm. Nếu bị hoãn: ghi vào danh sách công việc cho giai đoạn tiếp theo — để người đề xuất biết yêu cầu của họ không bị lãng quên, chỉ là chưa phải lúc.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 15 — STORY: CLOSE ===================== -->
+  <div class="slide tag-story" data-sec="Câu chuyện: Đóng dự án">
+    <div class="slide-header tag-story">
+      <div class="stag stag-story">Câu chuyện — Tháng 1/2025</div>
+      <div class="stitle">Hệ thống chạy được — nhưng Lan biết dự án chưa thực sự xong</div>
+      <div class="ssub">Go-live ngày 27/1. Còn bốn ngày đến deadline. Và còn nhiều việc cần làm.</div>
+    </div>
+    <div class="sbody">
+      <div class="scene-label"><div class="scene-dot"></div>27 tháng 1 năm 2025 — Go-live</div>
+      <p>Ngày 27/1, toàn bộ 12 báo cáo chạy lần đầu tiên trên môi trường thực tế. Đào kiểm tra từng chỉ tiêu. Hùng theo dõi log hệ thống. Phương ngồi cạnh nhìn số liệu hiện ra — đúng với những gì cô đã ký xác nhận từ tháng trước. Không có lỗi nghiêm trọng.</p>
+      <p>Nhưng Lan biết đây chưa phải là kết thúc. Cô có một checklist dài cho bốn ngày cuối cùng.</p>
+      <div class="grid2" style="margin-top:10px">
+        <div class="card cl-green">
+          <div class="clabel">Xác nhận nghiệm thu chính thức</div>
+          <div class="ctext">Phương ký biên bản nghiệm thu xác nhận 12 báo cáo đáp ứng đúng yêu cầu đã thống nhất từ đầu. TGĐ Minh ký phê duyệt go-live chính thức. Tú xác nhận hệ thống đã vượt qua kiểm tra bảo mật. Tất cả đều bằng văn bản — không chỉ email.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">Bàn giao tài liệu và đào tạo</div>
+          <div class="ctext">Hướng dẫn vận hành cho đội IT. Hướng dẫn sử dụng cho phòng Tài chính. Buổi đào tạo 2 tiếng cho nhân viên tài chính sẽ dùng hệ thống. Tất cả được lưu trong hệ thống tài liệu nội bộ — không nằm trên laptop cá nhân của Hùng hay Đào.</div>
+        </div>
+      </div>
+      <div class="story-box" style="margin-top:12px">
+        <span class="badge badge-story" style="margin-bottom:7px;display:inline-block">Buổi họp đúc kết — 31/1</span>
+        <p style="margin:0">Lan tổ chức buổi họp 90 phút với cả nhóm vào ngày cuối cùng. Cô hỏi ba câu: điều gì hoạt động tốt (phát hiện ra Tú sớm sau khi sự cố tuần 3), điều gì không hoạt động tốt (khảo sát yêu cầu từ Phương mất lâu hơn dự kiến vì định nghĩa chỉ tiêu chưa rõ), và lần sau sẽ làm khác gì (dành thêm một tuần cho khảo sát yêu cầu trước khi lập kế hoạch). Tài liệu này được gửi cho IT Manager và lưu vào kho kinh nghiệm dự án của công ty.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SLIDE 16 — SUMMARY ===================== -->
+  <div class="slide" data-sec="Tổng kết">
+    <div class="slide-header">
+      <div class="stag stag-theory">Tổng kết</div>
+      <div class="stitle">Mười điều Lan học được — và bạn có thể áp dụng ngay từ dự án tiếp theo</div>
+      <div class="ssub">Không cần chứng chỉ PM. Cần sự rõ ràng, kỷ luật giao tiếp, và can đảm nói thật.</div>
+    </div>
+    <div class="sbody">
+      <div class="grid2">
+        <div class="card cl-gold">
+          <div class="clabel">1 · Xác định phạm vi trước</div>
+          <div class="ctext">Dành hai ngày đầu để viết ra và ký tên vào tài liệu xác định phạm vi dự án. Đây không phải thủ tục — đây là công cụ phòng thủ quan trọng nhất bạn có.</div>
+        </div>
+        <div class="card cl-gold">
+          <div class="clabel">2 · Tìm người bảo trợ</div>
+          <div class="ctext">Xác định người có quyền ra quyết định và gỡ rào cản ngay từ đầu. Gặp họ mỗi tuần. Không có người bảo trợ, bạn không có chỗ để leo thang khi có vấn đề.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">3 · Tìm tất cả các bên liên quan</div>
+          <div class="ctext">Đặc biệt chú ý những bên liên quan "ẩn" — những người không có mặt trong cuộc họp nhưng có quyền dừng dự án lại. Trong ngân hàng, thường là phòng tuân thủ và đội bảo mật của ngân hàng mẹ.</div>
+        </div>
+        <div class="card cl-blue">
+          <div class="clabel">4 · Một người chịu trách nhiệm mỗi việc</div>
+          <div class="ctext">Trách nhiệm chung trong thực tế là không có trách nhiệm. Mỗi công việc phải gắn với một tên người cụ thể và một deadline cụ thể — không có ngoại lệ.</div>
+        </div>
+        <div class="card cl-purple">
+          <div class="clabel">5 · Cộng thêm thời gian dự phòng</div>
+          <div class="ctext">Thêm ít nhất 20% vào tổng thời gian ước tính. Trong ngân hàng, cộng thêm nữa vì còn có vòng phê duyệt và những sự cố vận hành không thể dự đoán chính xác khi nào xảy ra.</div>
+        </div>
+        <div class="card cl-purple">
+          <div class="clabel">6 · Kiểm tra ngắn, kiểm tra thường</div>
+          <div class="ctext">Gặp từng thành viên nhóm 15 phút mỗi tuần. Hỏi hai câu: tiến độ thế nào và có gì đang cản trở không. Nhiệm vụ của bạn là gỡ rào cản — càng nhanh càng tốt.</div>
+        </div>
+        <div class="card cl-green">
+          <div class="clabel">7 · Báo cáo tín hiệu màu</div>
+          <div class="ctext">Mỗi lần cập nhật tiến độ đều bắt đầu bằng trạng thái: xanh, vàng, hoặc đỏ. Tín hiệu đỏ không phải thất bại — che giấu tín hiệu đỏ mới là thất bại thật sự.</div>
+        </div>
+        <div class="card cl-green">
+          <div class="clabel">8 · Quy trình xử lý thay đổi yêu cầu</div>
+          <div class="ctext">Mọi yêu cầu thay đổi phạm vi, thời gian hoặc ngân sách đều phải qua quy trình: ghi nhận, đánh giá tác động, người bảo trợ quyết định bằng văn bản. Không có "thêm một chút" không chính thức.</div>
+        </div>
+        <div class="card cl-red">
+          <div class="clabel">9 · Xử lý vấn đề trong 48 giờ</div>
+          <div class="ctext">Vấn đề đang xảy ra khác với rủi ro có thể xảy ra. Vấn đề cần hành động ngay — mỗi ngày để tồn đọng sẽ nhân đôi tác động về sau.</div>
+        </div>
+        <div class="card cl-red">
+          <div class="clabel">10 · Đóng dự án một cách chính thức</div>
+          <div class="ctext">Hệ thống chạy được chưa phải là xong. Phải có: xác nhận nghiệm thu bằng văn bản, tài liệu bàn giao, đào tạo người dùng, và buổi đúc kết bài học. Đây là những gì quyết định dự án có để lại giá trị lâu dài hay không.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-row">
+    <button id="pb" onclick="go(-1)" disabled>← Trước</button>
+    <span id="legend" style="font-size:11px;color:var(--fg3);display:flex;gap:12px;align-items:center">
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#b8841e;display:inline-block"></span>Lý thuyết</span>
+      <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#1a5c35;display:inline-block"></span>Câu chuyện</span>
+    </span>
+    <button id="nb" class="primary" onclick="go(1)">Tiếp →</button>
+  </div>
+  <div class="hint">Dùng phím ← → để điều hướng giữa các slide</div>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const secs=Array.from(slides).map(s=>s.dataset.sec);
+const dots=document.getElementById('dots');
+let cur=0;
+slides.forEach((_,i)=>{
+  const d=document.createElement('div');
+  d.className='dot'+(i===0?' on':'');
+  d.onclick=()=>go2(i);
+  dots.appendChild(d);
+});
+function go2(n){
+  slides[cur].classList.remove('on');
+  dots.children[cur].classList.remove('on');
+  cur=Math.max(0,Math.min(n,slides.length-1));
+  slides[cur].classList.add('on');
+  dots.children[cur].classList.add('on');
+  document.getElementById('snum').textContent=(cur+1)+' / '+slides.length;
+  document.getElementById('ssec').textContent=secs[cur];
+  document.getElementById('pb').disabled=cur===0;
+  document.getElementById('nb').disabled=cur===slides.length-1;
+  document.getElementById('pf').style.width=Math.round(cur/(slides.length-1)*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function go(d){go2(cur+d);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')go(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')go(-1);
+});
+</script>
+</body>
+</html>
