@@ -41,14 +41,252 @@
         const Trash2 = (p) => <Icon {...p}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></Icon>;
         const Download = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Icon>;
         const Upload = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></Icon>;
+        const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
 
         // --- CONSTANTS ---
         const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+        const POSITIONS = ['UTG', 'MP', 'CO', 'BTN', 'SB', 'BB'];
         const SUITS = [
           { symbol: '♥', name: 'hearts', color: 'text-red-500', bg: 'bg-red-950', border: 'border-red-900' },
           { symbol: '♦', name: 'diamonds', color: 'text-red-500', bg: 'bg-red-950', border: 'border-red-900' },
           { symbol: '♣', name: 'clubs', color: 'text-blue-400', bg: 'bg-slate-900', border: 'border-slate-800' },
           { symbol: '♠', name: 'spades', color: 'text-blue-400', bg: 'bg-slate-900', border: 'border-slate-800' }
+        ];
+
+        // --- EDUCATION DATA (from Poker.xlsx + Ivey/Daniel fundamentals) ---
+        const EDUCATION_DATA = [
+          {
+            id: 'hand-rankings', category: 'Fundamentals', icon: '🃏', title: 'Hand Rankings',
+            tags: ['rankings', 'basics', 'hierarchy'],
+            sections: [
+              { subtitle: 'Strongest → Weakest', items: [
+                '👑 Royal Flush — A K Q J T same suit (unbeatable)',
+                '🌊 Straight Flush — 5 consecutive same suit',
+                '4️⃣ Four of a Kind — Four of the same rank',
+                '🏠 Full House — Three of a kind + a pair',
+                '🌸 Flush — Any 5 same suit',
+                '📈 Straight — 5 consecutive ranks (A can be low or high)',
+                '3️⃣ Three of a Kind',
+                '2️⃣ Two Pair',
+                '1️⃣ One Pair',
+                '⚡ High Card — No made hand; highest card plays',
+              ]},
+              { subtitle: 'Key Rules', items: [
+                'Suits are equal — no suit beats another',
+                'Ace plays both high (A-K-Q-J-T) and low (A-2-3-4-5)',
+                'Best 5 cards from 7 (2 hole + 5 board)',
+              ]},
+            ],
+          },
+          {
+            id: 'starting-hands', category: 'Pre-Flop', icon: '🎯', title: 'Starting Hands by Position',
+            tags: ['preflop', 'position', 'UTG', 'BTN', 'CO', 'starting hands', 'range'],
+            sections: [
+              { subtitle: 'Early Position — UTG, UTG+1, UTG+2', text: 'Play only premium hands. Raise or fold — never limp.', items: [
+                'Raise: AA KK QQ JJ TT, AK AQ',
+                'Fold everything else from early position',
+                'You act first post-flop all streets — you need the best hands',
+              ]},
+              { subtitle: 'Middle Position — MP, MP+1', text: 'Slightly wider. Still disciplined.', items: [
+                'Raise: All EP hands + 99 88 77, AJ AT, KQ',
+                'Call vs raise: suited connectors JTs T9s with position',
+                'Fold: weak offsuit, low unsuited connectors',
+              ]},
+              { subtitle: 'Late Position — HJ, CO, BTN', text: 'Position is power — act last, widen significantly.', items: [
+                'Raise: Any pair, any suited Ace, suited connectors',
+                'Raise: Unsuited broadways (KQ KJ QJ)',
+                'BTN: Widest opening range in poker — steal often',
+                'Open-up with wider range when players before you fold',
+              ]},
+              { subtitle: 'Blinds — SB / BB', text: 'SB: Out of position vs everyone, play tighter. BB: Last to act pre-flop, defend wider.', items: [
+                'SB facing raise: 3-bet premium hands or fold; avoid flat-calling',
+                'BB vs BTN steal: defend with suited hands, pairs, any two broadways',
+                'BB: You already have 1 BB invested — pot odds are better',
+              ]},
+              { subtitle: 'Facing a Raise Before You', items: [
+                '3-bet: QQ+ AK always. JJ AQ often.',
+                'Call: TT–22 (set mining if stack > 15× call), suited connectors',
+                'Fold: weak aces, offsuit connectors, small suited gaps',
+                'If player before you CALLED: tighten up (range capping)',
+              ]},
+            ],
+          },
+          {
+            id: 'pot-odds', category: 'Math', icon: '📐', title: 'Pot Odds & Card Odds',
+            tags: ['pot odds', 'card odds', 'outs', 'math', 'draw', 'equity', 'flush draw'],
+            sections: [
+              { subtitle: 'Pot Odds Formula', text: 'The price you pay to continue vs the pot size.', items: [
+                'Pot Odds % = Bet ÷ (Pot + Bet)',
+                'Example: bet 100 into 200 pot → 100 ÷ 300 = 33%',
+                'You need at least 33% equity to call profitably',
+              ]},
+              { subtitle: 'Card Odds — The 2×/4× Rule', text: 'Quick equity estimate from your outs.', items: [
+                'FLOP (2 cards to come): Outs × 4 ≈ equity %',
+                'TURN (1 card to come): Outs × 2 ≈ equity %',
+                '— Flush draw (9 outs): Flop ~36%, Turn ~18%',
+                '— Open-ended straight (8 outs): Flop ~32%, Turn ~16%',
+                '— Gutshot straight (4 outs): Flop ~16%, Turn ~8%',
+                '— Two overcards (6 outs): Flop ~24%, Turn ~12%',
+              ]},
+              { subtitle: '✅ The Golden Rule', text: 'CALL if your equity % > pot odds %.\nFOLD if pot odds % > your equity %.', items: []},
+              { subtitle: 'Quick Examples', items: [
+                'Flush draw on flop, half-pot bet: 36% equity vs 33% odds → CALL ✅',
+                'Gutshot on turn, pot-sized bet: 8% equity vs 50% odds → FOLD ❌',
+                'Open-ender on flop, third-pot bet: 32% equity vs 25% odds → CALL ✅',
+              ]},
+            ],
+          },
+          {
+            id: 'implied-odds', category: 'Math', icon: '💰', title: 'Implied Odds',
+            tags: ['implied odds', 'set mining', 'drawing', 'stack depth', 'math'],
+            sections: [
+              { subtitle: 'What Are Implied Odds?', text: 'Future chips you expect to win IF you hit your draw. Justifies calls when current pot odds alone don\'t.'},
+              { subtitle: 'When Implied Odds Are HIGH ↑', items: [
+                'Deep effective stacks (both players have chips to lose)',
+                'Draw is concealed — using 2 hole cards, hard to read',
+                'Opponent is a calling station — will pay off when you hit',
+                'You have a tight image — they won\'t believe your made hand',
+              ]},
+              { subtitle: 'When Implied Odds Are LOW ↓', items: [
+                'Short effective stacks — not enough chips to win',
+                'Draw uses only 1 hole card (board-heavy flush/straight)',
+                'Opponent is tight and likely to fold when you hit',
+                'You have a loose/aggressive image — they\'ll fold to big river bets',
+              ]},
+              { subtitle: 'Set Mining Rule of Thumb', items: [
+                'Calling a raise with a pocket pair hoping to flop a set (~12% chance)',
+                'You need effective stack ≥ 15× the call size to be profitable',
+                'Example: call 30 chips → need at least 450 chips effective stack',
+                'If stacks are short, fold small pairs vs raises',
+              ]},
+              { subtitle: 'The Rule', text: 'Good implied odds → call even without correct pot odds.\nPoor implied odds → stick strictly to pot odds.'},
+            ],
+          },
+          {
+            id: 'ev', category: 'Math', icon: '🧮', title: 'Expected Value (EV)',
+            tags: ['EV', 'expected value', 'math', 'decision making', 'long run'],
+            sections: [
+              { subtitle: 'The Formula', text: 'EV = (%Win × $Win) − (%Loss × $Loss)', items: [
+                '%Win = your probability of winning (equity)',
+                '$Win = amount you win if successful',
+                '%Loss = probability of losing (1 − %Win)',
+                '$Loss = amount you lose if unsuccessful',
+              ]},
+              { subtitle: 'Example: Flush Draw on the Flop', text: 'Pot = 200. Villain bets 100. You have a flush draw (36% equity).', items: [
+                'Call = 100 to potentially win 300',
+                'EV = (36% × 300) − (64% × 100)',
+                'EV = 108 − 64 = +44 → Positive EV, clear CALL ✅',
+              ]},
+              { subtitle: 'The Most Important Mindset Shift', text: 'A good decision with a bad outcome is STILL a good decision.\nA bad decision with a good outcome is STILL a bad decision.\n\nJudge yourself by process and EV — not by results. Bad beats are part of the game.'},
+              { subtitle: 'Fold Frequency (Bluff Defense)', items: [
+                'Fold Frequency = Bet ÷ (Pot + Bet)',
+                'Half-pot bet: fold 33% of the time to break even',
+                'Pot-sized bet: fold 50% of the time',
+                'Overbet (2× pot): fold 67% of the time',
+                'Use this to decide whether to call a suspected bluff',
+              ]},
+            ],
+          },
+          {
+            id: 'bluffing', category: 'Strategy', icon: '🎭', title: 'Bluffing',
+            tags: ['bluff', 'semi-bluff', 'aggression', 'c-bet', 'barrel', 'range', 'blockers'],
+            sections: [
+              { subtitle: 'Why Bluff?', items: [
+                'Win pots without the best hand',
+                'Make your strong hands harder to read (balance)',
+                'Pressure opponents who play scared',
+                'Protect your raising range — can\'t always have it',
+              ]},
+              { subtitle: 'How to Bluff Well', items: [
+                'Attack weakness — bet when opponent checks twice / shows no interest',
+                'Tell a consistent story — bluff boards that fit your perceived range',
+                'Pick the right target — 1 opponent max (2 at most)',
+                'Choose scary boards — paired, straight/flush completing cards',
+                'Use position — bluff more in position, less out of position',
+              ]},
+              { subtitle: 'Semi-Bluffing (Best Type of Bluff)', text: 'Betting when you have a draw — you can win two ways: fold equity now, or hit your draw later.', items: [
+                'Flush draw + aggression = classic semi-bluff',
+                'Open-ended straight draw + bet = semi-bluff',
+                'C-bet → double barrel → triple barrel (only with equity or strong reads)',
+                'If equity improves on turn, continue betting',
+              ]},
+              { subtitle: 'Blockers', text: 'Hold cards that reduce your opponent\'s strong hand combinations.', items: [
+                'Hold A♣ on a flush board → reduces villain\'s nut flush combos',
+                'Hold KQ on AKT board → you block some of their top pairs',
+                'Blockers make your bluffs more credible and profitable',
+              ]},
+              { subtitle: 'Capped Ranges', text: 'Detect when your opponent\'s range is weak based on their actions.', items: [
+                'Villain just calls pre-flop → likely no AA KK QQ AK (they\'d 3-bet)',
+                'Villain calls flop + turn → probably no sets or two-pair (they\'d raise)',
+                'Use this to bluff — their range is capped and unlikely to continue',
+              ]},
+            ],
+          },
+          {
+            id: 'tips', category: 'Strategy', icon: '💡', title: 'Key Tips',
+            tags: ['tips', 'discipline', 'mindset', 'basics', 'limp', 'stack', 'patience'],
+            sections: [
+              { subtitle: 'Table Fundamentals', items: [
+                '❌ Never limp — raise or fold. Limping is weak and passive.',
+                '🎯 Keep opponents guessing — don\'t always play the same way',
+                '💪 Play with conviction — if unsure, fold',
+                '📊 Track your stack in BB count (danger zone = under 15 BB)',
+                '🐌 Be patient — bad cards come in streaks; don\'t force it',
+                '📈 Build pot steadily — don\'t scare off opponents with a monster bet',
+              ]},
+              { subtitle: 'Why Bet? (The 4 Reasons)', items: [
+                '💰 Value — build a pot when you expect to have the best hand',
+                '👻 Bluff — win without the best hand',
+                '🔍 Information — see how they react to learn their range',
+                '🛡️ Protection — deny free cards that could outflop you',
+              ]},
+              { subtitle: 'Reading Players', items: [
+                'Tight player 3-bets you → give them credit, tighten up',
+                'Loose player always raises → widen your 3-bet range',
+                'Someone always folds to C-bets → bluff them every flop',
+                'Someone never folds to bluffs → stop bluffing, only value bet',
+                'Pay attention even when you\'re not in a hand',
+              ]},
+              { subtitle: 'Stack Awareness', items: [
+                '< 15 BB: Shove-or-fold territory. No implied odds. Push with any premium.',
+                '15–30 BB: Limited post-flop play. Raise-or-fold pre-flop.',
+                '30–100 BB: Standard play. All strategies apply.',
+                '100+ BB: Deep stack. Implied odds improve. Set mine, speculate.',
+              ]},
+            ],
+          },
+          {
+            id: 'decision-framework', category: 'Strategy', icon: '🧠', title: 'Decision Framework',
+            tags: ['framework', 'thought process', 'cheat sheet', 'checklist', 'range', 'image'],
+            sections: [
+              { subtitle: '📐 Mathematical Checklist', items: [
+                '1. What are the pot odds? (Bet ÷ (Pot + Bet))',
+                '2. What are my card odds? (Outs × 2 or × 4)',
+                '3. Am I getting the right price? (equity > pot odds?)',
+                '4. What are my implied odds? (if pot odds < equity)',
+              ]},
+              { subtitle: '🧠 Strategic Checklist', items: [
+                '1. What range do I represent? (based on position + bet size)',
+                '2. What is my opponent\'s range? (based on their position + actions)',
+                '3. What is my table image right now? (tight / loose / aggressive)',
+                '4. What is my opponent\'s image? (calling station / nit / balanced)',
+              ]},
+              { subtitle: '✋ Pre-Flop Quick Routine', items: [
+                'Stop. Hands on table. 2-second pause.',
+                'Know your position first.',
+                'What did players before you do? (fold / call / raise)',
+                'Is this hand in my range for this position?',
+                'What is my intention — value, steal, or fold?',
+              ]},
+              { subtitle: '🎯 Post-Flop Questions', items: [
+                'Who has range advantage on this board?',
+                'What hands am I representing?',
+                'What is my equity if I\'m called?',
+                'Is this a good bluff spot or value spot?',
+                'What does a bet accomplish here?',
+              ]},
+            ],
+          },
         ];
 
         // --- CUSTOM HOOKS ---
@@ -77,7 +315,7 @@
         }
 
         // --- PHYSICS CANVAS COMPONENT ---
-        function TokenPhysicsArea({ count, onAdd, onRemove }) {
+        function TokenPhysicsArea({ count, onAdd, onRemove, onShake }) {
           const containerRef = useRef(null);
           const rafRef = useRef(null);
           const tokensRef = useRef([]); 
@@ -244,12 +482,24 @@
             dragRef.current.id = null;
           };
 
-          // Determine CSS class based on token index
+          // Shake — give every token a random explosive velocity
+          const handleShake = () => {
+            tokensRef.current.forEach(t => {
+              t.vx = (Math.random() - 0.5) * 40;
+              t.vy = -(Math.random() * 20 + 10);
+              t.isDragging = false;
+            });
+          };
+
+          // Wire external onShake prop to internal handler via ref
+          useEffect(() => {
+            if (onShake) onShake.current = handleShake;
+          });
+
+          // Determine CSS class based on token index — new tier every 4
           const getTokenClass = (index) => {
-            if (index < 5) return 'token-t1';      // 1-5
-            if (index < 12) return 'token-t2';     // 6-12
-            if (index < 21) return 'token-t3';     // 13-21
-            return 'token-t4';                     // 22+
+            const tier = Math.floor(index / 4) + 1;
+            return `token-t${Math.min(tier, 7)}`;
           };
 
           return (
@@ -281,17 +531,24 @@
 
               {/* Control Panel (1/5 width) */}
               <div className="w-1/5 bg-neutral-900 flex flex-col justify-center items-center py-2 z-20 shadow-[-5px_0_15px_rgba(0,0,0,0.5)]">
-                <button 
-                  onClick={onAdd} 
+                <button
+                  onClick={onAdd}
                   className="flex-1 w-full flex items-center justify-center text-yellow-500 hover:bg-neutral-800 active:bg-neutral-700 active:scale-95 transition-all"
                 >
                   <Plus size={28} />
                 </button>
-                <div className="py-2 flex flex-col items-center">
+                <div className="py-1 flex flex-col items-center gap-1">
                   <div className="text-3xl font-mono font-black text-yellow-500 leading-none">{count}</div>
+                  <button
+                    onClick={() => onShake && onShake.current && onShake.current()}
+                    title="Shake!"
+                    className="text-neutral-500 hover:text-yellow-500 active:scale-90 transition-all text-base leading-none"
+                  >
+                    💥
+                  </button>
                 </div>
-                <button 
-                  onClick={onRemove} 
+                <button
+                  onClick={onRemove}
                   className="flex-1 w-full flex items-center justify-center text-neutral-500 hover:bg-neutral-800 active:bg-neutral-700 active:scale-95 transition-all"
                 >
                   <Minus size={28} />
@@ -309,6 +566,7 @@
           const [discTokens, setDiscTokens] = useLocalStorage('pt2_disc', 0);
           const [startTime, setStartTime] = useLocalStorage('pt2_start', Date.now());
           const [commOpen, setCommOpen] = useLocalStorage('pt2_comm', true);
+          const [miracleBudget, setMiracleBudget] = useLocalStorage('pt2_mb', 3);
           
           // Navigation State
           const [activeTab, setActiveTab] = useState('session'); // 'session', 'add', 'history', 'sessions', 'stats'
@@ -362,29 +620,33 @@
           const renderScreen = () => {
             switch (activeTab) {
               case 'session':
-                return <ScreenSession 
-                  hands={hands} discTokens={discTokens} setDiscTokens={setDiscTokens} 
-                  startTime={startTime} commOpen={commOpen} setCommOpen={setCommOpen} 
-                  navigate={setActiveTab} endSession={endSession} 
+                return <ScreenSession
+                  hands={hands} discTokens={discTokens} setDiscTokens={setDiscTokens}
+                  startTime={startTime} commOpen={commOpen} setCommOpen={setCommOpen}
+                  navigate={setActiveTab} endSession={endSession}
                   onAddHand={() => { setEditingHandId(null); setActiveTab('add'); }}
                   onEditHand={(id) => { setEditingHandId(id); setActiveTab('add'); }}
                   showToast={showToast}
+                  miracleBudget={miracleBudget} setMiracleBudget={setMiracleBudget}
                 />;
               case 'add':
-                return <ScreenAddHand 
-                  hands={hands} setHands={setHands} navigate={setActiveTab} showToast={showToast} 
+                return <ScreenAddHand
+                  hands={hands} setHands={setHands} navigate={setActiveTab} showToast={showToast}
                   editingHandId={editingHandId}
+                  miracleBudget={miracleBudget}
                 />;
               case 'history':
                 return <ScreenHistory hands={hands} startTime={startTime} showToast={showToast} onEditHand={(id) => { setEditingHandId(id); setActiveTab('add'); }} />;
               case 'sessions':
                 return <ScreenSessions sessions={sessions} setSessions={setSessions} showToast={showToast} />;
               case 'stats':
-                return <ScreenStats 
+                return <ScreenStats
                   hands={hands} sessions={sessions} discTokens={discTokens} startTime={startTime}
                   setHands={setHands} setSessions={setSessions} setDiscTokens={setDiscTokens} setStartTime={setStartTime}
-                  clearAllData={clearAllData} showToast={showToast} 
+                  clearAllData={clearAllData} showToast={showToast}
                 />;
+              case 'learn':
+                return <ScreenLearn />;
               default:
                 return <ScreenSession navigate={setActiveTab} />;
             }
@@ -394,34 +656,51 @@
             <div className="min-h-screen bg-neutral-950 text-neutral-200 font-sans selection:bg-yellow-600/30 flex justify-center">
               {/* Global Styles for Custom VFX Keyframes */}
               <style>{`
-                @keyframes pulseSlow {
-                  0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(250,204,21,0.5); }
-                  50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(250,204,21,0.9); }
+                @keyframes breathe {
+                  0%,100% { box-shadow: 0 0 5px rgba(234,179,8,0.3); }
+                  50% { box-shadow: 0 0 16px rgba(234,179,8,0.8); }
+                }
+                @keyframes pulseMed {
+                  0%,100% { transform: scale(1); box-shadow: 0 0 10px rgba(234,179,8,0.5); }
+                  50% { transform: scale(1.1); box-shadow: 0 0 24px rgba(250,204,21,0.9); }
                 }
                 @keyframes pulseFast {
-                  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(253,224,71,0.7); }
-                  50% { transform: scale(1.2); box-shadow: 0 0 45px rgba(253,224,71,1); }
+                  0%,100% { transform: scale(1); box-shadow: 0 0 14px rgba(234,179,8,0.7); }
+                  50% { transform: scale(1.18); box-shadow: 0 0 38px rgba(253,224,71,1); }
                 }
-                @keyframes flipColor {
-                  0%, 49% { background: #eab308; color: #422006; border-color: #fef08a; transform: scale(1.25); box-shadow: 0 0 50px #fef08a; }
-                  50%, 100% { background: #422006; color: #eab308; border-color: #a16207; transform: scale(1.15); box-shadow: 0 0 20px #eab308; }
+                @keyframes goldPurple {
+                  0%,100% { background:#eab308; border-color:#fef08a; color:#422006; box-shadow:0 0 20px #eab308; }
+                  50% { background:#a855f7; border-color:#e9d5ff; color:#fff; box-shadow:0 0 28px #a855f7; }
                 }
-                .token-t1 {
-                  background: rgba(234,179,8,0.2); border: 1px solid rgba(234,179,8,0.5); color: #eab308;
-                  box-shadow: 0 0 8px rgba(234,179,8,0.4);
+                @keyframes rainbow {
+                  0%   { background:#ef4444; border-color:#fca5a5; }
+                  20%  { background:#f97316; border-color:#fdba74; }
+                  40%  { background:#eab308; border-color:#fef08a; }
+                  60%  { background:#22c55e; border-color:#86efac; }
+                  80%  { background:#3b82f6; border-color:#93c5fd; }
+                  100% { background:#ef4444; border-color:#fca5a5; }
                 }
-                .token-t2 {
-                  background: #facc15; border: 1px solid #fef08a; color: #713f12; font-weight: bold;
-                  animation: pulseSlow 2.5s infinite ease-in-out;
+                @keyframes chaos {
+                  0%   { background:#fff; border-color:#fff; color:#000; transform:scale(1.25); box-shadow:0 0 40px #fff; }
+                  25%  { background:#f00; border-color:#fca5a5; color:#fff; transform:scale(0.9) rotate(10deg); box-shadow:0 0 30px #f00; }
+                  50%  { background:#a855f7; border-color:#d8b4fe; color:#fff; transform:scale(1.2); box-shadow:0 0 35px #a855f7; }
+                  75%  { background:#22c55e; border-color:#86efac; color:#000; transform:scale(1) rotate(-8deg); box-shadow:0 0 30px #22c55e; }
+                  100% { background:#fff; border-color:#fff; color:#000; transform:scale(1.25); box-shadow:0 0 40px #fff; }
                 }
-                .token-t3 {
-                  background: #fde047; border: 1px solid #fef08a; color: #422006; font-weight: 900;
-                  animation: pulseFast 0.6s infinite ease-in-out;
-                }
-                .token-t4 {
-                  font-weight: 900;
-                  animation: flipColor 0.2s infinite step-start;
-                }
+                /* Tier 1 (1-4): Spark — dim glow, still */
+                .token-t1 { background:rgba(234,179,8,0.15); border:1px solid rgba(234,179,8,0.3); color:rgba(234,179,8,0.55); }
+                /* Tier 2 (5-8): Warming — gentle breathe */
+                .token-t2 { background:rgba(234,179,8,0.28); border:1px solid rgba(234,179,8,0.65); color:#eab308; animation:breathe 2.5s ease-in-out infinite; }
+                /* Tier 3 (9-12): Focused — solid gold pulse */
+                .token-t3 { background:#ca8a04; border:1px solid #fef08a; color:#fefce8; font-weight:bold; animation:pulseMed 1.5s ease-in-out infinite; }
+                /* Tier 4 (13-16): Sharp — bright fast pulse */
+                .token-t4 { background:#eab308; border:2px solid #fef08a; color:#422006; font-weight:900; animation:pulseFast 0.75s ease-in-out infinite; }
+                /* Tier 5 (17-20): Elite — gold↔purple shift */
+                .token-t5 { border-width:2px; font-weight:900; animation:goldPurple 0.65s ease-in-out infinite; }
+                /* Tier 6 (21-24): Legendary — full rainbow */
+                .token-t6 { border-width:2px; color:#fff; font-weight:900; animation:rainbow 1.2s linear infinite; }
+                /* Tier 7 (25+): UNTOUCHABLE — chaos */
+                .token-t7 { border-width:2px; font-weight:900; animation:chaos 0.18s step-start infinite; }
               `}</style>
 
               <div className="w-full max-w-md bg-neutral-950 flex flex-col min-h-screen relative shadow-2xl border-x border-neutral-900">
@@ -433,11 +712,12 @@
 
                 {/* Bottom Navigation (Hide when adding a hand) */}
                 {activeTab !== 'add' && (
-                  <div className="sticky bottom-0 bg-neutral-950 border-t border-neutral-800 flex justify-between px-2 pb-6 pt-2 z-20">
-                    <NavItem icon={<Spade size={20} />} label="Session" isActive={activeTab === 'session'} onClick={() => setActiveTab('session')} />
-                    <NavItem icon={<History size={20} />} label="Hands" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
-                    <NavItem icon={<Layers size={20} />} label="Sessions" isActive={activeTab === 'sessions'} onClick={() => setActiveTab('sessions')} />
-                    <NavItem icon={<BarChart2 size={20} />} label="Stats" isActive={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
+                  <div className="sticky bottom-0 bg-neutral-950 border-t border-neutral-800 flex justify-between px-1 pb-6 pt-2 z-20">
+                    <NavItem icon={<Spade size={18} />} label="Session" isActive={activeTab === 'session'} onClick={() => setActiveTab('session')} />
+                    <NavItem icon={<History size={18} />} label="Hands" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
+                    <NavItem icon={<Layers size={18} />} label="Sessions" isActive={activeTab === 'sessions'} onClick={() => setActiveTab('sessions')} />
+                    <NavItem icon={<BarChart2 size={18} />} label="Stats" isActive={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
+                    <NavItem icon={<BookOpen size={18} />} label="Learn" isActive={activeTab === 'learn'} onClick={() => setActiveTab('learn')} />
                   </div>
                 )}
 
@@ -476,7 +756,8 @@
         }
 
         // --- SCREEN: SESSION (DASHBOARD) ---
-        function ScreenSession({ hands, discTokens, setDiscTokens, startTime, commOpen, setCommOpen, navigate, endSession, onAddHand, onEditHand, showToast }) {
+        function ScreenSession({ hands, discTokens, setDiscTokens, startTime, commOpen, setCommOpen, navigate, endSession, onAddHand, onEditHand, showToast, miracleBudget, setMiracleBudget }) {
+          const shakeRef = useRef(null);
           const [listHidden, setListHidden] = useState(true);
           const [showEndModal, setShowEndModal] = useState(false);
           const [pnlInput, setPnlInput] = useState('');
@@ -560,14 +841,44 @@
                   </div>
                 </div>
 
+                {/* Miracle Budget */}
+                {(() => {
+                  const miraclesUsed = hands.filter(h => h.isMiracle).length;
+                  const over = miraclesUsed > miracleBudget;
+                  const atLimit = miraclesUsed >= miracleBudget;
+                  return (
+                    <div className={`mb-4 flex items-center justify-between px-4 py-3 rounded-xl border ${over ? 'bg-red-500/10 border-red-500/40' : atLimit ? 'bg-orange-500/10 border-orange-500/30' : 'bg-neutral-900 border-neutral-800'}`}>
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">🎲</span>
+                        <div>
+                          <span className={`text-sm font-semibold ${over ? 'text-red-400' : atLimit ? 'text-orange-400' : 'text-neutral-300'}`}>
+                            Miracle budget
+                          </span>
+                          {atLimit && <div className="text-[10px] text-orange-400/80">Slow down — think before calling</div>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`font-mono font-black text-lg ${over ? 'text-red-400' : atLimit ? 'text-orange-400' : 'text-neutral-300'}`}>
+                          {miraclesUsed}/{miracleBudget}
+                        </span>
+                        <div className="flex gap-1">
+                          <button onClick={() => setMiracleBudget(prev => Math.max(1, prev - 1))} className="w-6 h-6 rounded bg-neutral-800 border border-neutral-700 text-neutral-400 flex items-center justify-center text-xs hover:bg-neutral-700 active:scale-90 transition-all">−</button>
+                          <button onClick={() => setMiracleBudget(prev => prev + 1)} className="w-6 h-6 rounded bg-neutral-800 border border-neutral-700 text-neutral-400 flex items-center justify-center text-xs hover:bg-neutral-700 active:scale-90 transition-all">+</button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
                 {/* Discipline Physics Playground */}
                 <div className="mb-2 pl-2 text-[11px] font-bold uppercase tracking-widest text-neutral-500">
-                  Cast votes for the Generous Winner in HDPG!
+                  ★ Discipline stars — great fold, good call, any hard decision
                 </div>
-                <TokenPhysicsArea 
-                  count={discTokens} 
+                <TokenPhysicsArea
+                  count={discTokens}
                   onAdd={() => setDiscTokens(prev => prev + 1)}
                   onRemove={() => setDiscTokens(prev => Math.max(0, prev - 1))}
+                  onShake={shakeRef}
                 />
 
                 {/* Log Hand Button */}
@@ -611,6 +922,11 @@
                             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${h.isVPIP ? 'bg-yellow-500/10 text-yellow-500' : 'bg-neutral-800 text-neutral-500'}`}>
                               {h.isVPIP ? 'VPIP' : 'FOLD'}
                             </span>
+                            {h.position && (
+                              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">
+                                {h.position}
+                              </span>
+                            )}
                           </div>
                           <div className="text-[11px] text-neutral-500 font-mono mt-1">
                             {h.total > 0 ? `${h.total} chips in` : 'No chips in'}
@@ -657,7 +973,7 @@
         }
 
         // --- SCREEN: ADD HAND ---
-        function ScreenAddHand({ hands, setHands, navigate, showToast, editingHandId }) {
+        function ScreenAddHand({ hands, setHands, navigate, showToast, editingHandId, miracleBudget = 3 }) {
           const initialHand = editingHandId ? hands.find(h => h.id === editingHandId) : null;
 
           const [holeCardsHidden, setHoleCardsHidden] = useState(false);
@@ -665,6 +981,9 @@
           const [pendingRank, setPendingRank] = useState(null);
           const [card1, setCard1] = useState(initialHand ? initialHand.card1 : null);
           const [card2, setCard2] = useState(initialHand ? initialHand.card2 : null);
+          const [position, setPosition] = useState(initialHand ? (initialHand.position || null) : null);
+          const [playRating, setPlayRating] = useState(initialHand ? (initialHand.playRating || null) : null);
+          const [isMiracle, setIsMiracle] = useState(initialHand ? (initialHand.isMiracle || false) : false);
           
           const [bets, setBets] = useState(initialHand ? {
             preflop: initialHand.bets.preflop.amount || '',
@@ -683,7 +1002,7 @@
           const [result, setResult] = useState(initialHand ? initialHand.result : null);
 
           const totalIn = Object.values(bets).reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
-          const isVPIP = (parseFloat(bets.preflop) || 0) > 0 && !folds.preflop;
+          const isVPIP = (parseFloat(bets.preflop) || 0) > 0;
 
           const handleSelectRank = (r) => {
             setPendingRank(r);
@@ -734,7 +1053,8 @@
 
             if (initialHand) {
               setHands(hands.map(h => h.id === initialHand.id ? {
-                ...h, card1, card2, bets: formattedBets, total: totalIn, isVPIP, result, ts: Date.now()
+                ...h, card1, card2, bets: formattedBets, total: totalIn, isVPIP, result,
+                position: position || null, playRating: playRating || null, isMiracle, ts: Date.now()
               } : h));
               showToast(`Hand #${initialHand.num} updated`);
             } else {
@@ -747,6 +1067,9 @@
                 total: totalIn,
                 isVPIP,
                 result,
+                position: position || null,
+                playRating: playRating || null,
+                isMiracle,
                 ts: Date.now()
               };
               setHands([...hands, newHand]);
@@ -810,6 +1133,25 @@
               </div>
 
               <div className="flex-1 overflow-y-auto p-4 pb-12 space-y-4">
+                {/* Position Picker */}
+                <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
+                  <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Your Position</div>
+                  <div className="grid grid-cols-6 gap-1.5">
+                    {POSITIONS.map(pos => (
+                      <button
+                        key={pos}
+                        onClick={() => setPosition(position === pos ? null : pos)}
+                        className={`py-2.5 rounded-lg text-sm font-bold transition-all border
+                          ${position === pos
+                            ? 'bg-yellow-500 border-yellow-400 text-black shadow-lg shadow-yellow-500/20'
+                            : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}
+                      >
+                        {pos}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 {/* Card Picker */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-4 text-center">Select your hole cards</div>
@@ -913,7 +1255,67 @@
                     <button onClick={() => setResult('fold')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'fold' ? 'bg-neutral-700 border-neutral-400 text-white ring-2 ring-neutral-400' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>Folded</button>
                   </div>
                 </div>
-                
+
+                {/* Play Quality Rating */}
+                <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
+                  <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">How well did you play?</div>
+                  <div className="flex justify-between gap-1.5">
+                    {[1,2,3,4,5].map(n => {
+                      const labels = ['Terrible','Bad','OK','Good','Perfect'];
+                      const colors = ['text-red-500','text-orange-400','text-yellow-500','text-lime-400','text-green-400'];
+                      const selected = playRating === n;
+                      return (
+                        <button
+                          key={n}
+                          onClick={() => setPlayRating(playRating === n ? null : n)}
+                          className={`flex-1 flex flex-col items-center gap-1 py-2.5 rounded-xl border transition-all
+                            ${selected
+                              ? 'bg-neutral-700 border-neutral-400 ring-1 ring-neutral-300'
+                              : 'bg-neutral-800 border-neutral-700 hover:bg-neutral-750'}`}
+                        >
+                          <span className={`text-xl ${selected ? colors[n-1] : 'text-neutral-500'}`}>
+                            {n <= (playRating || 0) ? '★' : '☆'}
+                          </span>
+                          <span className={`text-[9px] font-medium ${selected ? colors[n-1] : 'text-neutral-600'}`}>
+                            {labels[n-1]}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Miracle Call Toggle */}
+                {(() => {
+                  const miraclesUsed = hands.filter(h => h.isMiracle && h.id !== (editingHandId || -1)).length;
+                  const budgetExhausted = !isMiracle && miraclesUsed >= miracleBudget;
+                  return budgetExhausted ? (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-400 flex items-center gap-2">
+                      <span>🎲</span>
+                      <span>Miracle budget exhausted ({miraclesUsed}/{miracleBudget}). Are you sure this is worth it?</span>
+                    </div>
+                  ) : null;
+                })()}
+                <button
+                  onClick={() => setIsMiracle(!isMiracle)}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all
+                    ${isMiracle
+                      ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
+                      : 'bg-neutral-900 border-neutral-800 text-neutral-500'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🎲</span>
+                    <div className="text-left">
+                      <div className={`text-sm font-medium ${isMiracle ? 'text-orange-400' : 'text-neutral-300'}`}>Miracle call</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5">Low-odds call — knew it was risky</div>
+                    </div>
+                  </div>
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                    ${isMiracle ? 'bg-orange-500 border-orange-400' : 'border-neutral-600'}`}>
+                    {isMiracle && <span className="text-black text-xs font-black">✓</span>}
+                  </div>
+                </button>
+
                 {/* Actions */}
                 <div className="mt-6 flex flex-col gap-3">
                   <button 
@@ -995,6 +1397,11 @@
                             <span className={`text-[10px] font-mono px-2 py-1 rounded-md ${h.isVPIP ? 'bg-yellow-500/10 text-yellow-500' : 'bg-neutral-800 text-neutral-500'}`}>
                               {h.isVPIP ? 'VPIP' : 'FOLD'}
                             </span>
+                            {h.position && (
+                              <span className="text-[10px] font-mono px-2 py-1 rounded-md bg-blue-500/10 text-blue-400">
+                                {h.position}
+                              </span>
+                            )}
                          </div>
                          <span className={`text-sm font-medium ${h.result === 'won' ? 'text-green-500' : h.result === 'lost' ? 'text-red-500' : 'text-neutral-500'}`}>
                            {h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : 'Folded'}
@@ -1018,7 +1425,15 @@
                        
                        <div className="pl-9 pt-2 border-t border-neutral-800/50 flex justify-between items-center mt-1">
                          <span className="text-xs text-neutral-500">Total Invested</span>
-                         <span className="text-sm font-mono font-medium text-white">{h.total}</span>
+                         <div className="flex items-center gap-3">
+                           {h.playRating && (
+                             <span className={`text-xs font-mono ${h.playRating >= 4 ? 'text-green-400' : h.playRating <= 2 ? 'text-red-400' : 'text-yellow-500'}`}>
+                               {'★'.repeat(h.playRating)}{'☆'.repeat(5 - h.playRating)}
+                             </span>
+                           )}
+                           {h.isMiracle && <span className="text-[10px] text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded">🎲 miracle</span>}
+                           <span className="text-sm font-mono font-medium text-white">{h.total}</span>
+                         </div>
                        </div>
                      </div>
                   ))
@@ -1133,6 +1548,16 @@
           const lifetimePnl = sessions.reduce((acc, s) => acc + s.pnl, 0);
           const lifetimeDisc = sessions.reduce((acc, s) => acc + (s.discTokens || 0), 0) + discTokens;
 
+          // New stats from current session
+          const allCurrentHands = hands;
+          const ratedHands = allCurrentHands.filter(h => h.playRating);
+          const avgRating = ratedHands.length > 0
+            ? (ratedHands.reduce((a, h) => a + h.playRating, 0) / ratedHands.length).toFixed(1)
+            : null;
+          const miracleHands = allCurrentHands.filter(h => h.isMiracle).length;
+          const vpipHands = allCurrentHands.filter(h => h.isVPIP).length;
+          const miracleRate = vpipHands > 0 ? Math.round((miracleHands / vpipHands) * 100) : 0;
+
           const vpipColor = lifetimeVPIP <= 30 ? 'text-green-500' : lifetimeVPIP <= 50 ? 'text-yellow-500' : 'text-red-500';
           const vpipBg = lifetimeVPIP <= 30 ? 'bg-green-500' : lifetimeVPIP <= 50 ? 'bg-yellow-500' : 'bg-red-500';
 
@@ -1213,6 +1638,18 @@
                     <div className="text-3xl font-mono font-medium text-yellow-500">{lifetimeDisc}</div>
                     <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">★ Discipline</div>
                   </div>
+                  {avgRating && (
+                    <div className="bg-neutral-900 p-4 rounded-xl border border-neutral-800 text-center">
+                      <div className={`text-3xl font-mono font-medium ${avgRating >= 4 ? 'text-green-400' : avgRating >= 3 ? 'text-yellow-500' : 'text-red-400'}`}>{avgRating}</div>
+                      <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">Avg Play ★</div>
+                    </div>
+                  )}
+                  {vpipHands > 0 && (
+                    <div className="bg-neutral-900 p-4 rounded-xl border border-neutral-800 text-center">
+                      <div className={`text-3xl font-mono font-medium ${miracleRate > 30 ? 'text-red-400' : 'text-orange-400'}`}>{miracleRate}%</div>
+                      <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">🎲 Miracle Rate</div>
+                    </div>
+                  )}
                 </div>
 
                 {/* VPIP Target Bar */}
@@ -1262,6 +1699,360 @@
                 </div>
 
               </div>
+            </div>
+          );
+        }
+
+        // --- QUIZ DATA ---
+        const QUIZ_QUESTIONS = [
+          { id:1, category:'Pre-Flop', difficulty:'Easy', title:'Premium Hand, Early Position',
+            scenario:'You\'re UTG at a 6-handed table. You look down at A♠K♦.',
+            board:null, position:'UTG',
+            question:'Action is on you. What do you do?',
+            options:['Fold','Limp (call BB only)','Raise 3× BB','Go all-in immediately'],
+            correct:2,
+            explanation:'AK is a premium hand — always raise, never limp. 3× BB is standard. Limping gives everyone good pot odds to outdraw you and surrenders initiative. Shoving pre-flop is only correct when short-stacked (<15 BB).' },
+          { id:2, category:'Pre-Flop', difficulty:'Easy', title:'Worst Hand in Poker',
+            scenario:'UTG, 6-handed. You pick up 7♦2♣.',
+            board:null, position:'UTG',
+            question:'What do you do?',
+            options:['Fold','Limp — maybe flop two pair','Raise to steal blinds','Only play if you feel lucky'],
+            correct:0,
+            explanation:'72 offsuit is the worst starting hand. Fold immediately from early position. It has terrible equity, no straight potential, and even flopping a pair leaves you with a weak kicker. Never play this hand from UTG.' },
+          { id:3, category:'Math', difficulty:'Medium', title:'Flush Draw on the Flop',
+            scenario:'Flop: K♥8♥3♦. You have J♥9♥ — flush draw (9 outs). Pot = 200. Villain bets 100.',
+            board:'K♥ 8♥ 3♦', position:'CO',
+            question:'Do you call the 100 bet?',
+            options:['Fold — flush draws miss most of the time','Call — pot odds justify it','Raise as a semi-bluff','Both calling AND raising are correct plays'],
+            correct:3,
+            explanation:'Pot odds: 100÷300 = 33%. Flush draw equity: 9×4 = ~36%. Your equity beats the pot odds → call is +EV. But raising is ALSO correct: you might win by fold right now, and you still have equity if called. Semi-bluffing with a strong draw is often better than just calling.' },
+          { id:4, category:'Math', difficulty:'Medium', title:'Gutshot on the Turn',
+            scenario:'Turn: K♠Q♦5♥2♣. You have J♦T♦ (gutshot — need an Ace). Pot = 300. Villain bets 300.',
+            board:'K♠ Q♦ 5♥ 2♣', position:'BTN',
+            question:'Pot-sized bet, 4 outs to a gutshot. Call?',
+            options:['Call — I could still hit','Fold — the math doesn\'t work','Raise and represent a made hand','Call only if he looks weak'],
+            correct:1,
+            explanation:'Pot odds: 300÷600 = 50%. Gutshot equity: 4×2 = ~8%. You need 50% equity to call but only have 8%. Even with implied odds, you\'d need to win ~6× the bet size on the river — extremely unlikely. Fold is the only correct play here.' },
+          { id:5, category:'Pre-Flop', difficulty:'Easy', title:'Button Steal',
+            scenario:'Everyone folds to you on the BTN. You have K♠J♠. Blinds are SB and BB.',
+            board:null, position:'BTN',
+            question:'Two players left. What do you do?',
+            options:['Fold — KJ is a marginal hand','Limp — keep the pot small','Raise 2.5–3× BB','Only raise if BTN is your strong position'],
+            correct:2,
+            explanation:'BTN is the strongest position post-flop — you always act last. KJs is a solid hand: suited, two high cards, good straight/flush potential. Always raise here. Limping surrenders initiative and pot equity. Folding KJs on BTN is a major leak.' },
+          { id:6, category:'Pre-Flop', difficulty:'Hard', title:'Facing a 3-Bet with JJ',
+            scenario:'You raise 3× from MP with J♠J♦. A tight player 3-bets to 9× from the BTN.',
+            board:null, position:'MP',
+            question:'Tight villain 3-bets you. What do you do?',
+            options:['Fold — they must have QQ+ or AK','4-bet all-in immediately','Call and play post-flop','It depends on stack depth'],
+            correct:2,
+            explanation:'Against a tight 3-bet range (QQ+, AK, sometimes AQ), JJ is a slight dog but has too much equity to fold. Calling is standard — see the flop and fold if an A or K comes. 4-betting puts all your chips in as the underdog. This is a classic "call and reassess" spot.' },
+          { id:7, category:'Strategy', difficulty:'Medium', title:'C-Bet on a Dry Board',
+            scenario:'You raised pre-flop with A♣K♣. Flop: 7♦4♠2♥ — completely missed. Villain checks to you.',
+            board:'7♦ 4♠ 2♥', position:'BTN',
+            question:'Dry flop, villain checks, you have two overcards. C-bet?',
+            options:['Check — I missed, too dangerous','Bet 40–50% pot as C-bet','Bet pot for maximum pressure','Check-raise if they bet into me'],
+            correct:1,
+            explanation:'Classic C-bet spot. A 7-4-2 rainbow board rarely hits a calling range. You have six outs (any A or K), plus your pre-flop story says you have big cards. A 40–50% pot C-bet gets many folds and doesn\'t over-commit. This is one of the most profitable spots in poker.' },
+          { id:8, category:'Strategy', difficulty:'Hard', title:'Triple Barrel or Give Up?',
+            scenario:'You bluffed the flop and turn. Villain called both calmly. River pairs the board. Pot = 600.',
+            board:'A♦ 8♥ 3♠ 3♣ 7♦', position:'CO',
+            question:'Villain called twice. Do you fire the third barrel?',
+            options:['Bet big — complete the story','Bet small — show some weakness','Check and give up','Bet if he looks unsure'],
+            correct:2,
+            explanation:'A player who calls twice is rarely folding the river. Their range contains strong pairs and draws — they\'ve committed to calling. The 3 pairing doesn\'t help your story and doesn\'t scare them. Cut your losses, check and fold to any bet. Triple barrelling into a calling station is one of the biggest leaks.' },
+          { id:9, category:'Math', difficulty:'Hard', title:'Set Mining with Short Stacks',
+            scenario:'You have 5♠5♣. UTG (tight) raises 3×. Effective stack = 50 BB. You\'re on the BTN.',
+            board:null, position:'BTN',
+            question:'You hit a set ~12% of the time. Is calling profitable?',
+            options:['Call — set mining is always profitable','Call only if villain is loose','Fold — short stack kills implied odds','3-bet as a bluff instead'],
+            correct:2,
+            explanation:'Set mining rule: you need effective stack ≥ 15× the call size. Calling 3 BB → you need 45+ BB in effective stacks. At 50 BB total you barely qualify, but if villain is tight they may not pay you off when you hit. With truly short stacks (<30 BB), fold small pairs vs raises — the implied odds don\'t exist.' },
+          { id:10, category:'Strategy', difficulty:'Medium', title:'Slow Play or Fast Play?',
+            scenario:'Flop: A♥K♦A♣. You have A♠Q♠ — trip aces with top kicker. Villain bets into you.',
+            board:'A♥ K♦ A♣', position:'BB',
+            question:'You have the nuts essentially. Villain bets. Do you slow play?',
+            options:['Just call — trap them','Raise — build the pot','Fold — they might have the fourth ace','Call the flop, raise the turn'],
+            correct:1,
+            explanation:'Raise now. Villain is betting into you — they have something (KK for a full house, Kx, Ax). Build the pot. The board is dry so there\'s no "protecting" reason, but there is value: they have a hand they like. Slow playing trips gives them a cheap turn to outdraw you or lose interest. Get value now.' },
+          { id:11, category:'Pre-Flop', difficulty:'Medium', title:'Big Blind Defense',
+            scenario:'Everyone folds. BTN raises 3×. SB folds. You\'re BB with 8♥7♥.',
+            board:null, position:'BB',
+            question:'BTN is stealing. 87 suited in the BB. Call or fold?',
+            options:['Fold — 87s is too weak','Call — good implied odds and position is OK','3-bet as a bluff','Both calling and 3-betting are valid'],
+            correct:3,
+            explanation:'87s is a strong defending hand from BB: suited, connected, makes straights and flushes, playable on most boards. You already have 1 BB invested and get a discount. Calling is standard. 3-bet bluffing is ALSO valid — BTN has a wide stealing range and you can represent strong hands. Both plays are correct.' },
+          { id:12, category:'Strategy', difficulty:'Hard', title:'Kings on an Ace-High Board',
+            scenario:'You have K♣K♥. Flop: A♠7♦2♣. You C-bet. Tight villain raises.',
+            board:'A♠ 7♦ 2♣', position:'BTN',
+            question:'Tight villain raises your C-bet on an Ace-high board. What now?',
+            options:['Call — KK is still an overpair','3-bet to find out where you are','Fold — tight players don\'t raise without an Ace','Call the flop, see what happens on turn'],
+            correct:2,
+            explanation:'Tight players don\'t bluff-raise dry boards. Their range here is Ax (at minimum top pair), and likely two-pair or a set. Your KK is now just an overpair with ~20% equity vs their range. This is a classic discipline fold. It hurts, but folding KK on an Ace-high board vs a tight player is correct poker.' },
+          { id:13, category:'Math', difficulty:'Medium', title:'EV Calculation — Call or Fold?',
+            scenario:'You have a 40% chance to win. Pot = 200. Villain bets 100. Call 100 to win 300 total.',
+            board:'J♠ 8♦ 3♥', position:'CO',
+            question:'Using EV = (%Win × $Win) − (%Loss × $Loss), should you call?',
+            options:['Yes — EV is positive (+$60)','No — EV is negative (−$20)','It\'s break-even','Can\'t tell without knowing villain\'s exact hand'],
+            correct:0,
+            explanation:'EV = (40%×300) − (60%×100) = 120 − 60 = +60. Clearly positive. Pot odds check: 100÷300 = 33%, and your equity is 40% > 33%. Both methods agree: call. This is the fundamental calculation behind every good poker decision.' },
+          { id:14, category:'Strategy', difficulty:'Easy', title:'Why We Don\'t Limp',
+            scenario:'You have Q♠J♦ in Middle Position. No one has acted yet.',
+            board:null, position:'MP',
+            question:'You have a decent hand. Why is limping wrong here?',
+            options:['Limping is fine — saves chips','Limping lets too many players in cheaply','Should always go all-in with QJ','QJ is too weak to play at all'],
+            correct:1,
+            explanation:'Limping is weak because: (1) it gives everyone great pot odds to enter with random hands; (2) you surrender initiative — you can\'t win by making someone fold; (3) you signal a weak range; (4) multiway pots reduce the value of non-nut hands. Raise to 2.5–3× or fold. Never limp.' },
+          { id:15, category:'Strategy', difficulty:'Hard', title:'The Discipline Test',
+            scenario:'You\'ve been card dead for 30 hands. You pick up T♠9♠ in early position. Feels like time to play.',
+            board:null, position:'UTG',
+            question:'You\'re frustrated after 30 bad hands. T9 suited. UTG. What do you do?',
+            options:['Raise — T9s is strong enough from anywhere','Limp and see a cheap flop','Fold — T9s is too weak for early position','Call any raise; you\'re due a good flop'],
+            correct:2,
+            explanation:'T9s is a playable hand from late position, but from UTG you\'ll be out of position all streets against 5+ players. The frustration is irrelevant — every hand is independent. Playing a marginal hand from bad position because you\'re bored or "due" is the exact leak this app is designed to fix. Fold, be patient, wait for position.' },
+        ];
+
+        // --- SCREEN: LEARN (Education + Quiz) ---
+        function ScreenLearn() {
+          const [tab, setTab] = useState('learn');
+          // Education state
+          const [search, setSearch] = useState('');
+          const [activeCategory, setActiveCategory] = useState('All');
+          const [openId, setOpenId] = useState(null);
+
+          // Quiz state
+          const [qIndex, setQIndex] = useState(0);
+          const [qOrder, setQOrder] = useState(() => QUIZ_QUESTIONS.map((_, i) => i).sort(() => Math.random() - 0.5));
+          const [selected, setSelected] = useState(null);
+          const [score, setScore] = useState({ correct: 0, total: 0 });
+          const [quizDone, setQuizDone] = useState(false);
+
+          const currentQ = QUIZ_QUESTIONS[qOrder[qIndex]];
+
+          const handleAnswer = (idx) => {
+            if (selected !== null) return;
+            setSelected(idx);
+            setScore(s => ({ correct: s.correct + (idx === currentQ.correct ? 1 : 0), total: s.total + 1 }));
+          };
+
+          const handleNext = () => {
+            if (qIndex + 1 >= qOrder.length) { setQuizDone(true); return; }
+            setQIndex(i => i + 1);
+            setSelected(null);
+          };
+
+          const handleRestart = () => {
+            setQOrder(QUIZ_QUESTIONS.map((_, i) => i).sort(() => Math.random() - 0.5));
+            setQIndex(0); setSelected(null);
+            setScore({ correct: 0, total: 0 }); setQuizDone(false);
+          };
+
+          // Education filter
+          const categories = ['All', ...Array.from(new Set(EDUCATION_DATA.map(d => d.category)))];
+
+          const filtered = EDUCATION_DATA.filter(item => {
+            const matchCat = activeCategory === 'All' || item.category === activeCategory;
+            if (!search.trim()) return matchCat;
+            const q = search.toLowerCase();
+            const inTitle = item.title.toLowerCase().includes(q);
+            const inTags = item.tags.some(t => t.toLowerCase().includes(q));
+            const inContent = item.sections.some(s =>
+              (s.subtitle || '').toLowerCase().includes(q) ||
+              (s.text || '').toLowerCase().includes(q) ||
+              (s.items || []).some(i => i.toLowerCase().includes(q))
+            );
+            return matchCat && (inTitle || inTags || inContent);
+          });
+
+          const diffColor = { Easy: 'text-green-400', Medium: 'text-yellow-400', Hard: 'text-red-400' };
+          const catColor  = { 'Pre-Flop': 'bg-blue-500/10 text-blue-400', Math: 'bg-purple-500/10 text-purple-400', Strategy: 'bg-orange-500/10 text-orange-400' };
+
+          return (
+            <div className="flex flex-col h-full overflow-hidden">
+              {/* Header + sub-tab bar */}
+              <div className="px-5 pt-12 pb-0 border-b border-neutral-800/50 bg-neutral-950 sticky top-0 z-10">
+                <h1 className="text-lg font-medium text-white mb-3">Learn Poker</h1>
+                <div className="flex gap-0 border-b border-neutral-800">
+                  <button
+                    onClick={() => setTab('learn')}
+                    className={`flex-1 py-2.5 text-sm font-semibold border-b-2 transition-all
+                      ${tab === 'learn' ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-neutral-500 hover:text-neutral-300'}`}
+                  >📚 Study</button>
+                  <button
+                    onClick={() => setTab('quiz')}
+                    className={`flex-1 py-2.5 text-sm font-semibold border-b-2 transition-all
+                      ${tab === 'quiz' ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-neutral-500 hover:text-neutral-300'}`}
+                  >🎯 Quiz {score.total > 0 && `${score.correct}/${score.total}`}</button>
+                </div>
+              </div>
+
+              {/* ── STUDY TAB ── */}
+              {tab === 'learn' && (
+                <div className="flex flex-col flex-1 overflow-hidden">
+                  <div className="px-4 pt-3 pb-2 bg-neutral-950">
+                    <input
+                      type="text"
+                      value={search}
+                      onChange={e => setSearch(e.target.value)}
+                      placeholder="Search tips, odds, bluffing…"
+                      className="w-full bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-neutral-500 focus:border-yellow-500 focus:outline-none mb-2"
+                    />
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {categories.map(cat => (
+                        <button key={cat} onClick={() => setActiveCategory(cat)}
+                          className={`shrink-0 px-3 py-1 rounded-full text-xs font-semibold border transition-all
+                            ${activeCategory === cat ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:border-neutral-500'}`}>
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-4 flex flex-col gap-3 pb-12">
+                    {filtered.length === 0 ? (
+                      <div className="text-center py-16 text-neutral-500">
+                        <BookOpen size={40} className="mx-auto mb-4 opacity-20" />
+                        <p>No results for "{search}"</p>
+                      </div>
+                    ) : filtered.map(item => {
+                      const isOpen = openId === item.id;
+                      return (
+                        <div key={item.id} className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
+                          <button onClick={() => setOpenId(isOpen ? null : item.id)}
+                            className="w-full flex items-center gap-3 p-4 text-left hover:bg-neutral-800/50 transition-colors">
+                            <span className="text-2xl">{item.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-white text-sm">{item.title}</div>
+                              <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-0.5">{item.category}</div>
+                            </div>
+                            <span className="text-neutral-500 text-sm">{isOpen ? '▲' : '▼'}</span>
+                          </button>
+                          {isOpen && (
+                            <div className="px-4 pb-4 flex flex-col gap-4 border-t border-neutral-800">
+                              {item.sections.map((sec, si) => (
+                                <div key={si} className="pt-3">
+                                  {sec.subtitle && <div className="text-[11px] font-bold uppercase tracking-widest text-yellow-500 mb-2">{sec.subtitle}</div>}
+                                  {sec.text && <p className="text-sm text-neutral-300 leading-relaxed mb-2 whitespace-pre-line">{sec.text}</p>}
+                                  {sec.items && sec.items.length > 0 && (
+                                    <ul className="flex flex-col gap-1.5">
+                                      {sec.items.map((txt, ii) => (
+                                        <li key={ii} className="text-sm text-neutral-300 leading-snug flex gap-2">
+                                          <span className="text-neutral-600 shrink-0 mt-0.5">·</span><span>{txt}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                    <div className="h-4" />
+                  </div>
+                </div>
+              )}
+
+              {/* ── QUIZ TAB ── */}
+              {tab === 'quiz' && (
+                <div className="flex-1 overflow-y-auto px-4 pt-4 pb-12">
+                  {quizDone ? (
+                    /* Results screen */
+                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
+                      <div className="text-6xl">{score.correct >= 12 ? '🏆' : score.correct >= 8 ? '🎯' : '📚'}</div>
+                      <div>
+                        <div className="text-4xl font-mono font-black text-white">{score.correct}<span className="text-neutral-500 text-2xl">/{score.total}</span></div>
+                        <div className={`text-lg font-semibold mt-1 ${score.correct >= 12 ? 'text-green-400' : score.correct >= 8 ? 'text-yellow-400' : 'text-red-400'}`}>
+                          {score.correct >= 12 ? 'Outstanding!' : score.correct >= 8 ? 'Solid play.' : 'Keep studying.'}
+                        </div>
+                      </div>
+                      <p className="text-sm text-neutral-400 max-w-xs">
+                        {score.correct >= 12
+                          ? 'You know your fundamentals cold. Now apply them at the table.'
+                          : score.correct >= 8
+                          ? 'Good foundation. Review the Study tab for the spots you missed.'
+                          : 'Spend some time in the Study tab — the math and pre-flop sections will help most.'}
+                      </p>
+                      <button onClick={handleRestart}
+                        className="px-8 py-3 bg-yellow-500 text-black font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-yellow-500/20">
+                        Shuffle & Restart
+                      </button>
+                    </div>
+                  ) : (
+                    /* Question screen */
+                    <div className="flex flex-col gap-4">
+                      {/* Progress */}
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-neutral-500 font-mono">{qIndex + 1} / {QUIZ_QUESTIONS.length}</span>
+                        <span className="text-xs text-neutral-500 font-mono">{score.correct} correct</span>
+                      </div>
+                      <div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-yellow-500 transition-all duration-300" style={{ width: `${((qIndex) / QUIZ_QUESTIONS.length) * 100}%` }} />
+                      </div>
+
+                      {/* Badges */}
+                      <div className="flex gap-2">
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${catColor[currentQ.category] || 'bg-neutral-800 text-neutral-400'}`}>{currentQ.category}</span>
+                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full bg-neutral-800 ${diffColor[currentQ.difficulty]}`}>{currentQ.difficulty}</span>
+                        {currentQ.position && <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/10 text-blue-400">{currentQ.position}</span>}
+                      </div>
+
+                      {/* Scenario */}
+                      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+                        <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">{currentQ.title}</div>
+                        <p className="text-sm text-neutral-200 leading-relaxed">{currentQ.scenario}</p>
+                        {currentQ.board && (
+                          <div className="mt-3 pt-3 border-t border-neutral-800">
+                            <div className="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Board</div>
+                            <div className="font-mono text-base text-white tracking-wider">{currentQ.board}</div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Question */}
+                      <p className="text-sm font-semibold text-white px-1">{currentQ.question}</p>
+
+                      {/* Options */}
+                      <div className="flex flex-col gap-2">
+                        {currentQ.options.map((opt, idx) => {
+                          const isCorrect = idx === currentQ.correct;
+                          const isSelected = idx === selected;
+                          const revealed = selected !== null;
+                          let cls = 'bg-neutral-900 border-neutral-700 text-neutral-200';
+                          if (revealed && isCorrect) cls = 'bg-green-500/15 border-green-500 text-green-300';
+                          else if (revealed && isSelected && !isCorrect) cls = 'bg-red-500/15 border-red-500 text-red-300';
+                          else if (!revealed) cls = 'bg-neutral-900 border-neutral-700 text-neutral-200 hover:bg-neutral-800 active:scale-[0.98]';
+                          return (
+                            <button key={idx} onClick={() => handleAnswer(idx)}
+                              className={`w-full text-left px-4 py-3.5 rounded-xl border text-sm font-medium transition-all ${cls}`}>
+                              <span className="text-neutral-500 font-mono mr-2">{String.fromCharCode(65+idx)}.</span>{opt}
+                              {revealed && isCorrect && <span className="float-right">✅</span>}
+                              {revealed && isSelected && !isCorrect && <span className="float-right">❌</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Explanation */}
+                      {selected !== null && (
+                        <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
+                          <div className="text-[10px] uppercase tracking-widest text-yellow-500 mb-2 font-bold">Explanation</div>
+                          <p className="text-sm text-neutral-300 leading-relaxed">{currentQ.explanation}</p>
+                        </div>
+                      )}
+
+                      {/* Next button */}
+                      {selected !== null && (
+                        <button onClick={handleNext}
+                          className="w-full py-3.5 bg-yellow-500 text-black font-bold rounded-xl active:scale-[0.98] transition-all shadow-lg shadow-yellow-500/20">
+                          {qIndex + 1 >= QUIZ_QUESTIONS.length ? 'See Results' : 'Next Question →'}
+                        </button>
+                      )}
+                      <div className="h-4" />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         }
