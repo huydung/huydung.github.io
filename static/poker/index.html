@@ -1703,7 +1703,452 @@
           );
         }
 
-        // --- QUIZ DATA ---
+        // --- QUIZ ENGINE ---
+        // Helpers
+        const _rng = arr => arr[Math.floor(Math.random() * arr.length)];
+        const _int = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+        const _r5  = n => Math.round(n / 5) * 5;
+
+        const _DRAWS = [
+          { name:'flush draw',                 outs:9,  hint:'9 cards of your suit remain in the deck' },
+          { name:'open-ended straight draw',   outs:8,  hint:'4 cards on each end complete your straight' },
+          { name:'double gutshot straight draw',outs:8, hint:'two inside-straight draws = 8 outs total' },
+          { name:'gutshot straight draw',      outs:4,  hint:'only 1 rank completes your straight' },
+          { name:'two overcards',              outs:6,  hint:'3 aces + 3 kings give you top pair' },
+          { name:'flush draw + gutshot',       outs:12, hint:'9 flush outs + 4 straight outs (minus overlap)' },
+          { name:'flush draw + open-ender',    outs:15, hint:'9 flush + 8 straight outs (minus overlap ≈ 15)' },
+          { name:'pair draw (two overcards)',  outs:6,  hint:'hitting top pair: 3+3 outs' },
+        ];
+        const _BFS = [
+          {label:'1/4 pot', v:0.25}, {label:'1/3 pot', v:0.333}, {label:'half pot', v:0.5},
+          {label:'2/3 pot', v:0.667},{label:'3/4 pot', v:0.75},  {label:'pot-sized', v:1.0},
+          {label:'1.5× pot',v:1.5},
+        ];
+        const _POTS = [80,100,120,150,200,250,300,400,500,600];
+
+        // Generator 1 — Pot Odds
+        function genPotOdds() {
+          const pot = _rng(_POTS);
+          const bf  = _rng(_BFS);
+          const bet = Math.max(10, _r5(pot * bf.v));
+          const draw= _rng(_DRAWS);
+          const street = Math.random() > 0.5 ? 'flop' : 'turn';
+          const mult = street === 'flop' ? 4 : 2;
+          const equity = draw.outs * mult;
+          const potOdds = Math.round((bet / (pot + bet)) * 100);
+          const call = equity >= potOdds;
+          const close = Math.abs(equity - potOdds) <= 4;
+          return {
+            category:'Math', difficulty: close ? 'Hard' : Math.abs(equity-potOdds)>12 ? 'Easy' : 'Medium',
+            scenario:`On the ${street}. Pot = ${pot}. You have a ${draw.name} (${draw.outs} outs). Villain bets ${bet} (${bf.label}).`,
+            question:`Pot odds = ${potOdds}%. Your equity ≈ ${draw.outs}×${mult} = ~${equity}%. Do you call?`,
+            options:[
+              `Call — equity (${equity}%) beats pot odds (${potOdds}%)`,
+              `Fold — pot odds (${potOdds}%) exceed equity (${equity}%)`,
+              'Raise as a semi-bluff to take it down now',
+              'Need more info — depends entirely on reads',
+            ],
+            correct: call ? 0 : 1,
+            explanation:`Pot odds: ${bet}÷(${pot}+${bet}) = ${potOdds}%. ${draw.name.charAt(0).toUpperCase()+draw.name.slice(1)} equity on the ${street}: ${draw.outs}×${mult} = ~${equity}%. ${call ? `Equity (${equity}%) > pot odds (${potOdds}%) → call is +EV.` : `Pot odds (${potOdds}%) > equity (${equity}%) → fold saves chips long-term.`}${close ? ' This is a close spot — implied odds and villain tendencies become tiebreakers.' : ''} Note: ${draw.hint}.`,
+          };
+        }
+
+        // Generator 2 — EV Calculation
+        function genEV() {
+          const equity = _int(18, 65);
+          const pot    = _rng(_POTS);
+          const bf     = _rng(_BFS.slice(0,5));
+          const bet    = Math.max(10, _r5(pot * bf.v));
+          const ev     = Math.round((equity/100)*pot - ((100-equity)/100)*bet);
+          const pos    = ev > 0;
+          const close  = Math.abs(ev) <= 15;
+          return {
+            category:'Math', difficulty: close ? 'Hard' : Math.abs(ev)>50 ? 'Easy' : 'Medium',
+            scenario:`You estimate ~${equity}% equity. Pot = ${pot}. Villain bets ${bet}. You call ${bet} to potentially win ${pot}.`,
+            question:`EV = (${equity}% × ${pot}) − (${100-equity}% × ${bet}) = ?`,
+            options:[
+              `+${Math.abs(ev)} → Calling is profitable long-term`,
+              `−${Math.abs(ev)} → Folding is correct, it's a losing call`,
+              `≈ 0 — Essentially break-even, marginal spot`,
+              `Can't calculate EV without seeing villain's hand`,
+            ],
+            correct: close ? 2 : pos ? 0 : 1,
+            explanation:`EV = (${equity}%×${pot}) − (${100-equity}%×${bet}) = ${Math.round((equity/100)*pot)} − ${Math.round(((100-equity)/100)*bet)} = ${ev>0?'+':''}${ev}. ${pos?'Positive EV → calling grows your stack over time.':close?'Near break-even. Tiny edges compound over thousands of hands — implied odds, reads, and position tip the scale.':'Negative EV → folding is correct. Being pot-committed is a feeling, not math.'} Key mindset: judge decisions by EV, never by individual outcomes.`,
+          };
+        }
+
+        // Generator 3 — Fold Frequency
+        function genFoldFreq() {
+          const pot = _rng(_POTS);
+          const bf  = _rng(_BFS);
+          const bet = Math.max(10, _r5(pot * bf.v));
+          const ff  = Math.round((bet/(pot+bet))*100);
+          // Three wrong answers near the real one
+          const wrongs = [
+            Math.max(5, ff - _int(7,18)),
+            Math.min(95, ff + _int(7,18)),
+            Math.round((bet/pot)*100), // common mistake: forgetting +bet in denominator
+          ].map(n => `${n}%`);
+          const opts = [`${ff}%`, ...wrongs].sort(() => Math.random()-0.5);
+          return {
+            category:'Math', difficulty:'Medium',
+            scenario:`Villain bets ${bet} chips into a ${pot} chip pot (a ${bf.label} bet).`,
+            question:`What % of the time must villain be bluffing for a CALL to break even? (Formula: Bet ÷ (Pot + Bet))`,
+            options: opts,
+            correct: opts.indexOf(`${ff}%`),
+            explanation:`Fold Frequency = ${bet} ÷ (${pot}+${bet}) = ${bet}÷${pot+bet} = ${ff}%. This is the breakeven point: if villain bluffs MORE than ${ff}% here, calling is profitable. Less than ${ff}%, folding wins long-term. A ${bf.label} bet needs ${ff}% fold equity to work as a pure bluff.`,
+          };
+        }
+
+        // Generator 4 — Out Counting
+        function genOutCounting() {
+          const draw = _rng(_DRAWS);
+          const pool = _DRAWS.filter(d => d.outs !== draw.outs);
+          const wrongs = [...new Set(pool.map(d=>d.outs))].sort(()=>Math.random()-0.5).slice(0,3);
+          const opts = [draw.outs, ...wrongs].sort(()=>Math.random()-0.5).map(n=>`${n} outs`);
+          return {
+            category:'Math', difficulty: [9,8].includes(draw.outs) ? 'Easy' : draw.outs<=4 ? 'Easy' : 'Medium',
+            scenario:`You're on a draw and assessing your outs.`,
+            question:`How many outs does a typical ${draw.name} have?`,
+            options: opts,
+            correct: opts.indexOf(`${draw.outs} outs`),
+            explanation:`A ${draw.name} has ${draw.outs} outs. ${draw.hint.charAt(0).toUpperCase()+draw.hint.slice(1)}. Quick equity: on the flop ×4 = ~${draw.outs*4}%; on the turn ×2 = ~${draw.outs*2}%.`,
+          };
+        }
+
+        // Generator 5 — Starting Hand Decision
+        const _HAND_TABLE = [
+          ['AA','UTG',0,'AA is the best hand in poker. Always raise — never limp, never slow-play pre-flop. Build the pot immediately.'],
+          ['AA','BTN',0,'AA from BTN — raise and be happy. Consider 3-betting or 4-betting to build even more value.'],
+          ['KK','MP',0,'KK is the second-best hand. Raise from any position. Only consider folding in extreme tournament ICM spots.'],
+          ['QQ','CO',0,'QQ is a premium hand. Raise, and 3-bet if someone raised before you. Fold only vs a 4-bet from the tightest player at the table.'],
+          ['JJ','BTN',0,'JJ from BTN — raise. Call a 3-bet (you have ~40% vs QQ-AA,AK), fold to a 4-bet from a nit.'],
+          ['TT','UTG',0,'TT is a solid raise from UTG. Fold to a 3-bet unless the 3-bettor is wide.'],
+          ['99','CO',0,'99 from CO — raise. Good hand with a mid-pair. Call a 3-bet for set-mining.'],
+          ['88','BTN',0,'88 from BTN — raise. Good steal hand + pair equity. Set mines well with deep stacks.'],
+          ['77','UTG',2,'Fold 77 from UTG. Too speculative for early position — you\'re out of position vs everyone.'],
+          ['66','MP',2,'Fold 66 from MP. Mid-pocket pairs need position or very deep stacks to set-mine profitably.'],
+          ['55','BTN',0,'55 from BTN — raise or fold. Raising is correct as a positional steal + set-mining hand.'],
+          ['55','UTG',2,'Fold 55 from UTG. Small pairs from early position are a leak — you can\'t set-mine profitably.'],
+          ['22','BTN',0,'22 from BTN — raise as a steal. If called, you\'re set-mining. If re-raised, fold.'],
+          ['22','UTG',2,'Fold 22 from UTG. Tiny pair, no position, hard to realize equity. Classic fold.'],
+          ['AKs','UTG',0,'AKs is a monster. Raise from any position, 3-bet liberally. It has ~40% equity vs all hands.'],
+          ['AKo','MP',0,'AKo — raise and often 3-bet. Premium hand, top 2% of starting hands.'],
+          ['AQs','CO',0,'AQs is strong from CO. Raise and 3-bet vs BTN or blinds.'],
+          ['AQo','UTG',0,'AQo from UTG — raise. It\'s a premium hand, though slightly vulnerable to 3-bets from AK.'],
+          ['AJo','UTG',2,'Fold AJo from UTG. Too often dominated by AQ and AK. Out of position post-flop.'],
+          ['ATs','BTN',0,'ATs from BTN — always raise. Suited ace with good nut potential.'],
+          ['A9o','MP',2,'Fold A9o from MP. Weak kicker offsuit = dominated by every better ace.'],
+          ['A5s','CO',0,'A5s from CO — raise. Suited ace with nut flush draw + A-2-3-4-5 straight potential.'],
+          ['A2s','UTG',2,'Fold A2s from UTG. Too speculative — out of position, weak kicker, limited post-flop value.'],
+          ['KQs','MP',0,'KQs from MP — raise. Strong suited broadway, rarely dominated.'],
+          ['KQo','UTG',0,'KQo from UTG — raise. It\'s a borderline hand but raising is standard.'],
+          ['KJo','UTG',2,'Fold KJo from UTG. Too often dominated (vs KQ, AJ, AK) with bad position.'],
+          ['KTs','BTN',0,'KTs from BTN — raise. Strong late-position hand.'],
+          ['K9o','MP',2,'Fold K9o from MP. Weak kicker, no suit, bad position. Classic fold.'],
+          ['QJs','CO',0,'QJs from CO — raise. Premium suited connector with good playability.'],
+          ['QJo','UTG',2,'Fold QJo from UTG. Suited connectors need position. Offsuit amplifies the weakness.'],
+          ['JTs','BTN',0,'JTs from BTN — raise. One of the best suited connectors. Excellent playability.'],
+          ['JTo','UTG',2,'Fold JTo from UTG. Suited connectors are position-dependent. Offsuit makes this a clear fold.'],
+          ['T9s','CO',0,'T9s from CO — raise. Good positional hand with double-draw potential.'],
+          ['98s','BTN',0,'98s from BTN — raise. Classic steal hand with great post-flop potential.'],
+          ['87s','CO',0,'87s from CO — raise. Suited connector in position.'],
+          ['87s','UTG',2,'Fold 87s from UTG. Needs position to be profitable. From UTG you\'re out of position for 5+ streets.'],
+          ['76s','BTN',0,'76s from BTN — raise. Good steal. If you flop a draw you have position to semi-bluff.'],
+          ['72o','UTG',2,'Fold 72o from anywhere. The worst hand in poker — no straight potential, terrible kicker, no suit.'],
+          ['72o','BTN',2,'Fold 72o even from BTN. No redeeming qualities. Some players raise it as a pure bluff, but that\'s unnecessary.'],
+          ['53s','BTN',0,'53s from BTN — some players raise this as a steal. It has wheel straight potential (A-2-3-4-5). Borderline.'],
+          ['T2o','UTG',2,'Fold T2o from UTG. Trash hand — no pair, no straight, offsuit. Easy fold.'],
+        ];
+
+        function genStartingHand() {
+          const [hand, pos, corr, expl] = _rng(_HAND_TABLE);
+          return {
+            category:'Pre-Flop', difficulty: corr===1 ? 'Hard' : 'Easy',
+            scenario:`You are dealt ${hand} in ${pos} position. No one has acted ahead of you.`,
+            question:`What is the standard play?`,
+            options:['Raise (open the pot)','Limp (just call the BB)','Fold'],
+            correct: corr,
+            explanation: expl,
+          };
+        }
+
+        // Generator 6 — Implied Odds
+        function genImpliedOdds() {
+          const draw = _rng(_DRAWS.slice(0,4));
+          const call = _rng([10,15,20,25,30,40]);
+          const mult = _rng([4,6,8,10,12,15,18,22]);
+          const stack = call * mult;
+          const needed = draw.outs <= 4 ? 15 : draw.outs <= 8 ? 10 : 8;
+          const ok = mult >= needed;
+          return {
+            category:'Math', difficulty: Math.abs(mult-needed)<=3 ? 'Hard' : 'Medium',
+            scenario:`You have a ${draw.name} (${draw.outs} outs). Current pot odds don't justify a call. Call size = ${call} chips. Effective stack = ${stack} chips (${mult}× the call).`,
+            question:`Do you have sufficient implied odds to call?`,
+            options:[
+              `Yes — ${stack} chips in effective stacks is enough future value`,
+              `No — effective stack is too shallow; implied odds don't save this call`,
+              `Only matters if villain is a loose caller`,
+              `Implied odds can never justify calling without pot odds`,
+            ],
+            correct: ok ? 0 : 1,
+            explanation:`Rule of thumb for a ${draw.name}: you need effective stack ≥ ${needed}× the call. Here: ${mult}× the call (${stack} chips). ${ok ? `${mult}× ≥ ${needed}× → sufficient implied odds. When you hit, you can win enough to make the call profitable long-term.` : `${mult}× < ${needed}× → implied odds don't work. Short effective stacks mean you can't win enough when you hit to justify the call.`} Remember: implied odds only apply when villain will pay you off on the river.`,
+          };
+        }
+
+        // Static Scenario Bank (~55 hand-crafted strategic spots)
+        const SCENARIO_BANK = [
+          {category:'Pre-Flop',difficulty:'Easy',
+           scenario:'You have AA UTG. Everyone folds to you.',
+           question:'What do you do?',
+           options:['Raise 3× BB','Limp to disguise your hand','Raise 8× BB to chase everyone out','Check your option (you\'re first to act)'],
+           correct:0,
+           explanation:'Always raise with AA, never limp. 3× BB builds the pot while keeping villains in with weaker hands. Limping risks giving everyone cheap odds to crack your aces in a multiway pot. Never slow-play aces pre-flop.'},
+          {category:'Pre-Flop',difficulty:'Medium',
+           scenario:'You have KK. A tight player unexpectedly shoves all-in before you act. 100BB stacks.',
+           question:'What do you do?',
+           options:['Call — KK is too strong to fold pre-flop','Fold — they always have AA here','Reraise to 3× their shove','Ask for a count and tank for 5 minutes'],
+           correct:0,
+           explanation:'Call. Even vs a tight shove range of QQ+/AK, KK has ~55-70% equity. The only time to consider folding KK pre-flop is in very specific tournament ICM bubble spots. In cash games: always call. You\'ll occasionally run into AA, but folding is a much bigger long-run mistake.'},
+          {category:'Pre-Flop',difficulty:'Medium',
+           scenario:'You raise AQo from UTG. A normally tight player 3-bets to 3× your raise.',
+           question:'What do you do with AQo facing a 3-bet from a tight player?',
+           options:['4-bet all-in — AQ is too good to fold','Call — play it post-flop in position','Fold — AQo is dominated too often','Call only if you have position'],
+           correct:2,
+           explanation:'AQo vs a tight 3-bet range (QQ+, AK) is dominated most of the time. When they have AK you\'re drawing to a split, when they have QQ+ you have ~28% equity. Calling out of position is a leak; 4-betting gets called by everything that beats you. Folding is the tight but correct play from early position.'},
+          {category:'Pre-Flop',difficulty:'Hard',
+           scenario:'UTG raises, MP calls. You\'re on the BTN with JJ. Pot = 7 BB.',
+           question:'Squeeze opportunity — what do you do with JJ?',
+           options:['Call — see a flop cheaply','Fold — too many players, JJ is vulnerable','3-bet (squeeze) to 10–12× BB','Just call and hope for a low board'],
+           correct:2,
+           explanation:'This is a squeeze spot. By 3-betting large, you put both UTG and MP in a tough spot — UTG must continue vs a 3-bet with range disadvantage, and MP must call or fold cold. JJ plays best heads-up. The squeeze also builds the pot when you have a premium hand. 3-bet to ~10-12 BB.'},
+          {category:'Pre-Flop',difficulty:'Medium',
+           scenario:'You\'re SB with A♠K♠. BTN raises 3×. What do you do from SB?',
+           question:'AKs in the small blind facing a BTN open. SB is the worst position post-flop.',
+           options:['Call — AKs is too strong to 3-bet here','3-bet — AKs plays well as the aggressor','Fold — bad position post-flop','Limp and see a flop cheaply'],
+           correct:1,
+           explanation:'3-bet with AKs from SB. You don\'t want to call because: (1) you\'re out of position every street; (2) AKs is a premium hand that benefits from being the aggressor; (3) a 3-bet folds out hands that flip/dominate you. If villain calls and you miss, you can often c-bet and take it.'},
+          {category:'Pre-Flop',difficulty:'Easy',
+           scenario:'You\'re on the BTN. Everyone folds to you. You have 9♠8♠.',
+           question:'Everyone folded — you have 98 suited on the BTN. What do you do?',
+           options:['Fold — 98s is a speculative hand','Raise — BTN is the best position','Limp and see a flop','Call only if BB is tight'],
+           correct:1,
+           explanation:'Raise 98s from BTN. You only have 2 opponents (SB + BB) and you act last post-flop every street. 98s is a strong suited connector — it makes straights, flushes, two-pair, and is very difficult to play against. Never limp from the button; raising wins the blinds often and gives you the lead.'},
+          {category:'Pre-Flop',difficulty:'Hard',
+           scenario:'You\'re BB with 4♣3♣. BTN min-raises (2×). SB folds. You\'re getting 3:1 pot odds.',
+           question:'BB with 43s facing a min-raise from BTN. Only need to call 1 BB more.',
+           options:['Fold — 43s is trash','Call — great pot odds, position OK since you act last pre-flop','3-bet bluff — represent strength','Call only if you know how to play post-flop'],
+           correct:1,
+           explanation:'Call with 43s vs a BTN min-raise from BB. The pot odds are excellent (3:1 with a hand that has straight and flush potential). Yes you\'re out of position post-flop, but the price is right for a speculative hand. 43s can flop powerful hidden hands. Folding here gives up too much equity for 1 BB.'},
+          {category:'Strategy',difficulty:'Easy',
+           scenario:'You raised pre-flop. Flop is 3♦7♠2♣ — very low and dry. Villain checks to you.',
+           question:'You raised pre-flop with two broadways, completely missed on 3-7-2. Villain checks.',
+           options:['Check — protect your range','Bet 40–50% pot as a C-bet','Bet pot — maximum pressure','Give up, check and fold to any bet'],
+           correct:1,
+           explanation:'C-bet 40–50% pot. This board misses most BB/SB calling ranges (low, rainbow, no Broadway cards). As the pre-flop raiser your range has a big advantage here. A small C-bet gets folds often and costs little when called. This is one of the highest EV C-bet spots in poker.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'Flop: A♠K♦Q♣. You have J♠T♠ — an open-ended straight draw to the nuts. Villain checks.',
+           question:'A-K-Q flop with JT = you have a draw to Broadway (the nut straight). Villain checks.',
+           options:['Check behind — wait to hit','Bet as a semi-bluff','Check-raise if villain bets','Fold — you have nothing yet'],
+           correct:1,
+           explanation:'Bet as a semi-bluff. You have the nut straight draw (8 outs) and on a very scary board (AKQ) villain\'s range is mostly checking weak pairs and worse draws. Your hand looks like AK, AQ, KQ, AA, etc. Betting achieves two things: fold equity now + you make the nut straight ~32% of the time with two cards to come.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You flop top pair top kicker (A♠ on A♦7♣2♥ board). You bet, villain calls. Turn brings 8♦ (possible new draws). Villain checks.',
+           question:'Top pair top kicker, turned a harmless(ish) card. Villain check-called the flop.',
+           options:['Check behind — slow play and trap','Bet again — extract value while ahead','Check-raise line — check and go for it','Bet small to look weak'],
+           correct:1,
+           explanation:'Bet again for value. Villain called the flop and showed interest — they likely have a pair (7x, 2x), a draw, or a weak ace. You want to charge them to continue. The 8 adds some draw potential but doesn\'t change your hand\'s relative strength significantly. Keep the pressure on; checking often gives free cards and lets them realize equity cheaply.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'You C-bet the flop with total air. Villain calls. Turn is a blank. Villain checks again.',
+           question:'Bluffed the flop, got called. Turn is blank. Villain checks again. Double barrel?',
+           options:['Double barrel — apply pressure again','Check — abort the bluff, take the free card','Bet small — show weakness on purpose','All-in to maximise fold equity'],
+           correct:0,
+           explanation:'Generally yes — double barrel. When a villain calls a flop C-bet on a dry board and checks the turn, their range is mostly weak pairs and speculative hands. A second barrel on a blank turn (especially a card that completes draws they might fear) can fold out a lot of their range. The key: have a credible story and pick turns that are good for your perceived range.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'You\'ve bet flop and turn as a bluff. Villain called both with no hesitation. River is a blank.',
+           question:'Villain called twice without hesitation. River is a blank. Triple barrel?',
+           options:['Bet — triple barrel, complete the story','Check — abort, give up','Bet small — maybe they fold to a blocker bet','Shove all-in for maximum pressure'],
+           correct:1,
+           explanation:'Give up. A villain who calls twice without hesitation is not folding the river. Their range at this point is strong — pairs, sets, two-pair, slow-played monsters. They\'re not on a draw (they\'d be nervous). Triple barrelling into a relaxed caller is pouring chips away. Check, fold if bet, move on.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have top set (KKK) on K♥9♦4♥ flop. Villain donk bets (bets into you first) half pot.',
+           question:'You flopped top set, villain leads into you (donk bet). What do you do?',
+           options:['Call — keep them in, hide your strength','Raise — build the pot, protect vs draws','Fold — donk bets usually mean strong hands','Shove immediately'],
+           correct:1,
+           explanation:'Raise. The board has a heart flush draw, so you need to charge draws. Also, villain\'s donk bet range is wide — weak pairs, draws, random two-pairs. When you have the nuts (or near it) on a draw-heavy board, raise to build the pot and make draws pay. Slow playing sets on wet boards is a common and expensive mistake.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have middle pair (7♠7♦) on a K♠9♥4♣ board. You\'re out of position. Villain checks behind on flop.',
+           question:'Middle pair on a King-high board, villain checks behind. Turn comes 3♦. What do you do?',
+           options:['Bet out — take control of the pot','Check again — your hand has showdown value but is weak','Fold if villain bets','Bet big to rep a King'],
+           correct:1,
+           explanation:'Check. Your 77 on KQ94 has showdown value but is genuinely weak. Villain checked behind the flop — their range is often middling pairs, weak kings, or draws. Betting turns your hand into a bluff (you\'d fold to a raise). Checking keeps the pot small, preserves your showdown value, and avoids being blown off a marginal hand.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'Villain check-raises your turn bet on a J♠8♦7♠3♠ board. You have J♥T♥ (top pair + gutshot). Pot = 800. Their check-raise is large.',
+           question:'Villain check-raises the turn on a very wet board. You have top pair + a gutshot.',
+           options:['Call — you have too much equity to fold','3-bet all-in — semi-bluff with your outs','Fold — check-raises here are usually strong','Call only if your draw is strong enough'],
+           correct:2,
+           explanation:'Lean towards folding. On a J-8-7-3 board with three spades, a check-raise on the turn is almost always a very strong hand: two-pair, a set, a made flush, or the nut straight. Your top pair + gutshot has ~20% equity vs their range — and you\'re out of position. Calling turns your hand into a drawing hand with reverse implied odds (if you hit your gutshot, the board is very scary). Disciplined fold.'},
+          {category:'Strategy',difficulty:'Easy',
+           scenario:'You have AA. Flop is K♠9♦2♣. You bet, villain raises.',
+           question:'You have aces, villain raises your bet on K92 rainbow. What do you do?',
+           options:['Fold — they have KK or 99','Just call — keep the pot manageable','3-bet — you still have the best hand usually','Depends entirely on villain type'],
+           correct:3,
+           explanation:'It depends on villain. Against a tight player, a raise here is almost always KK, 99, or K9 — very strong. Against an aggressive/loose player, it could be K-Q, K-J, a bluff, or a draw. vs tight: call or fold. vs loose: 3-bet for value. Context is everything. AA is still strong but not invulnerable on K-high boards.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'River card completes the flush. You have two pair. Villain bets big (pot-sized). What is your thought process?',
+           question:'River completes an obvious flush. You have two pair. Villain fires pot.',
+           options:['Call — they might be bluffing the flush','Fold — two pair loses to a flush','Raise — represent a full house','Depends on villain and pot odds'],
+           correct:3,
+           explanation:'It depends. Pot odds: pot-sized bet = 50% breakeven call. Key questions: (1) Does villain have flush draws in their range given their pre-flop and post-flop actions? (2) Could they be bluffing missed draws? (3) Does villain over-bluff or under-bluff rivers? A tight passive player betting pot on a flush card almost always has the flush. An aggressive bluffer? Call is reasonable. No universal answer — read the player.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have nothing (Q-high) on the river. Villain checks. You missed your straight draw.',
+           question:'Missed draw, Q-high, villain checks to you on the river. Bet or check?',
+           options:['Check — take the free showdown (you might win on Q-high)','Bet as a bluff — villain showed weakness by checking','Bet small — maybe they fold a pair','Fold your hand face-down'],
+           correct:1,
+           explanation:'Bet as a bluff. Villain checked the river showing weakness — their range is capped at medium-strength hands (they\'d bet stronger hands). Q-high loses at showdown to everything. Bluffing here is your only way to win. Size your bet to make it credible (60–80% pot). If villain has been calling down light all session, skip the bluff — but against a normal player, fire.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have KK. Flop is A♥7♦2♣. You C-bet, tight villain calls. Turn is 5♠. Villain checks.',
+           question:'KK on an ace-high board — you c-bet, tight villain called. Turn blank, they check again.',
+           options:['Double barrel — they probably don\'t have an ace','Check — reevaluate, you might be behind','Bet big — get them off their hand','Shove — maximum pressure'],
+           correct:1,
+           explanation:'Check behind and take the free card. A tight villain who called your C-bet on an ace-high board very likely has an ace. Betting again is value-owning yourself. By checking, you control the pot size, get to showdown cheaply, and potentially improve to two pair on the river. This is a classic "I have a medium strength hand, I should not be building a big pot" spot.'},
+          {category:'Strategy',difficulty:'Easy',
+           scenario:'You have 9♦9♠. Flop is 9♥4♦2♠ — you flopped a set. Villain bets into you.',
+           question:'You flopped a set of nines on a dry board. Villain leads into you.',
+           options:['Fold — they probably have a better set','Call — slow play to trap','Raise — build the pot now','Check-raise on the turn instead'],
+           correct:1,
+           explanation:'Call here (on a dry board). The board is 9-4-2 rainbow — no draws. If you raise now, villain folds everything weak. By calling, you invite them to continue bluffing or build the pot naturally. You can raise on the turn or river when the pot is bigger. Slow playing sets on dry boards (no draws) is acceptable strategy.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have A♥K♦ on a A♠J♦T♠ board. Two spades, you have top pair top kicker. Villain checks.',
+           question:'Top pair top kicker on a very wet board (two spades, two broadways, two-way straight). Villain checks.',
+           options:['Bet big — protect your top pair','Check behind — too dangerous a board to bet thin','Bet small — keep them in','All-in immediately'],
+           correct:0,
+           explanation:'Bet — and bet fairly large (60-75% pot). The AJT board is extremely draw-heavy: flush draws, open-ended straight draws (QK or Q9), and combo draws. Your top pair is ahead now but extremely vulnerable. You need to charge draws. Checking gives free equity to tons of hands that can beat you. This is a "fast play for protection" spot.'},
+          {category:'Strategy',difficulty:'Easy',
+           scenario:'You limp in with 6♠5♠ pre-flop. Four players see a cheap flop. Flop is 7♣8♦9♠ — you flopped the nut straight.',
+           question:'You flopped the nut straight in a multiway pot. What do you do?',
+           options:['Check — slow play the nuts','Bet big — protect and build pot','Bet small — keep everyone in','All-in immediately'],
+           correct:1,
+           explanation:'Bet and bet large. In a multiway pot with a very wet board (7-8-9 with a spade flush draw), there are tons of hands with strong equity vs your straight: flush draws, two-pair+draws, set+draw. Slow playing the nuts on wet boards in multi-way pots is a huge mistake. Charge everyone, build the pot you\'re going to win.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'You raised QQ pre-flop. Only BB calls. Flop is Q♦J♠T♠. BB checks to you.',
+           question:'You flopped top set (QQQ) but the board is J-T-J — two-way straight, flush draw. BB checks.',
+           options:['Bet big — too many draws, protect immediately','Check — confusing them is better','Bet small — look weak to induce a raise','Shove all-in right now'],
+           correct:0,
+           explanation:'Bet big, immediately. QJT with two spades is one of the most draw-heavy boards possible. Hands with 10-15+ outs are very common here (AK of spades has a straight draw + flush draw = 15 outs, ~54% equity on flop!). Even though you have top set, many draws have you beaten or near-flipping. You MUST charge them maximum price. This is not a slow-play board.'},
+          {category:'Discipline',difficulty:'Medium',
+           scenario:'You\'ve lost your last 4 pots in a row. You pick up 5♥4♦ in UTG. You feel the urge to play.',
+           question:'Card dead + on a losing streak. 54 offsuit UTG. What\'s the right move?',
+           options:['Play it — you\'re due for a win','Fold — losing streaks end when you play disciplined poker','Limp and hope for a miracle flop','Raise to steal the blinds'],
+           correct:1,
+           explanation:'Fold. This is the discipline test. Losing streaks don\'t change the math — 54o from UTG is always a losing play. The urge to "get it back" or "do something" is exactly the tilt that costs money. Each hand is completely independent. Fold, take a breath, wait for position and better cards. The discipline fold IS the winning play.'},
+          {category:'Discipline',difficulty:'Easy',
+           scenario:'You\'re running hot — won 3 of the last 4 pots. You\'re now on the BTN with Q♠3♣.',
+           question:'Running hot, on the BTN with Q3 offsuit. Should you play?',
+           options:['Raise — you\'re on a heater, ride the momentum','Fold — Q3o is trash even from BTN','Limp and see what happens','All-in — you can\'t lose right now'],
+           correct:1,
+           explanation:'Fold. Running hot doesn\'t change hand values. Q3o from BTN has poor equity, a weak kicker, and no straight/flush potential. The "heater" feeling is a cognitive bias — cards are random and independent. Stick to your range. Playing garbage because you feel lucky is how sessions turn around quickly. Fold and wait for a real hand.'},
+          {category:'Discipline',difficulty:'Hard',
+           scenario:'You\'ve been playing for 3 hours. You\'re tired. You have QQ — the best hand you\'ve seen all session.',
+           question:'Tired after 3 hours, finally get QQ. UTG raises, MP calls, you\'re on CO with QQ.',
+           options:['3-bet big — you\'ve waited 3 hours for this','Call — just call and see a flop','Fold — too many players, QQ is tricky multiway','Shove all-in — max value from QQ'],
+           correct:0,
+           explanation:'3-bet. Fatigue and session length don\'t change the right play — QQ is a premium hand. 3-betting isolates UTG, gets value, and gives you a manageable heads-up pot. The danger with fatigue is overcomplicating things or being results-oriented. The right play is the right play regardless of how tired you are. 3-bet, play it normally.'},
+          {category:'Discipline',difficulty:'Medium',
+           scenario:'A player at the table has been bullying you all session, betting large every time. You have J♥T♥ in MP.',
+           question:'The table bully raises again. You have JTs in MP. Is this a good hand to take a stand with?',
+           options:['3-bet — stand up to the bully','Call — JTs plays well post-flop','Fold — the bully might have a real hand','Your decision should have nothing to do with "taking a stand"'],
+           correct:3,
+           explanation:'Your decision should be based purely on JTs\' value vs their raising range, your position, and stack depth — NOT on emotion toward a specific player. JTs from MP vs a wide raiser is likely a call or a 3-bet bluff depending on reads. But making decisions to "take a stand" emotionally is how tilt starts. Play the hand, not the player\'s behavior.'},
+          {category:'Math',difficulty:'Easy',
+           scenario:'You\'re on the flop with an open-ended straight draw. Pot = 200. Villain bets 60.',
+           question:'Pot = 200, villain bets 60, you have an open-ender (8 outs on flop). Call or fold?',
+           options:['Call — equity > pot odds','Fold — 8 outs isn\'t enough','Raise as a semi-bluff','It depends on who is acting next'],
+           correct:0,
+           explanation:'Call (or raise). Pot odds: 60÷(200+60) = ~23%. Open-ender equity on flop: 8×4 = ~32%. Equity (32%) > pot odds (23%) → clear call. You could also raise as a semi-bluff. This is one of the most standard "pot odds call" spots in poker — the math strongly favors continuing.'},
+          {category:'Math',difficulty:'Hard',
+           scenario:'Pot = 300. You have a flush draw (9 outs) on the TURN. Villain bets 300 (pot-sized).',
+           question:'Flush draw on the TURN (only 1 card to come). Pot-sized bet. Call?',
+           options:['Call — flush draws are worth playing','Fold — only 1 card left, pot odds are bad','Raise as a semi-bluff','Call only if you have implied odds'],
+           correct:1,
+           explanation:'Fold the naked flush draw vs a pot-sized bet on the turn. Pot odds: 300÷600 = 50%. Flush draw equity on the turn (1 card): 9×2 = ~18%. You need 50% equity but only have 18%. Even with implied odds, you\'d need villain to call a large river bet when you hit — and on a 3-flush board, a seasoned player won\'t pay you much. Fold.'},
+          {category:'Math',difficulty:'Medium',
+           scenario:'You have two overcards to the board (AK on a Q-7-3 board). 6 outs to top pair. Villain bets half pot.',
+           question:'Two overcards on Q-7-3 board. 6 outs to top pair. Villain bets half pot.',
+           options:['Call — equity is close to pot odds','Fold — 6 outs isn\'t reliable enough','Raise — represent a set or two pair','Depends on whether villain is bluffing'],
+           correct:0,
+           explanation:'Call. Pot odds: half pot bet = 33%. Two overcard equity on flop: 6×4 = 24%. Hmm — equity (24%) slightly below pot odds (33%). This is actually borderline. However: AK has backdoor flush/straight potential adding ~3-5%, bringing total equity to ~27-29%. Close call. Leaning call vs most villains since the hand has hidden equity. Very tight players fold here.'},
+          {category:'Pre-Flop',difficulty:'Medium',
+           scenario:'You\'re in the CO. UTG raises 3×, MP calls. You have A♠A♣.',
+           question:'UTG raises, MP calls, you have AA in CO. What do you do?',
+           options:['Call — hide your strength','3-bet to 10–12× — build a big pot with the best hand','Fold — multiway pots are dangerous for AA','Limp-reraise if possible'],
+           correct:1,
+           explanation:'3-bet large (10-12× BB). With AA in CO facing a raise and a call, you want to build a big pot AND ideally play heads-up. A large 3-bet: (1) gets maximum value from UTG\'s strong-but-second-best hands; (2) makes it expensive for both to continue; (3) may isolate to one caller. Don\'t slow play AA pre-flop — it\'s the only time in poker the math is completely on your side.'},
+          {category:'Pre-Flop',difficulty:'Medium',
+           scenario:'You\'re BB. UTG raises 3×. Everyone folds to you. You have K♠Q♦.',
+           question:'BB with KQo facing UTG raise. Out of position, but good hand. What do you do?',
+           options:['Call — KQo has value, see a flop','3-bet — represent a strong hand','Fold — out of position vs UTG is bad with KQo','Always 3-bet with broadways from BB'],
+           correct:0,
+           explanation:'Call is standard. KQo has good equity but is dominated by AK, AQ, and KK fairly often vs a UTG range. 3-betting turns it into a semi-bluff (fine but risky). Calling is the straightforward play — you get a flop and can navigate post-flop. Folding KQo vs any raise is too tight. If you flop top pair with a strong kicker, you have an easy value spot.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You raise from BTN, BB calls. Flop is 2♣2♦2♥ — the entire board is paired (trip deuces).',
+           question:'Flop is 2-2-2. You raised pre-flop, BB checked. What do you do?',
+           options:['Bet — represent a 2 in your hand','Check behind — nobody has anything here','Bet small as a blocker','The correct play depends on villain\'s tendencies'],
+           correct:0,
+           explanation:'Bet. On a 2-2-2 board, everyone "has" trip deuces (your best 5 cards include the board). The question is who has a better kicker. As the pre-flop raiser with a high-card range, you have the range advantage — your AK, AQ, KQ, etc. are better kickers than most BB defending hands. C-bet and take this pot often.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'You have A♠2♠ and the flop is K♠Q♠J♠ — you flopped the nut flush. Villain bets.',
+           question:'You flopped the nut flush (A-high). Villain leads into you. What do you do?',
+           options:['Call — slow play the nuts, let them build the pot','Raise — build the pot, protect vs board pairing','Fold — obviously wrong','Call the flop and decide on the turn'],
+           correct:1,
+           explanation:'Raise. The board is K-Q-J — incredibly connected. If the board pairs on turn or river, your flush is counterfeited by a full house. Also, villain is betting into you, meaning they have something. Raise to build the pot NOW before dangerous cards can appear. The nut flush on a wet board is not a slow-play hand.'},
+          {category:'Strategy',difficulty:'Medium',
+           scenario:'You have 5♠5♦ and flop 5♣5♥K♦ — you have quads. Villain checks.',
+           question:'You flopped quads (5555). Villain checks. Bet or slow play?',
+           options:['Slow play — check behind, don\'t scare them off','Bet small — look like a draw or weak pair','Bet normal — the board isn\'t scary so they\'ll call','Shove immediately for max value'],
+           correct:1,
+           explanation:'Bet small. With quads, you\'re guaranteed to win the hand — your only job is to maximize what you extract. A small bet (30-40% pot) looks like a weak King, a draw, or a confused player. It keeps villain in and invites a raise or a call. Never check-behind with quads when you have a plan to get value — small bets on early streets build bigger pots by the river.'},
+          {category:'Pre-Flop',difficulty:'Hard',
+           scenario:'You\'re UTG+1 with A♣K♦. UTG raises 3×. What do you do?',
+           question:'UTG raises before you, and you have AKo in UTG+1. What\'s your play?',
+           options:['Call — keep it simple with AK','3-bet — AK is a premium hand worth building a pot with','Fold — AK vs UTG raise is dangerous','3-bet if aggressive, call if passive villain'],
+           correct:1,
+           explanation:'3-bet. AKo vs a UTG raise is a classic 3-bet spot. You have a top-5 hand. 3-betting: (1) builds a pot you\'re a favorite in; (2) gets value from QQ, JJ, AQ that might 4-bet or call; (3) defines UTG\'s range (if they 4-bet, you can comfortably shove or fold depending on reads). Calling is passive — you go to the flop without initiative and out of position vs the table.'},
+          {category:'Strategy',difficulty:'Hard',
+           scenario:'It\'s the river. You have a weak hand (second pair) and check. Villain shoves all-in — very large overbet.',
+           question:'River check from you, villain shoves all-in for an overbet. Second pair with some showdown value. What do you do?',
+           options:['Call — they could be bluffing a missed draw','Fold — large overbets are almost always the nuts','Depends on villain and board texture','Fold unless you have a specific read they over-bluff'],
+           correct:3,
+           explanation:'Fold by default, but reads matter. River overbets (1.5-2× pot+) have a very polarized range: either the nuts or a big bluff. Second pair has moderate showdown value but is rarely good here vs the nuts. The key: is this villain capable of river overbetting as a bluff? Have you seen them do it? Without a specific read of over-bluffing, fold. Against a known aggro over-bluffer, call can be profitable.'},
+        ];
+
+        // Master generator dispatcher — picks type randomly
+        const _GEN_WEIGHTS = [
+          { fn: genPotOdds, w: 20 },
+          { fn: genEV,      w: 12 },
+          { fn: genFoldFreq,w: 10 },
+          { fn: genOutCounting, w: 10 },
+          { fn: genStartingHand, w: 18 },
+          { fn: genImpliedOdds,  w: 10 },
+          { fn: () => _rng(SCENARIO_BANK), w: 20 },
+        ];
+        const _TOTAL_W = _GEN_WEIGHTS.reduce((a,g) => a+g.w, 0);
+        function generateQuestion(catFilter) {
+          let attempts = 0;
+          while (attempts++ < 30) {
+            let r = Math.random() * _TOTAL_W, chosen = null;
+            for (const g of _GEN_WEIGHTS) { r -= g.w; if (r <= 0) { chosen = g.fn; break; } }
+            if (!chosen) chosen = _rng(_GEN_WEIGHTS).fn;
+            const q = chosen();
+            if (!catFilter || catFilter === 'All' || q.category === catFilter) return q;
+          }
+          // Fallback: just call the right generator
+          if (catFilter === 'Math') return genPotOdds();
+          if (catFilter === 'Pre-Flop') return genStartingHand();
+          return _rng(SCENARIO_BANK);
+        }
+
+        // Old static bank kept as fallback { id:1, ... — replaced below
         const QUIZ_QUESTIONS = [
           { id:1, category:'Pre-Flop', difficulty:'Easy', title:'Premium Hand, Early Position',
             scenario:'You\'re UTG at a 6-handed table. You look down at A♠K♦.',
@@ -1820,31 +2265,43 @@
           const [activeCategory, setActiveCategory] = useState('All');
           const [openId, setOpenId] = useState(null);
 
-          // Quiz state
-          const [qIndex, setQIndex] = useState(0);
-          const [qOrder, setQOrder] = useState(() => QUIZ_QUESTIONS.map((_, i) => i).sort(() => Math.random() - 0.5));
-          const [selected, setSelected] = useState(null);
-          const [score, setScore] = useState({ correct: 0, total: 0 });
-          const [quizDone, setQuizDone] = useState(false);
-
-          const currentQ = QUIZ_QUESTIONS[qOrder[qIndex]];
+          // Quiz state — infinite dynamic mode
+          const [qCatFilter, setQCatFilter] = useState('All');
+          const [currentQ, setCurrentQ] = useState(() => generateQuestion('All'));
+          const [qSelected, setQSelected] = useState(null);
+          const [quizStats, setQuizStats] = useLocalStorage('pt2_qstats', {
+            total:0, correct:0,
+            by:{ Math:[0,0], 'Pre-Flop':[0,0], Strategy:[0,0], Discipline:[0,0] }
+          });
 
           const handleAnswer = (idx) => {
-            if (selected !== null) return;
-            setSelected(idx);
-            setScore(s => ({ correct: s.correct + (idx === currentQ.correct ? 1 : 0), total: s.total + 1 }));
+            if (qSelected !== null) return;
+            setQSelected(idx);
+            const isCorrect = idx === currentQ.correct;
+            setQuizStats(s => {
+              const by = { ...s.by };
+              const cat = currentQ.category;
+              const prev = by[cat] || [0,0];
+              by[cat] = [prev[0] + (isCorrect?1:0), prev[1]+1];
+              return { total: s.total+1, correct: s.correct+(isCorrect?1:0), by };
+            });
           };
 
           const handleNext = () => {
-            if (qIndex + 1 >= qOrder.length) { setQuizDone(true); return; }
-            setQIndex(i => i + 1);
-            setSelected(null);
+            setCurrentQ(generateQuestion(qCatFilter));
+            setQSelected(null);
           };
 
-          const handleRestart = () => {
-            setQOrder(QUIZ_QUESTIONS.map((_, i) => i).sort(() => Math.random() - 0.5));
-            setQIndex(0); setSelected(null);
-            setScore({ correct: 0, total: 0 }); setQuizDone(false);
+          const handleFilterChange = (cat) => {
+            setQCatFilter(cat);
+            setCurrentQ(generateQuestion(cat === qCatFilter ? 'All' : cat));
+            setQSelected(null);
+          };
+
+          const handleResetStats = () => {
+            if (window.confirm('Reset all quiz stats?')) {
+              setQuizStats({ total:0, correct:0, by:{ Math:[0,0], 'Pre-Flop':[0,0], Strategy:[0,0], Discipline:[0,0] } });
+            }
           };
 
           // Education filter
@@ -1882,7 +2339,7 @@
                     onClick={() => setTab('quiz')}
                     className={`flex-1 py-2.5 text-sm font-semibold border-b-2 transition-all
                       ${tab === 'quiz' ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-neutral-500 hover:text-neutral-300'}`}
-                  >🎯 Quiz {score.total > 0 && `${score.correct}/${score.total}`}</button>
+                  >🎯 Quiz {quizStats.total > 0 && `${quizStats.correct}/${quizStats.total}`}</button>
                 </div>
               </div>
 
@@ -1955,102 +2412,101 @@
 
               {/* ── QUIZ TAB ── */}
               {tab === 'quiz' && (
-                <div className="flex-1 overflow-y-auto px-4 pt-4 pb-12">
-                  {quizDone ? (
-                    /* Results screen */
-                    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center gap-6">
-                      <div className="text-6xl">{score.correct >= 12 ? '🏆' : score.correct >= 8 ? '🎯' : '📚'}</div>
-                      <div>
-                        <div className="text-4xl font-mono font-black text-white">{score.correct}<span className="text-neutral-500 text-2xl">/{score.total}</span></div>
-                        <div className={`text-lg font-semibold mt-1 ${score.correct >= 12 ? 'text-green-400' : score.correct >= 8 ? 'text-yellow-400' : 'text-red-400'}`}>
-                          {score.correct >= 12 ? 'Outstanding!' : score.correct >= 8 ? 'Solid play.' : 'Keep studying.'}
-                        </div>
-                      </div>
-                      <p className="text-sm text-neutral-400 max-w-xs">
-                        {score.correct >= 12
-                          ? 'You know your fundamentals cold. Now apply them at the table.'
-                          : score.correct >= 8
-                          ? 'Good foundation. Review the Study tab for the spots you missed.'
-                          : 'Spend some time in the Study tab — the math and pre-flop sections will help most.'}
-                      </p>
-                      <button onClick={handleRestart}
-                        className="px-8 py-3 bg-yellow-500 text-black font-bold rounded-xl active:scale-95 transition-all shadow-lg shadow-yellow-500/20">
-                        Shuffle & Restart
-                      </button>
-                    </div>
-                  ) : (
-                    /* Question screen */
-                    <div className="flex flex-col gap-4">
-                      {/* Progress */}
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-neutral-500 font-mono">{qIndex + 1} / {QUIZ_QUESTIONS.length}</span>
-                        <span className="text-xs text-neutral-500 font-mono">{score.correct} correct</span>
-                      </div>
-                      <div className="h-1 bg-neutral-800 rounded-full overflow-hidden">
-                        <div className="h-full bg-yellow-500 transition-all duration-300" style={{ width: `${((qIndex) / QUIZ_QUESTIONS.length) * 100}%` }} />
-                      </div>
-
-                      {/* Badges */}
-                      <div className="flex gap-2">
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${catColor[currentQ.category] || 'bg-neutral-800 text-neutral-400'}`}>{currentQ.category}</span>
-                        <span className={`text-[10px] font-bold px-2 py-1 rounded-full bg-neutral-800 ${diffColor[currentQ.difficulty]}`}>{currentQ.difficulty}</span>
-                        {currentQ.position && <span className="text-[10px] font-bold px-2 py-1 rounded-full bg-blue-500/10 text-blue-400">{currentQ.position}</span>}
-                      </div>
-
-                      {/* Scenario */}
-                      <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
-                        <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-1">{currentQ.title}</div>
-                        <p className="text-sm text-neutral-200 leading-relaxed">{currentQ.scenario}</p>
-                        {currentQ.board && (
-                          <div className="mt-3 pt-3 border-t border-neutral-800">
-                            <div className="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Board</div>
-                            <div className="font-mono text-base text-white tracking-wider">{currentQ.board}</div>
-                          </div>
+                <div className="flex-1 overflow-y-auto pb-12">
+                  {/* Stats bar */}
+                  <div className="px-4 pt-3 pb-2 bg-neutral-950 border-b border-neutral-800/50">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-2xl font-mono font-black text-yellow-500">{quizStats.correct}</span>
+                        <span className="text-sm text-neutral-500 font-mono">/ {quizStats.total} correct</span>
+                        {quizStats.total > 0 && (
+                          <span className={`text-xs font-bold ml-1 ${Math.round(quizStats.correct/quizStats.total*100) >= 70 ? 'text-green-400' : 'text-orange-400'}`}>
+                            ({Math.round(quizStats.correct/quizStats.total*100)}%)
+                          </span>
                         )}
                       </div>
+                      <button onClick={handleResetStats} className="text-[10px] text-neutral-600 hover:text-neutral-400 transition-colors">reset</button>
+                    </div>
+                    {/* Per-category breakdown */}
+                    <div className="flex gap-2 flex-wrap">
+                      {Object.entries(quizStats.by).map(([cat, [c,t]]) => t === 0 ? null : (
+                        <span key={cat} className={`text-[10px] px-2 py-0.5 rounded-full font-semibold ${catColor[cat] || 'bg-neutral-800 text-neutral-400'}`}>
+                          {cat} {Math.round(c/t*100)}%
+                        </span>
+                      ))}
+                    </div>
+                    {/* Category filter chips */}
+                    <div className="flex gap-2 mt-2 overflow-x-auto">
+                      {['All','Math','Pre-Flop','Strategy','Discipline'].map(cat => (
+                        <button key={cat} onClick={() => handleFilterChange(cat)}
+                          className={`shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border transition-all
+                            ${qCatFilter===cat ? 'bg-yellow-500 border-yellow-400 text-black' : 'bg-neutral-800 border-neutral-700 text-neutral-400'}`}>
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-                      {/* Question */}
-                      <p className="text-sm font-semibold text-white px-1">{currentQ.question}</p>
+                  {/* Question card */}
+                  <div className="px-4 pt-4 flex flex-col gap-4">
+                    {/* Badges */}
+                    <div className="flex gap-2 flex-wrap">
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full ${catColor[currentQ.category] || 'bg-neutral-800 text-neutral-400'}`}>{currentQ.category}</span>
+                      <span className={`text-[10px] font-bold px-2 py-1 rounded-full bg-neutral-800 ${diffColor[currentQ.difficulty]}`}>{currentQ.difficulty}</span>
+                    </div>
 
-                      {/* Options */}
-                      <div className="flex flex-col gap-2">
-                        {currentQ.options.map((opt, idx) => {
-                          const isCorrect = idx === currentQ.correct;
-                          const isSelected = idx === selected;
-                          const revealed = selected !== null;
-                          let cls = 'bg-neutral-900 border-neutral-700 text-neutral-200';
-                          if (revealed && isCorrect) cls = 'bg-green-500/15 border-green-500 text-green-300';
-                          else if (revealed && isSelected && !isCorrect) cls = 'bg-red-500/15 border-red-500 text-red-300';
-                          else if (!revealed) cls = 'bg-neutral-900 border-neutral-700 text-neutral-200 hover:bg-neutral-800 active:scale-[0.98]';
-                          return (
-                            <button key={idx} onClick={() => handleAnswer(idx)}
-                              className={`w-full text-left px-4 py-3.5 rounded-xl border text-sm font-medium transition-all ${cls}`}>
-                              <span className="text-neutral-500 font-mono mr-2">{String.fromCharCode(65+idx)}.</span>{opt}
-                              {revealed && isCorrect && <span className="float-right">✅</span>}
-                              {revealed && isSelected && !isCorrect && <span className="float-right">❌</span>}
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Explanation */}
-                      {selected !== null && (
-                        <div className="bg-neutral-900 border border-neutral-700 rounded-xl p-4">
-                          <div className="text-[10px] uppercase tracking-widest text-yellow-500 mb-2 font-bold">Explanation</div>
-                          <p className="text-sm text-neutral-300 leading-relaxed">{currentQ.explanation}</p>
+                    {/* Scenario */}
+                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl p-4">
+                      <p className="text-sm text-neutral-200 leading-relaxed">{currentQ.scenario}</p>
+                      {currentQ.board && (
+                        <div className="mt-3 pt-3 border-t border-neutral-800">
+                          <div className="text-[10px] text-neutral-500 uppercase tracking-widest mb-1">Board</div>
+                          <div className="font-mono text-base text-white tracking-wider">{currentQ.board}</div>
                         </div>
                       )}
-
-                      {/* Next button */}
-                      {selected !== null && (
-                        <button onClick={handleNext}
-                          className="w-full py-3.5 bg-yellow-500 text-black font-bold rounded-xl active:scale-[0.98] transition-all shadow-lg shadow-yellow-500/20">
-                          {qIndex + 1 >= QUIZ_QUESTIONS.length ? 'See Results' : 'Next Question →'}
-                        </button>
-                      )}
-                      <div className="h-4" />
                     </div>
-                  )}
+
+                    {/* Question */}
+                    <p className="text-sm font-semibold text-white px-1">{currentQ.question}</p>
+
+                    {/* Options */}
+                    <div className="flex flex-col gap-2">
+                      {currentQ.options.map((opt, idx) => {
+                        const isCorrect = idx === currentQ.correct;
+                        const isChosen  = idx === qSelected;
+                        const revealed  = qSelected !== null;
+                        let cls = 'bg-neutral-900 border-neutral-700 text-neutral-200 hover:bg-neutral-800 active:scale-[0.98]';
+                        if (revealed && isCorrect)              cls = 'bg-green-500/15 border-green-500 text-green-300';
+                        else if (revealed && isChosen)          cls = 'bg-red-500/15 border-red-500 text-red-300';
+                        else if (revealed)                      cls = 'bg-neutral-900 border-neutral-800 text-neutral-500 opacity-60';
+                        return (
+                          <button key={idx} onClick={() => handleAnswer(idx)}
+                            className={`w-full text-left px-4 py-3.5 rounded-xl border text-sm font-medium transition-all ${cls}`}>
+                            <span className="text-neutral-500 font-mono mr-2">{String.fromCharCode(65+idx)}.</span>{opt}
+                            {revealed && isCorrect && <span className="float-right">✅</span>}
+                            {revealed && isChosen && !isCorrect && <span className="float-right">❌</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Explanation */}
+                    {qSelected !== null && (
+                      <div className={`rounded-xl p-4 border ${qSelected === currentQ.correct ? 'bg-green-500/10 border-green-500/30' : 'bg-neutral-900 border-neutral-700'}`}>
+                        <div className="text-[10px] uppercase tracking-widest text-yellow-500 mb-2 font-bold">Explanation</div>
+                        <p className="text-sm text-neutral-300 leading-relaxed">{currentQ.explanation}</p>
+                      </div>
+                    )}
+
+                    {/* Next */}
+                    {qSelected !== null && (
+                      <button onClick={handleNext}
+                        className="w-full py-3.5 bg-yellow-500 text-black font-bold rounded-xl active:scale-[0.98] transition-all shadow-lg shadow-yellow-500/20">
+                        Next Question →
+                      </button>
+                    )}
+                    <div className="h-4" />
+                  </div>
                 </div>
               )}
             </div>
