@@ -42,6 +42,7 @@
         const Download = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></Icon>;
         const Upload = (p) => <Icon {...p}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></Icon>;
         const BookOpen = (p) => <Icon {...p}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
+        const Target = (p) => <Icon {...p}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></Icon>;
 
         // --- CONSTANTS ---
         const RANKS = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
@@ -752,11 +753,11 @@
                 {/* Bottom Navigation (Hide when adding a hand) */}
                 {activeTab !== 'add' && (
                   <div className="sticky bottom-0 bg-neutral-950 border-t border-neutral-800 flex justify-between px-1 pb-6 pt-2 z-20">
-                    <NavItem icon={<Spade size={18} />} label="Session" isActive={activeTab === 'session'} onClick={() => setActiveTab('session')} />
-                    <NavItem icon={<Layers size={18} />} label="Sessions" isActive={activeTab === 'sessions'} onClick={() => setActiveTab('sessions')} />
                     <NavItem icon={<BarChart2 size={18} />} label="Stats" isActive={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
+                    <NavItem icon={<Layers size={18} />} label="Sessions" isActive={activeTab === 'sessions'} onClick={() => setActiveTab('sessions')} />
+                    <NavItem icon={<Spade size={20} />} label="NOW" isActive={activeTab === 'session'} onClick={() => setActiveTab('session')} />
                     <NavItem icon={<BookOpen size={18} />} label="Study" isActive={activeTab === 'education'} onClick={() => setActiveTab('education')} />
-                    <NavItem icon={<span className="text-base leading-none">🎯</span>} label="Quiz" isActive={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} />
+                    <NavItem icon={<Target size={18} />} label="Quiz" isActive={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} />
                   </div>
                 )}
 
@@ -797,9 +798,12 @@
         // --- SCREEN: SESSION (DASHBOARD) ---
         function ScreenSession({ hands, discTokens, setDiscTokens, startTime, commOpen, setCommOpen, navigate, endSession, onAddHand, onEditHand, showToast, miracleBudget, setMiracleBudget }) {
           const shakeRef = useRef(null);
+          const scrollRef = useRef(null);
           const [listHidden, setListHidden] = useState(true);
           const [showEndModal, setShowEndModal] = useState(false);
           const [pnlInput, setPnlInput] = useState('');
+
+          useEffect(() => { requestAnimationFrame(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }); }, []);
 
           // Derived Stats
           const total = hands.length;
@@ -833,7 +837,7 @@
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 pb-12">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 pb-12">
                 {/* Commitments */}
                 <div className="mb-4 rounded-xl border border-yellow-500/30 bg-gradient-to-br from-yellow-500/10 to-transparent relative overflow-hidden">
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-yellow-500 to-yellow-500/20"></div>
@@ -919,7 +923,7 @@
 
                 {/* Discipline Physics Playground */}
                 <div className="mb-2 pl-2 text-[11px] font-bold uppercase tracking-widest text-neutral-500">
-                  🎯 Encouragement tokens — great fold, good call, great hard decisions
+                  🎯 Well-Played tokens — great fold, good call, nice bluff, max value
                 </div>
                 <TokenPhysicsArea
                   count={discTokens}
@@ -955,11 +959,11 @@
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${h.result === 'won' ? 'text-green-500' : h.result === 'lost' ? 'text-red-500' : 'text-neutral-400'}`}>
-                              {h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : 'Folded'}
+                            <span className={`text-sm font-medium ${h.result === 'won' ? 'text-green-500' : h.result === 'lost' ? 'text-red-500' : h.result === 'fold' ? 'text-orange-400' : 'text-neutral-400'}`}>
+                              {h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : h.result === 'fold' ? 'Fold' : 'Skip'}
                             </span>
                             <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${h.isVPIP ? 'bg-yellow-500/10 text-yellow-500' : 'bg-neutral-800 text-neutral-500'}`}>
-                              {h.isVPIP ? 'VPIP' : 'FOLD'}
+                              {h.isVPIP ? 'VPIP' : h.result === 'skip' ? 'SKIP' : 'FOLD'}
                             </span>
                             {h.position && (
                               <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">
@@ -1015,15 +1019,16 @@
         function ScreenAddHand({ hands, setHands, navigate, showToast, editingHandId, miracleBudget = 3 }) {
           const initialHand = editingHandId ? hands.find(h => h.id === editingHandId) : null;
 
-          const [holeCardsHidden, setHoleCardsHidden] = useState(true);
           const [pickingCard, setPickingCard] = useState(1);
           const [pendingRank, setPendingRank] = useState(null);
-          const [flashRank, setFlashRank] = useState(null);   // rank string — green flash 1s on rank button
-          const [flashSuit, setFlashSuit] = useState(null);   // suit name — green flash on suit button
-          const [flashCard, setFlashCard] = useState(null);   // 1 or 2 — green flash 1.2s on card slot
-          const flashRankTimer = useRef(null);
-          const flashSuitTimer = useRef(null);
-          const flashCardTimer = useRef(null);
+          // Per-card visibility: hidden by default, shown for 1s after entry or on tap
+          const [showCard1, setShowCard1] = useState(false);
+          const [showCard2, setShowCard2] = useState(false);
+          const card1Timer = useRef(null);
+          const card2Timer = useRef(null);
+          const scrollRef = useRef(null);
+
+          useEffect(() => { requestAnimationFrame(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }); }, []);
           const [card1, setCard1] = useState(initialHand ? initialHand.card1 : null);
           const [card2, setCard2] = useState(initialHand ? initialHand.card2 : null);
           const [position, setPosition] = useState(initialHand ? (initialHand.position || null) : null);
@@ -1047,16 +1052,23 @@
           const [result, setResult] = useState(initialHand ? initialHand.result : null);
 
           const totalIn = Object.values(bets).reduce((acc, val) => acc + (parseFloat(val) || 0), 0);
-          const isVPIP = (parseFloat(bets.preflop) || 0) > 0;
+          // Skip = folded preflop without voluntarily committing chips (e.g. SB/BB posting then folding)
+          const isVPIP = result !== 'skip' && (parseFloat(bets.preflop) || 0) > 0;
 
-          const handleSelectRank = (r) => {
-            setPendingRank(r);
-            if (holeCardsHidden) {
-              clearTimeout(flashRankTimer.current);
-              setFlashRank(r);
-              flashRankTimer.current = setTimeout(() => setFlashRank(null), 1000);
+          // Show a card for 1s, then auto-hide
+          const peekCard = (slot) => {
+            if (slot === 1) {
+              clearTimeout(card1Timer.current);
+              setShowCard1(true);
+              card1Timer.current = setTimeout(() => setShowCard1(false), 1000);
+            } else {
+              clearTimeout(card2Timer.current);
+              setShowCard2(true);
+              card2Timer.current = setTimeout(() => setShowCard2(false), 1000);
             }
           };
+
+          const handleSelectRank = (r) => { setPendingRank(r); };
 
           const handleSelectSuit = (suitObj) => {
             if (!pendingRank) return;
@@ -1069,36 +1081,19 @@
               return;
             }
 
-            const completedSlot = pickingCard; // capture before state update
-            if (pickingCard === 1) {
-              setCard1(newCard);
-              setPickingCard(2);
-            } else {
-              setCard2(newCard);
-              setPickingCard(1);
-            }
+            const completedSlot = pickingCard;
+            if (pickingCard === 1) { setCard1(newCard); setPickingCard(2); }
+            else                   { setCard2(newCard); setPickingCard(1); }
             setPendingRank(null);
 
-            // Brief confirmations when hidden
-            if (holeCardsHidden) {
-              clearTimeout(flashRankTimer.current);
-              setFlashRank(null);
-              // Flash the suit button for ~900ms
-              clearTimeout(flashSuitTimer.current);
-              setFlashSuit(suitObj.name);
-              flashSuitTimer.current = setTimeout(() => setFlashSuit(null), 900);
-              // Flash the completed card slot for 1.2s
-              clearTimeout(flashCardTimer.current);
-              setFlashCard(completedSlot);
-              flashCardTimer.current = setTimeout(() => setFlashCard(null), 1200);
-            }
+            // Show the completed card for 1s
+            peekCard(completedSlot);
           };
 
           const handleClearCards = () => {
             setCard1(null); setCard2(null); setPendingRank(null); setPickingCard(1);
-            clearTimeout(flashRankTimer.current); setFlashRank(null);
-            clearTimeout(flashSuitTimer.current); setFlashSuit(null);
-            clearTimeout(flashCardTimer.current); setFlashCard(null);
+            clearTimeout(card1Timer.current); setShowCard1(false);
+            clearTimeout(card2Timer.current); setShowCard2(false);
           };
 
           const handleBetChange = (round, val) => {
@@ -1154,45 +1149,33 @@
             }
           };
 
-          // UI Helpers
-          const CardLarge = ({ card, placeholder, flash }) => {
-            if (holeCardsHidden && card) {
-              return (
-                <div className={`w-16 h-24 rounded-xl border-2 flex items-center justify-center text-3xl font-mono shadow-inner select-none transition-all duration-150
-                  ${flash ? 'border-green-500 bg-green-900/40 text-green-300 scale-105 shadow-green-500/30' : 'border-neutral-700 bg-neutral-800 text-neutral-500'}`}>
-                  ✓
-                </div>
-              );
-            }
+          // UI Helpers — card slot: hidden by default, tappable to peek for 1s
+          const CardLarge = ({ card, placeholder, show, slot }) => {
             if (!card) {
               return <div className="w-16 h-24 rounded-xl border-2 border-dashed border-neutral-700 bg-neutral-900 flex items-center justify-center text-sm text-neutral-600 font-mono select-none">{placeholder}</div>;
             }
+            if (!show) {
+              return (
+                <div
+                  onClick={() => peekCard(slot)}
+                  className="w-16 h-24 rounded-xl border-2 border-neutral-700 bg-neutral-800 flex items-center justify-center text-2xl text-neutral-500 font-mono shadow-inner select-none cursor-pointer active:scale-95 transition-transform"
+                  title="Tap to peek"
+                >?</div>
+              );
+            }
             const isRed = card.suitName === 'hearts' || card.suitName === 'diamonds';
             return (
-              <div className={`w-16 h-24 rounded-xl border-2 flex flex-col items-center justify-center font-mono select-none shadow-lg
-                ${isRed ? 'bg-gradient-to-br from-[#3a1515] to-[#1e0e0e] border-red-900/50 text-red-500' : 'bg-gradient-to-br from-[#151530] to-[#0e0e1e] border-blue-900/50 text-blue-400'}`}>
+              <div
+                onClick={() => peekCard(slot)}
+                className={`w-16 h-24 rounded-xl border-2 flex flex-col items-center justify-center font-mono select-none shadow-lg cursor-pointer active:scale-95 transition-transform
+                  ${isRed ? 'bg-gradient-to-br from-[#3a1515] to-[#1e0e0e] border-red-900/50 text-red-500' : 'bg-gradient-to-br from-[#151530] to-[#0e0e1e] border-blue-900/50 text-blue-400'}`}
+              >
                 <span className="text-3xl font-bold leading-none mb-1">{card.rank}</span>
                 <span className="text-3xl leading-none">{card.suit}</span>
               </div>
             );
           };
 
-          // Calculate used ranks to grey them out if pocket pairs are impossible
-          const isUsed = (r) => {
-            if (holeCardsHidden) return false; // Hide used state when cards are hidden to prevent shoulder-surfing
-            if (card1 && card2 && card1.rank !== card2.rank) {
-              return card1.rank === r || card2.rank === r;
-            }
-            return false;
-          };
-
-          const handleToggleHide = () => {
-            const willHide = !holeCardsHidden;
-            setHoleCardsHidden(willHide);
-            if (willHide) {
-              setPendingRank(null); // Clear active selection to hide the suit row and remove rank highlight
-            }
-          };
 
           return (
             <div className="flex flex-col h-full bg-neutral-950">
@@ -1205,7 +1188,7 @@
                 <div className="w-8"></div> {/* Placeholder to balance header */}
               </div>
 
-              <div className="flex-1 overflow-y-auto p-4 pb-12 space-y-4">
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 pb-12 space-y-4">
                 {/* Position Picker */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Your Position</div>
@@ -1230,8 +1213,8 @@
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-4 text-center">Select your hole cards</div>
                   
                   <div className="flex justify-center gap-4 mb-4">
-                    <CardLarge card={card1} placeholder="Card 1" flash={flashCard === 1} />
-                    <CardLarge card={card2} placeholder="Card 2" flash={flashCard === 2} />
+                    <CardLarge card={card1} placeholder="Card 1" show={showCard1} slot={1} />
+                    <CardLarge card={card2} placeholder="Card 2" show={showCard2} slot={2} />
                   </div>
 
                   <div className="text-center text-xs text-yellow-500 font-medium mb-3 h-4">
@@ -1240,30 +1223,26 @@
 
                   <div className="grid grid-cols-7 gap-1.5 mb-3">
                     {RANKS.map(r => (
-                      <button 
-                        key={r} 
+                      <button
+                        key={r}
                         onClick={() => handleSelectRank(r)}
-                        disabled={isUsed(r)}
                         className={`py-2 rounded font-mono font-medium text-sm transition-all border
-                          ${holeCardsHidden && flashRank === r ? 'bg-green-900 border-green-500 text-green-300' :
-                            !holeCardsHidden && pendingRank === r ? 'bg-red-950 border-red-500 text-red-500' :
-                            isUsed(r) ? 'bg-neutral-950 border-neutral-800 text-neutral-700 opacity-30' :
-                            'bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700'}`}
+                          ${pendingRank === r
+                            ? 'bg-yellow-900 border-yellow-500 text-yellow-300'
+                            : 'bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700'}`}
                       >
                         {r}
                       </button>
                     ))}
                   </div>
 
-                  {(pendingRank || flashSuit) && (
-                    <div className="flex justify-center gap-2 mb-2 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {pendingRank && (
+                    <div className="flex justify-center gap-2 mb-2">
                       {SUITS.map(s => (
                         <button
                           key={s.name}
                           onClick={() => handleSelectSuit(s)}
-                          disabled={!pendingRank}
-                          className={`w-14 h-12 rounded border flex items-center justify-center text-2xl active:scale-90 transition-all
-                            ${flashSuit === s.name ? 'bg-green-900 border-green-400 scale-110 shadow-lg shadow-green-500/30' : `${s.bg} ${s.border} ${s.color}`}`}
+                          className={`w-14 h-12 rounded border flex items-center justify-center text-2xl active:scale-90 transition-all ${s.bg} ${s.border} ${s.color}`}
                         >
                           {s.symbol}
                         </button>
@@ -1271,14 +1250,9 @@
                     </div>
                   )}
 
-                  <div className="flex justify-between items-center mt-6 border-t border-neutral-800 pt-4">
+                  <div className="flex justify-between items-center mt-4 border-t border-neutral-800 pt-3">
                     <button onClick={handleClearCards} className="text-xs text-neutral-400 hover:text-white px-2 py-1">Clear cards</button>
-                    <button 
-                      onClick={handleToggleHide}
-                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded transition-colors ${holeCardsHidden ? 'bg-neutral-800 text-neutral-300 border border-neutral-700 hover:border-yellow-500/50 hover:text-yellow-400' : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/30'}`}
-                    >
-                      {holeCardsHidden ? <Eye size={14} /> : <EyeOff size={14} />} {holeCardsHidden ? 'Show cards' : 'Hide cards'}
-                    </button>
+                    <span className="text-[10px] text-neutral-600">Tap a card to peek</span>
                   </div>
                 </div>
 
@@ -1294,21 +1268,13 @@
                   ].map(round => (
                     <div key={round.id} className="flex items-center gap-3">
                       <div className={`w-16 text-xs font-medium ${round.color}`}>{round.label}</div>
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         placeholder="0"
                         value={bets[round.id]}
                         onChange={(e) => handleBetChange(round.id, e.target.value)}
                         className="flex-1 bg-neutral-950 border border-neutral-700 rounded-lg p-2 text-white font-mono focus:border-yellow-500 outline-none placeholder:text-neutral-600"
                       />
-                      <button 
-                        onClick={() => toggleFold(round.id)}
-                        className={`w-24 flex items-center justify-center gap-1.5 px-3 py-2 rounded border text-xs font-medium transition-colors
-                          ${folds[round.id] ? 'bg-red-500/10 border-red-500/30 text-red-500' : 'bg-neutral-800 border-neutral-700 text-neutral-400'}`}
-                      >
-                        <div className={`w-2 h-2 rounded-full ${folds[round.id] ? 'bg-red-500' : 'bg-neutral-600'}`}></div>
-                        Folded
-                      </button>
                     </div>
                   ))}
 
@@ -1316,19 +1282,19 @@
                     <span className="text-sm text-neutral-400">Total chips in:</span>
                     <span className="text-lg font-mono font-medium text-yellow-500">{totalIn}</span>
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-neutral-400">Counts as VPIP?</span>
-                    <span className={`text-sm font-medium ${isVPIP ? 'text-green-500' : 'text-neutral-500'}`}>{isVPIP ? 'Yes' : 'No'}</span>
-                  </div>
                 </div>
 
                 {/* Result */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Outcome</div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <button onClick={() => setResult('won')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'won' ? 'bg-green-500/20 border-green-500 text-green-400 ring-2 ring-green-500 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>Won</button>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => setResult('skip')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'skip' ? 'bg-blue-500/20 border-blue-500 text-blue-300 ring-2 ring-blue-500' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>
+                      Skip
+                    </button>
+                    <button onClick={() => setResult('fold')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'fold' ? 'bg-orange-500/20 border-orange-500 text-orange-300 ring-2 ring-orange-500' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>
+                      Fold                     </button>
                     <button onClick={() => setResult('lost')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'lost' ? 'bg-red-500/20 border-red-500 text-red-400 ring-2 ring-red-500 shadow-[0_0_15px_rgba(239,68,68,0.15)]' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>Lost</button>
-                    <button onClick={() => setResult('fold')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'fold' ? 'bg-neutral-700 border-neutral-400 text-white ring-2 ring-neutral-400' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>Folded</button>
+                    <button onClick={() => setResult('won')} className={`py-3 rounded-xl border text-sm font-bold transition-all ${result === 'won' ? 'bg-green-500/20 border-green-500 text-green-400 ring-2 ring-green-500 shadow-[0_0_15px_rgba(34,197,94,0.15)]' : 'bg-neutral-800 border-neutral-700 text-neutral-400 hover:bg-neutral-700'}`}>Won</button>
                   </div>
                 </div>
 
@@ -1471,7 +1437,7 @@
                               <CardMini card={h.card2} hidden={false} />
                             </div>
                             <span className={`text-[10px] font-mono px-2 py-1 rounded-md ${h.isVPIP ? 'bg-yellow-500/10 text-yellow-500' : 'bg-neutral-800 text-neutral-500'}`}>
-                              {h.isVPIP ? 'VPIP' : 'FOLD'}
+                              {h.isVPIP ? 'VPIP' : h.result === 'skip' ? 'SKIP' : 'FOLD'}
                             </span>
                             {h.position && (
                               <span className="text-[10px] font-mono px-2 py-1 rounded-md bg-blue-500/10 text-blue-400">
@@ -1479,8 +1445,8 @@
                               </span>
                             )}
                          </div>
-                         <span className={`text-sm font-medium ${h.result === 'won' ? 'text-green-500' : h.result === 'lost' ? 'text-red-500' : 'text-neutral-500'}`}>
-                           {h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : 'Folded'}
+                         <span className={`text-sm font-medium ${h.result === 'won' ? 'text-green-500' : h.result === 'lost' ? 'text-red-500' : h.result === 'fold' ? 'text-orange-400' : 'text-neutral-400'}`}>
+                           {h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : h.result === 'fold' ? 'Fold' : 'Skip'}
                          </span>
                        </div>
                        
@@ -1532,10 +1498,11 @@
           };
 
           const getHeatmapColor = (h) => {
-            if (!h.isVPIP) return 'bg-slate-900 border-slate-800'; // Pre-flop fold (blueish)
-            if (h.result === 'won') return 'bg-green-950 border-green-900';
-            if (h.result === 'lost') return 'bg-red-950 border-red-900';
-            return 'bg-yellow-950/50 border-yellow-900/50'; // VPIP but folded later
+            if (h.result === 'skip') return 'bg-neutral-900 border-neutral-800';          // skip — no VPIP
+            if (!h.isVPIP)          return 'bg-slate-900 border-slate-800';               // non-VPIP fold
+            if (h.result === 'won') return 'bg-green-950 border-green-900';               // VPIP won
+            if (h.result === 'lost') return 'bg-red-950 border-red-900';                  // VPIP lost
+            return 'bg-orange-950/60 border-orange-900/50';                               // VPIP fold
           };
 
           return (
@@ -1584,17 +1551,17 @@
                               {(s.hands || []).map((h, i) => (
                                 <div 
                                   key={i} 
-                                  title={`Hand #${h.num}: ${h.isVPIP?'VPIP':'Fold'} - ${h.result}`}
+                                  title={`Hand #${h.num}: ${h.result === 'skip' ? 'Skip' : h.isVPIP ? 'VPIP' : 'Fold'} - ${h.result}`}
                                   className={`w-[18px] h-[18px] rounded-[3px] border ${getHeatmapColor(h)}`}
                                 ></div>
                               ))}
                             </div>
                             
                             <div className="flex gap-4 flex-wrap mb-4 px-1">
-                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-green-950 border border-green-900"></div><span className="text-[10px] text-neutral-500">VPIP Won</span></div>
-                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-red-950 border border-red-900"></div><span className="text-[10px] text-neutral-500">VPIP Lost</span></div>
-                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-yellow-950/50 border border-yellow-900/50"></div><span className="text-[10px] text-neutral-500">VPIP Fold</span></div>
-                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-slate-900 border border-slate-800"></div><span className="text-[10px] text-neutral-500">Pre Fold</span></div>
+                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-green-950 border border-green-900"></div><span className="text-[10px] text-neutral-500">Won</span></div>
+                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-red-950 border border-red-900"></div><span className="text-[10px] text-neutral-500">Lost</span></div>
+                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-orange-950/60 border border-orange-900/50"></div><span className="text-[10px] text-neutral-500">Fold</span></div>
+                              <div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-sm bg-neutral-900 border border-neutral-800"></div><span className="text-[10px] text-neutral-500">Skip</span></div>
                             </div>
 
                             <button 
