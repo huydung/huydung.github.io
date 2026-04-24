@@ -315,10 +315,30 @@
         }
 
         // --- PHYSICS CANVAS COMPONENT ---
+        // Curated pool of 80 positive emoji — one assigned randomly to each new token
+        const DISC_EMOJIS = [
+          // Power & mastery
+          '👑','🏆','🥇','💎','🔱','⚜️','🎖️','🏅','🌟','✨',
+          // Fire & energy
+          '🔥','⚡','💥','☄️','🌪️','🌊','🌈','🌤️','⭐','💫',
+          // Animals — courage & cunning
+          '🦁','🐉','🦅','🦊','🐯','🦋','🦚','🦜','🐺','🦈',
+          // Zen & discipline
+          '🧘','🎯','🪄','🎩','🔮','🧿','☯️','🕉️','🌸','🍀',
+          // Poker / cards / game
+          '🃏','🎰','🎲','♠️','♣️','🂡','🎪','🎭','🎬','🎵',
+          // Mythical & legendary
+          '🦄','🧙','🧜','🧚','🧝','🐲','🧞','🦸','⚔️','🛡️',
+          // Nature & growth
+          '🌿','🌺','🌻','🍃','🎋','🌴','🪸','🌵','🎍','🍁',
+          // Celebration & joy
+          '🎆','🎇','🎊','🎉','🥂','🏄','🤸','🧗','🤺','🥋',
+        ];
+
         function TokenPhysicsArea({ count, onAdd, onRemove, onShake }) {
           const containerRef = useRef(null);
           const rafRef = useRef(null);
-          const tokensRef = useRef([]); 
+          const tokensRef = useRef([]);
           const domRefs = useRef({});
           const dragRef = useRef({ id: null, lastX: 0, lastY: 0 });
           const [renderList, setRenderList] = useState([]);
@@ -335,6 +355,7 @@
                 tokensRef.current.push({
                   id: Math.random().toString(36).substr(2, 9),
                   index: currentLen + i, // Store index for tier styling
+                  emoji: DISC_EMOJIS[Math.floor(Math.random() * DISC_EMOJIS.length)],
                   x: width / 2 + (Math.random() * 40 - 20),
                   y: -40 - (i * 30),
                   vx: Math.random() * 6 - 3,
@@ -523,7 +544,7 @@
                   >
                     {/* Inner div handles the CSS scaling animations without overriding JS translate */}
                     <div className={`w-full h-full rounded-full flex items-center justify-center transition-colors duration-200 ${getTokenClass(token.index)}`}>
-                      ★
+                      <span className="text-base leading-none select-none" style={{filter:'drop-shadow(0 0 4px rgba(255,255,255,0.3))'}}>{token.emoji || '★'}</span>
                     </div>
                   </div>
                 ))}
@@ -571,6 +592,11 @@
           // Navigation State
           const [activeTab, setActiveTab] = useState('session'); // 'session', 'add', 'history', 'sessions', 'stats'
           const [editingHandId, setEditingHandId] = useState(null);
+
+          // Quiz state lifted here so it survives tab switches
+          const [quizQ, setQuizQ] = useState(() => generateQuestion('All'));
+          const [quizSelected, setQuizSelected] = useState(null);
+          const [quizCatFilter, setQuizCatFilter] = useState('All');
           
           // Toast State
           const [toastMsg, setToastMsg] = useState('');
@@ -645,8 +671,20 @@
                   setHands={setHands} setSessions={setSessions} setDiscTokens={setDiscTokens} setStartTime={setStartTime}
                   clearAllData={clearAllData} showToast={showToast}
                 />;
-              case 'learn':
-                return <ScreenLearn />;
+              case 'education':
+                return <ScreenLearn
+                  tab="education"
+                  currentQ={quizQ} setCurrentQ={setQuizQ}
+                  qSelected={quizSelected} setQSelected={setQuizSelected}
+                  qCatFilter={quizCatFilter} setQCatFilter={setQuizCatFilter}
+                />;
+              case 'quiz':
+                return <ScreenLearn
+                  tab="quiz"
+                  currentQ={quizQ} setCurrentQ={setQuizQ}
+                  qSelected={quizSelected} setQSelected={setQuizSelected}
+                  qCatFilter={quizCatFilter} setQCatFilter={setQuizCatFilter}
+                />;
               default:
                 return <ScreenSession navigate={setActiveTab} />;
             }
@@ -656,6 +694,7 @@
             <div className="min-h-screen bg-neutral-950 text-neutral-200 font-sans selection:bg-yellow-600/30 flex justify-center">
               {/* Global Styles for Custom VFX Keyframes */}
               <style>{`
+                button, a { touch-action: manipulation; }
                 @keyframes breathe {
                   0%,100% { box-shadow: 0 0 5px rgba(234,179,8,0.3); }
                   50% { box-shadow: 0 0 16px rgba(234,179,8,0.8); }
@@ -714,10 +753,10 @@
                 {activeTab !== 'add' && (
                   <div className="sticky bottom-0 bg-neutral-950 border-t border-neutral-800 flex justify-between px-1 pb-6 pt-2 z-20">
                     <NavItem icon={<Spade size={18} />} label="Session" isActive={activeTab === 'session'} onClick={() => setActiveTab('session')} />
-                    <NavItem icon={<History size={18} />} label="Hands" isActive={activeTab === 'history'} onClick={() => setActiveTab('history')} />
                     <NavItem icon={<Layers size={18} />} label="Sessions" isActive={activeTab === 'sessions'} onClick={() => setActiveTab('sessions')} />
                     <NavItem icon={<BarChart2 size={18} />} label="Stats" isActive={activeTab === 'stats'} onClick={() => setActiveTab('stats')} />
-                    <NavItem icon={<BookOpen size={18} />} label="Learn" isActive={activeTab === 'learn'} onClick={() => setActiveTab('learn')} />
+                    <NavItem icon={<BookOpen size={18} />} label="Study" isActive={activeTab === 'education'} onClick={() => setActiveTab('education')} />
+                    <NavItem icon={<span className="text-base leading-none">🎯</span>} label="Quiz" isActive={activeTab === 'quiz'} onClick={() => setActiveTab('quiz')} />
                   </div>
                 )}
 
@@ -870,9 +909,17 @@
                   );
                 })()}
 
+                {/* Log Hand Button */}
+                <button
+                  onClick={onAddHand}
+                  className="w-full bg-yellow-500 text-black font-semibold text-lg py-3.5 rounded-xl flex items-center justify-center gap-2 mb-4 active:scale-[0.98] transition-transform shadow-lg shadow-yellow-500/20"
+                >
+                  <Plus size={20} /> Log Hand
+                </button>
+
                 {/* Discipline Physics Playground */}
                 <div className="mb-2 pl-2 text-[11px] font-bold uppercase tracking-widest text-neutral-500">
-                  ★ Discipline stars — great fold, good call, any hard decision
+                  🎯 Encouragement tokens — great fold, good call, great hard decisions
                 </div>
                 <TokenPhysicsArea
                   count={discTokens}
@@ -880,14 +927,6 @@
                   onRemove={() => setDiscTokens(prev => Math.max(0, prev - 1))}
                   onShake={shakeRef}
                 />
-
-                {/* Log Hand Button */}
-                <button 
-                  onClick={onAddHand}
-                  className="w-full bg-yellow-500 text-black font-semibold text-lg py-3.5 rounded-xl flex items-center justify-center gap-2 mb-6 active:scale-[0.98] transition-transform shadow-lg shadow-yellow-500/20 mt-4"
-                >
-                  <Plus size={20} /> Log Hand
-                </button>
 
                 {/* Mini Hand List */}
                 <div className="flex items-center justify-between mb-3">
@@ -976,9 +1015,15 @@
         function ScreenAddHand({ hands, setHands, navigate, showToast, editingHandId, miracleBudget = 3 }) {
           const initialHand = editingHandId ? hands.find(h => h.id === editingHandId) : null;
 
-          const [holeCardsHidden, setHoleCardsHidden] = useState(false);
+          const [holeCardsHidden, setHoleCardsHidden] = useState(true);
           const [pickingCard, setPickingCard] = useState(1);
           const [pendingRank, setPendingRank] = useState(null);
+          const [flashRank, setFlashRank] = useState(null);   // rank string — green flash 1s on rank button
+          const [flashSuit, setFlashSuit] = useState(null);   // suit name — green flash on suit button
+          const [flashCard, setFlashCard] = useState(null);   // 1 or 2 — green flash 1.2s on card slot
+          const flashRankTimer = useRef(null);
+          const flashSuitTimer = useRef(null);
+          const flashCardTimer = useRef(null);
           const [card1, setCard1] = useState(initialHand ? initialHand.card1 : null);
           const [card2, setCard2] = useState(initialHand ? initialHand.card2 : null);
           const [position, setPosition] = useState(initialHand ? (initialHand.position || null) : null);
@@ -1006,12 +1051,17 @@
 
           const handleSelectRank = (r) => {
             setPendingRank(r);
+            if (holeCardsHidden) {
+              clearTimeout(flashRankTimer.current);
+              setFlashRank(r);
+              flashRankTimer.current = setTimeout(() => setFlashRank(null), 1000);
+            }
           };
 
           const handleSelectSuit = (suitObj) => {
             if (!pendingRank) return;
             const newCard = { rank: pendingRank, suit: suitObj.symbol, suitName: suitObj.name };
-            
+
             // Check dupe
             const otherCard = pickingCard === 1 ? card2 : card1;
             if (otherCard && otherCard.rank === newCard.rank && otherCard.suit === newCard.suit) {
@@ -1019,6 +1069,7 @@
               return;
             }
 
+            const completedSlot = pickingCard; // capture before state update
             if (pickingCard === 1) {
               setCard1(newCard);
               setPickingCard(2);
@@ -1027,10 +1078,27 @@
               setPickingCard(1);
             }
             setPendingRank(null);
+
+            // Brief confirmations when hidden
+            if (holeCardsHidden) {
+              clearTimeout(flashRankTimer.current);
+              setFlashRank(null);
+              // Flash the suit button for ~900ms
+              clearTimeout(flashSuitTimer.current);
+              setFlashSuit(suitObj.name);
+              flashSuitTimer.current = setTimeout(() => setFlashSuit(null), 900);
+              // Flash the completed card slot for 1.2s
+              clearTimeout(flashCardTimer.current);
+              setFlashCard(completedSlot);
+              flashCardTimer.current = setTimeout(() => setFlashCard(null), 1200);
+            }
           };
 
           const handleClearCards = () => {
             setCard1(null); setCard2(null); setPendingRank(null); setPickingCard(1);
+            clearTimeout(flashRankTimer.current); setFlashRank(null);
+            clearTimeout(flashSuitTimer.current); setFlashSuit(null);
+            clearTimeout(flashCardTimer.current); setFlashCard(null);
           };
 
           const handleBetChange = (round, val) => {
@@ -1087,9 +1155,14 @@
           };
 
           // UI Helpers
-          const CardLarge = ({ card, placeholder }) => {
+          const CardLarge = ({ card, placeholder, flash }) => {
             if (holeCardsHidden && card) {
-              return <div className="w-16 h-24 rounded-xl border-2 border-neutral-700 bg-neutral-800 flex items-center justify-center text-3xl text-neutral-500 font-mono shadow-inner select-none">?</div>;
+              return (
+                <div className={`w-16 h-24 rounded-xl border-2 flex items-center justify-center text-3xl font-mono shadow-inner select-none transition-all duration-150
+                  ${flash ? 'border-green-500 bg-green-900/40 text-green-300 scale-105 shadow-green-500/30' : 'border-neutral-700 bg-neutral-800 text-neutral-500'}`}>
+                  ✓
+                </div>
+              );
             }
             if (!card) {
               return <div className="w-16 h-24 rounded-xl border-2 border-dashed border-neutral-700 bg-neutral-900 flex items-center justify-center text-sm text-neutral-600 font-mono select-none">{placeholder}</div>;
@@ -1157,8 +1230,8 @@
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-4 text-center">Select your hole cards</div>
                   
                   <div className="flex justify-center gap-4 mb-4">
-                    <CardLarge card={card1} placeholder="Card 1" />
-                    <CardLarge card={card2} placeholder="Card 2" />
+                    <CardLarge card={card1} placeholder="Card 1" flash={flashCard === 1} />
+                    <CardLarge card={card2} placeholder="Card 2" flash={flashCard === 2} />
                   </div>
 
                   <div className="text-center text-xs text-yellow-500 font-medium mb-3 h-4">
@@ -1172,8 +1245,9 @@
                         onClick={() => handleSelectRank(r)}
                         disabled={isUsed(r)}
                         className={`py-2 rounded font-mono font-medium text-sm transition-all border
-                          ${pendingRank === r ? 'bg-red-950 border-red-500 text-red-500' : 
-                            isUsed(r) ? 'bg-neutral-950 border-neutral-800 text-neutral-700 opacity-30' : 
+                          ${holeCardsHidden && flashRank === r ? 'bg-green-900 border-green-500 text-green-300' :
+                            !holeCardsHidden && pendingRank === r ? 'bg-red-950 border-red-500 text-red-500' :
+                            isUsed(r) ? 'bg-neutral-950 border-neutral-800 text-neutral-700 opacity-30' :
                             'bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700'}`}
                       >
                         {r}
@@ -1181,13 +1255,15 @@
                     ))}
                   </div>
 
-                  {pendingRank && (
+                  {(pendingRank || flashSuit) && (
                     <div className="flex justify-center gap-2 mb-2 animate-in fade-in slide-in-from-top-2 duration-200">
                       {SUITS.map(s => (
-                        <button 
+                        <button
                           key={s.name}
                           onClick={() => handleSelectSuit(s)}
-                          className={`w-14 h-12 rounded border flex items-center justify-center text-2xl active:scale-90 transition-all ${s.bg} ${s.border} ${s.color}`}
+                          disabled={!pendingRank}
+                          className={`w-14 h-12 rounded border flex items-center justify-center text-2xl active:scale-90 transition-all
+                            ${flashSuit === s.name ? 'bg-green-900 border-green-400 scale-110 shadow-lg shadow-green-500/30' : `${s.bg} ${s.border} ${s.color}`}`}
                         >
                           {s.symbol}
                         </button>
@@ -1199,9 +1275,9 @@
                     <button onClick={handleClearCards} className="text-xs text-neutral-400 hover:text-white px-2 py-1">Clear cards</button>
                     <button 
                       onClick={handleToggleHide}
-                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded transition-colors ${holeCardsHidden ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/30' : 'bg-neutral-800 text-neutral-400 border border-neutral-700'}`}
+                      className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded transition-colors ${holeCardsHidden ? 'bg-neutral-800 text-neutral-300 border border-neutral-700 hover:border-yellow-500/50 hover:text-yellow-400' : 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/30'}`}
                     >
-                      {holeCardsHidden ? <EyeOff size={14} /> : <Eye size={14} />} {holeCardsHidden ? 'Hidden' : 'Hide'}
+                      {holeCardsHidden ? <Eye size={14} /> : <EyeOff size={14} />} {holeCardsHidden ? 'Show cards' : 'Hide cards'}
                     </button>
                   </div>
                 </div>
@@ -2257,18 +2333,14 @@
             explanation:'T9s is a playable hand from late position, but from UTG you\'ll be out of position all streets against 5+ players. The frustration is irrelevant — every hand is independent. Playing a marginal hand from bad position because you\'re bored or "due" is the exact leak this app is designed to fix. Fold, be patient, wait for position.' },
         ];
 
-        // --- SCREEN: LEARN (Education + Quiz) ---
-        function ScreenLearn() {
-          const [tab, setTab] = useState('learn');
-          // Education state
+        // --- SCREEN: LEARN (Education or Quiz — tab driven by bottom nav) ---
+        function ScreenLearn({ tab, currentQ, setCurrentQ, qSelected, setQSelected, qCatFilter, setQCatFilter }) {
+          // Education state (local — OK to reset on navigation)
           const [search, setSearch] = useState('');
           const [activeCategory, setActiveCategory] = useState('All');
           const [openId, setOpenId] = useState(null);
 
-          // Quiz state — infinite dynamic mode
-          const [qCatFilter, setQCatFilter] = useState('All');
-          const [currentQ, setCurrentQ] = useState(() => generateQuestion('All'));
-          const [qSelected, setQSelected] = useState(null);
+          // Quiz stats persisted to localStorage
           const [quizStats, setQuizStats] = useLocalStorage('pt2_qstats', {
             total:0, correct:0,
             by:{ Math:[0,0], 'Pre-Flop':[0,0], Strategy:[0,0], Discipline:[0,0] }
@@ -2326,25 +2398,21 @@
 
           return (
             <div className="flex flex-col h-full overflow-hidden">
-              {/* Header + sub-tab bar */}
-              <div className="px-5 pt-12 pb-0 border-b border-neutral-800/50 bg-neutral-950 sticky top-0 z-10">
-                <h1 className="text-lg font-medium text-white mb-3">Learn Poker</h1>
-                <div className="flex gap-0 border-b border-neutral-800">
-                  <button
-                    onClick={() => setTab('learn')}
-                    className={`flex-1 py-2.5 text-sm font-semibold border-b-2 transition-all
-                      ${tab === 'learn' ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-neutral-500 hover:text-neutral-300'}`}
-                  >📚 Study</button>
-                  <button
-                    onClick={() => setTab('quiz')}
-                    className={`flex-1 py-2.5 text-sm font-semibold border-b-2 transition-all
-                      ${tab === 'quiz' ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-neutral-500 hover:text-neutral-300'}`}
-                  >🎯 Quiz {quizStats.total > 0 && `${quizStats.correct}/${quizStats.total}`}</button>
-                </div>
+              {/* Header */}
+              <div className="px-5 pt-12 pb-4 border-b border-neutral-800/50 bg-neutral-950 sticky top-0 z-10">
+                {tab === 'education'
+                  ? <h1 className="text-lg font-medium text-white">📚 Study</h1>
+                  : <div className="flex items-baseline gap-2">
+                      <h1 className="text-lg font-medium text-white">🎯 Quiz</h1>
+                      {quizStats.total > 0 && (
+                        <span className="text-sm text-neutral-500 font-mono">{quizStats.correct}/{quizStats.total} correct</span>
+                      )}
+                    </div>
+                }
               </div>
 
               {/* ── STUDY TAB ── */}
-              {tab === 'learn' && (
+              {tab === 'education' && (
                 <div className="flex flex-col flex-1 overflow-hidden">
                   <div className="px-4 pt-3 pb-2 bg-neutral-950">
                     <input
@@ -2417,15 +2485,13 @@
                   <div className="px-4 pt-3 pb-2 bg-neutral-950 border-b border-neutral-800/50">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-2xl font-mono font-black text-yellow-500">{quizStats.correct}</span>
-                        <span className="text-sm text-neutral-500 font-mono">/ {quizStats.total} correct</span>
                         {quizStats.total > 0 && (
-                          <span className={`text-xs font-bold ml-1 ${Math.round(quizStats.correct/quizStats.total*100) >= 70 ? 'text-green-400' : 'text-orange-400'}`}>
-                            ({Math.round(quizStats.correct/quizStats.total*100)}%)
+                          <span className={`text-xs font-bold ${Math.round(quizStats.correct/quizStats.total*100) >= 70 ? 'text-green-400' : 'text-orange-400'}`}>
+                            {Math.round(quizStats.correct/quizStats.total*100)}% accuracy
                           </span>
                         )}
                       </div>
-                      <button onClick={handleResetStats} className="text-[10px] text-neutral-600 hover:text-neutral-400 transition-colors">reset</button>
+                      <button onClick={handleResetStats} className="text-[10px] text-neutral-600 hover:text-neutral-400 transition-colors">reset stats</button>
                     </div>
                     {/* Per-category breakdown */}
                     <div className="flex gap-2 flex-wrap">
