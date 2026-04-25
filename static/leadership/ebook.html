@@ -50,7 +50,7 @@ html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); f
 #toc { flex: 1; overflow-y: auto; overflow-x: hidden; font-size: 12.5px; }
 #toc ol { list-style: none; padding-left: 10px; margin: 0; }
 #toc > ol { padding-left: 0; }
-#toc li { margin: 1px 0; }
+#toc li { margin: 1px 0; position: relative; }
 #toc a {
   display: block; padding: 4px 6px; border-radius: 4px; color: var(--text);
   text-decoration: none; line-height: 1.35;
@@ -58,11 +58,39 @@ html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); f
   min-width: 0;
 }
 #toc a:hover { background: var(--accent-soft); color: var(--accent); }
-#toc a[data-depth="0"] { font-weight: 600; padding: 5px 6px; margin-top: 4px; font-size: 13px; }
-#toc a[data-depth="1"] { font-weight: 500; font-size: 12.5px; }
+#toc a[data-depth="0"] { font-weight: 600; padding: 5px 28px 5px 6px; margin-top: 4px; font-size: 13px; border-radius: 4px; }
+#toc a[data-depth="1"] { font-weight: 500; font-size: 12.5px; padding-right: 24px; }
 #toc a[data-depth="2"] { color: var(--muted); font-size: 12px; }
 #toc a[data-depth="3"] { color: var(--muted); font-size: 11.5px; padding-left: 4px; }
 #toc a.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+/* Collapsible TOC */
+.toc-details { display: block; }
+.toc-details > ol { display: block; }
+
+/* The summary is a small chevron button that floats right inside the li */
+.toc-summary {
+  list-style: none;
+  display: block;
+  position: absolute;
+  top: 0; right: 0;
+  width: 26px; height: 26px;
+  cursor: pointer;
+  background: none; border: none; padding: 0; margin: 0;
+  border-radius: 4px;
+  z-index: 1;
+}
+.toc-summary::-webkit-details-marker { display: none; }
+.toc-summary:hover { background: var(--accent-soft); }
+.toc-summary::after {
+  content: '›';
+  display: flex; align-items: center; justify-content: center;
+  height: 100%; width: 100%;
+  font-size: 13px; color: var(--muted);
+  transition: transform 0.18s ease;
+  transform: rotate(90deg);
+}
+.toc-details:not([open]) > .toc-summary::after { transform: rotate(0deg); }
 
 #controls { display: flex; gap: 5px; flex-wrap: wrap; }
 #controls button {
@@ -230,17 +258,24 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#about-the-contributors" data-depth="0">About the Contributors</a>
 </li>
-<li><a href="#chapter-1-introduction" data-depth="0">Chapter 1 Introduction</a>
+<li><a href="#chapter-1-introduction" data-depth="0" class="has-children">Chapter 1 Introduction</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#leadership-defined" data-depth="1">Leadership Defined</a>
+<li><a href="#leadership-defined" data-depth="1" class="has-children">Leadership Defined</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#ways-of-conceptualizing-leadership" data-depth="2">Ways of Conceptualizing Leadership</a>
 </li>
 <li><a href="#definition-and-components" data-depth="2">Definition and Components</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#leadership-described" data-depth="1">Leadership Described</a>
+<li><a href="#leadership-described" data-depth="1" class="has-children">Leadership Described</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#trait-versus-process-leadership" data-depth="2">Trait Versus Process Leadership</a>
 </li>
@@ -250,17 +285,21 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#leadership-and-coercion" data-depth="2">Leadership and Coercion</a>
 </li>
-<li><a href="#leadership-and-morality" data-depth="2">Leadership and Morality</a>
+<li><a href="#leadership-and-morality" data-depth="2" class="has-children">Leadership and Morality</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#leadership-and-morality" data-depth="3">Leadership Is a Neutral Process</a>
 </li>
 <li><a href="#leadership-and-morality" data-depth="3">Leadership Is a Moral Process</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#leadership-and-management" data-depth="2">Leadership and Management</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#plan-of-the-book" data-depth="1">Plan of the Book</a>
 </li>
@@ -275,10 +314,15 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-1-introduction-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-2-trait-approach" data-depth="0">Chapter 2 Trait Approach</a>
+<li><a href="#chapter-2-trait-approach" data-depth="0" class="has-children">Chapter 2 Trait Approach</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-2-trait-approach-description" data-depth="1">Description</a>
+<li><a href="#chapter-2-trait-approach-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#intelligence" data-depth="2">Intelligence</a>
 </li>
@@ -297,6 +341,7 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#emotional-intelligence" data-depth="2">Emotional Intelligence</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-the-trait-approach-work" data-depth="1">How Does the Trait Approach Work?</a>
 </li>
@@ -306,7 +351,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-2-trait-approach-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-2-trait-approach-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-2-trait-approach-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-2-1-choosing-a-new-director-of-research" data-depth="2">Case 2.1 Choosing a New Director of Research</a>
 </li>
@@ -315,22 +362,33 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-2-3-elon-musk" data-depth="2">Case 2.3 Elon Musk</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-2-trait-approach-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-2-trait-approach-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-2-trait-approach-leadership-instrument" data-depth="2">Leadership Trait Questionnaire (LTQ)</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-2-trait-approach-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-3-skills-approach" data-depth="0">Chapter 3 Skills Approach</a>
+<li><a href="#chapter-3-skills-approach" data-depth="0" class="has-children">Chapter 3 Skills Approach</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-3-skills-approach-description" data-depth="1">Description</a>
+<li><a href="#chapter-3-skills-approach-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#three-skill-approach" data-depth="2">Three-Skill Approach</a>
+<li><a href="#three-skill-approach" data-depth="2" class="has-children">Three-Skill Approach</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#three-skill-approach" data-depth="3">Technical Skills</a>
 </li>
@@ -341,8 +399,11 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#three-skill-approach" data-depth="3">Summary of the Three-Skill Approach</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#skills-model" data-depth="2">Skills Model</a>
+<li><a href="#skills-model" data-depth="2" class="has-children">Skills Model</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#skills-model" data-depth="3">Individual Attributes</a>
 </li>
@@ -355,8 +416,10 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#skills-model" data-depth="3">Summary of the Skills Model</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-the-skills-approach-work" data-depth="1">How Does the Skills Approach Work?</a>
 </li>
@@ -366,7 +429,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-3-skills-approach-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-3-skills-approach-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-3-skills-approach-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-3-1-a-strained-research-team" data-depth="2">Case 3.1 A Strained Research Team</a>
 </li>
@@ -375,20 +440,29 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-3-3-2019-global-teacher-of-the-year-peter-tabichi" data-depth="2">Case 3.3 2019 Global Teacher of the Year: Peter Tabichi</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-3-skills-approach-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-3-skills-approach-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-3-skills-approach-leadership-instrument" data-depth="2">Skills Inventory</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-3-skills-approach-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-4-behavioral-approach" data-depth="0">Chapter 4 Behavioral Approach</a>
+<li><a href="#chapter-4-behavioral-approach" data-depth="0" class="has-children">Chapter 4 Behavioral Approach</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-4-behavioral-approach-description" data-depth="1">Description</a>
+<li><a href="#chapter-4-behavioral-approach-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#task-and-relationship-behaviors" data-depth="2">Task and Relationship Behaviors</a>
 </li>
@@ -396,7 +470,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#task-and-relationship-behaviors" data-depth="2">Relationship Orientation</a>
 </li>
-<li><a href="#historical-background-of-the-behavioral-approach" data-depth="2">Historical Background of the Behavioral Approach</a>
+<li><a href="#historical-background-of-the-behavioral-approach" data-depth="2" class="has-children">Historical Background of the Behavioral Approach</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#historical-background-of-the-behavioral-approach" data-depth="3">The Ohio State Studies</a>
 </li>
@@ -409,10 +485,12 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#historical-background-of-the-behavioral-approach" data-depth="3">Opportunism</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#recent-studies" data-depth="2">Recent Studies</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-the-behavioral-approach-work" data-depth="1">How Does the Behavioral Approach Work?</a>
 </li>
@@ -422,7 +500,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-4-behavioral-approach-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-4-behavioral-approach-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-4-behavioral-approach-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-4-1-a-drill-sergeant-at-first" data-depth="2">Case 4.1 A Drill Sergeant at First</a>
 </li>
@@ -431,26 +511,36 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-4-3-cheer-coach-monica-aldama" data-depth="2">Case 4.3 Cheer Coach Monica Aldama</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-4-behavioral-approach-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-4-behavioral-approach-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-4-behavioral-approach-leadership-instrument" data-depth="2">Leadership Behavior Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-4-behavioral-approach-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-5-situational-approach" data-depth="0">Chapter 5 Situational Approach</a>
+<li><a href="#chapter-5-situational-approach" data-depth="0" class="has-children">Chapter 5 Situational Approach</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-5-situational-approach-description" data-depth="1">Description</a>
+<li><a href="#chapter-5-situational-approach-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#leadership-style" data-depth="2">Leadership Style</a>
 </li>
 <li><a href="#development-level" data-depth="2">Development Level</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-slii-work" data-depth="1">How Does SLII® Work?</a>
 </li>
@@ -460,7 +550,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-5-situational-approach-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-5-situational-approach-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-5-situational-approach-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-5-1-marathon-runners-at-different-levels" data-depth="2">Case 5.1 Marathon Runners at Different Levels</a>
 </li>
@@ -469,22 +561,33 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-5-3-philosophies-of-chinese-leadership" data-depth="2">Case 5.3 Philosophies of Chinese Leadership</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-5-situational-approach-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-5-situational-approach-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-5-situational-approach-leadership-instrument" data-depth="2">SLII® Questionnaire: Sample Items</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-5-situational-approach-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-6-path-goal-theory" data-depth="0">Chapter 6 Path–Goal Theory</a>
+<li><a href="#chapter-6-path-goal-theory" data-depth="0" class="has-children">Chapter 6 Path–Goal Theory</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-6-path-goal-theory-description" data-depth="1">Description</a>
+<li><a href="#chapter-6-path-goal-theory-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-6-path-goal-theory-leader-behaviors" data-depth="2">Leader Behaviors</a>
+<li><a href="#chapter-6-path-goal-theory-leader-behaviors" data-depth="2" class="has-children">Leader Behaviors</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-6-path-goal-theory-description" data-depth="3">Directive Leadership</a>
 </li>
@@ -495,12 +598,14 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-6-path-goal-theory-description" data-depth="3">Achievement-Oriented Leadership</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#follower-characteristics" data-depth="2">Follower Characteristics</a>
 </li>
 <li><a href="#task-characteristics" data-depth="2">Task Characteristics</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-path-goal-theory-work" data-depth="1">How Does Path–Goal Theory Work?</a>
 </li>
@@ -510,7 +615,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-6-path-goal-theory-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-6-path-goal-theory-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-6-path-goal-theory-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-6-1-three-shifts-three-supervisors" data-depth="2">Case 6.1 Three Shifts, Three Supervisors</a>
 </li>
@@ -519,32 +626,45 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-6-3-row-the-boat" data-depth="2">Case 6.3 Row the Boat</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-6-path-goal-theory-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-6-path-goal-theory-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-6-path-goal-theory-leadership-instrument" data-depth="2">Path–Goal Leadership Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-6-path-goal-theory-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-7-leader-member-exchange-theory" data-depth="0">Chapter 7 Leader–Member Exchange Theory</a>
+<li><a href="#chapter-7-leader-member-exchange-theory" data-depth="0" class="has-children">Chapter 7 Leader–Member Exchange Theory</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-7-leader-member-exchange-theory-description" data-depth="1">Description</a>
+<li><a href="#chapter-7-leader-member-exchange-theory-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#early-studies" data-depth="2">Early Studies</a>
 </li>
 <li><a href="#later-studies" data-depth="2">Later Studies</a>
 </li>
-<li><a href="#leadership-development" data-depth="2">Leadership Development</a>
+<li><a href="#leadership-development" data-depth="2" class="has-children">Leadership Development</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-7-leader-member-exchange-theory-description" data-depth="3">Emotions and LMX Development</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-lmx-theory-work" data-depth="1">How Does LMX Theory Work?</a>
 </li>
@@ -554,7 +674,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-7-leader-member-exchange-theory-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-7-leader-member-exchange-theory-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-7-leader-member-exchange-theory-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-7-1-his-team-gets-the-best-assignments" data-depth="2">Case 7.1 His Team Gets the Best Assignments</a>
 </li>
@@ -563,26 +685,37 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-7-3-pixar-creating-space-for-success" data-depth="2">Case 7.3 Pixar: Creating Space for Success</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-7-leader-member-exchange-theory-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-7-leader-member-exchange-theory-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-7-leader-member-exchange-theory-leadership-instrument" data-depth="2">LMX-7 Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-7-leader-member-exchange-theory-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-8-transformational-leadership" data-depth="0">Chapter 8 Transformational Leadership</a>
+<li><a href="#chapter-8-transformational-leadership" data-depth="0" class="has-children">Chapter 8 Transformational Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-8-transformational-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-8-transformational-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#transformational-leadership-defined" data-depth="2">Transformational Leadership Defined</a>
 </li>
 <li><a href="#transformational-leadership-and-charisma" data-depth="2">Transformational Leadership and Charisma</a>
 </li>
-<li><a href="#a-model-of-transformational-leadership" data-depth="2">A Model of Transformational Leadership</a>
+<li><a href="#a-model-of-transformational-leadership" data-depth="2" class="has-children">A Model of Transformational Leadership</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-8-transformational-leadership-description" data-depth="3">Transformational Leadership Factors</a>
 </li>
@@ -593,16 +726,21 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-8-transformational-leadership-description" data-depth="3">Transformational Leadership Measurements</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#other-transformational-perspectives" data-depth="2">Other Transformational Perspectives</a>
+<li><a href="#other-transformational-perspectives" data-depth="2" class="has-children">Other Transformational Perspectives</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-8-transformational-leadership-description" data-depth="3">Bennis and Nanus</a>
 </li>
 <li><a href="#chapter-8-transformational-leadership-description" data-depth="3">Kouzes and Posner</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-8-transformational-leadership-description" data-depth="1">How Does the Transformational Leadership Approach Work?</a>
 </li>
@@ -612,7 +750,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-8-transformational-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-8-transformational-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-8-transformational-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-8-1-the-vision-failed" data-depth="2">Case 8.1 The Vision Failed</a>
 </li>
@@ -621,32 +761,45 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-8-3-grandmothers-and-benches" data-depth="2">Case 8.3 Grandmothers and Benches</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-8-transformational-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-8-transformational-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-8-transformational-leadership-leadership-instrument" data-depth="2">Transformational Leadership Inventory</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-8-transformational-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-9-authentic-leadership" data-depth="0">Chapter 9 Authentic Leadership</a>
+<li><a href="#chapter-9-authentic-leadership" data-depth="0" class="has-children">Chapter 9 Authentic Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-9-authentic-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-9-authentic-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#authentic-leadership-defined" data-depth="2">Authentic Leadership Defined</a>
 </li>
-<li><a href="#approaches-to-authentic-leadership" data-depth="2">Approaches to Authentic Leadership</a>
+<li><a href="#approaches-to-authentic-leadership" data-depth="2" class="has-children">Approaches to Authentic Leadership</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-9-authentic-leadership-description" data-depth="3">Practical Approach</a>
 </li>
 <li><a href="#chapter-9-authentic-leadership-description" data-depth="3">Theoretical Approach</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-authentic-leadership-work" data-depth="1">How Does Authentic Leadership Work?</a>
 </li>
@@ -656,7 +809,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-9-authentic-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-9-authentic-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-9-authentic-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-9-1-am-i-really-a-leader" data-depth="2">Case 9.1 Am I Really a Leader?</a>
 </li>
@@ -665,20 +820,29 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-9-3-the-arena-of-authenticity" data-depth="2">Case 9.3 The Arena of Authenticity</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-9-authentic-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-9-authentic-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-9-authentic-leadership-leadership-instrument" data-depth="2">Authentic Leadership Self-Assessment Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-9-authentic-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-10-servant-leadership" data-depth="0">Chapter 10 Servant Leadership</a>
+<li><a href="#chapter-10-servant-leadership" data-depth="0" class="has-children">Chapter 10 Servant Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-10-servant-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-10-servant-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#servant-leadership-defined" data-depth="2">Servant Leadership Defined</a>
 </li>
@@ -689,8 +853,11 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#building-a-theory-about-servant-leadership" data-depth="2">Building a Theory About Servant Leadership</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#model-of-servant-leadership" data-depth="1">Model of Servant Leadership</a>
+<li><a href="#model-of-servant-leadership" data-depth="1" class="has-children">Model of Servant Leadership</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-10-servant-leadership-antecedent-conditions" data-depth="2">Antecedent Conditions</a>
 </li>
@@ -701,6 +868,7 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#summary-of-the-model-of-servant-leadership" data-depth="2">Summary of the Model of Servant Leadership</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-servant-leadership-work" data-depth="1">How Does Servant Leadership Work?</a>
 </li>
@@ -710,7 +878,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-10-servant-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-10-servant-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-10-servant-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-10-1-global-health-care" data-depth="2">Case 10.1 Global Health Care</a>
 </li>
@@ -719,28 +889,42 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-10-3-energy-to-inspire-the-world" data-depth="2">Case 10.3 Energy to Inspire the World</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-10-servant-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-10-servant-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-10-servant-leadership-leadership-instrument" data-depth="2">Servant Leadership Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-10-servant-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-11-adaptive-leadership" data-depth="0">Chapter 11 Adaptive Leadership</a>
+<li><a href="#chapter-11-adaptive-leadership" data-depth="0" class="has-children">Chapter 11 Adaptive Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-11-adaptive-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-11-adaptive-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#adaptive-leadership-defined" data-depth="2">Adaptive Leadership Defined</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#a-model-of-adaptive-leadership" data-depth="1">A Model of Adaptive Leadership</a>
+<li><a href="#a-model-of-adaptive-leadership" data-depth="1" class="has-children">A Model of Adaptive Leadership</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#situational-challenges" data-depth="2">Situational Challenges</a>
+<li><a href="#situational-challenges" data-depth="2" class="has-children">Situational Challenges</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-11-adaptive-leadership-description" data-depth="3">Technical Challenges</a>
 </li>
@@ -749,12 +933,14 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-11-adaptive-leadership-description" data-depth="3">Adaptive Challenges</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-6-path-goal-theory-leader-behaviors" data-depth="2">Leader Behaviors</a>
 </li>
 <li><a href="#adaptive-work" data-depth="2">Adaptive Work</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-adaptive-leadership-work" data-depth="1">How Does Adaptive Leadership Work?</a>
 </li>
@@ -764,7 +950,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-11-adaptive-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-11-adaptive-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-11-adaptive-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-11-1-silence-stigma-and-mental-illness" data-depth="2">Case 11.1 Silence, Stigma, and Mental Illness</a>
 </li>
@@ -773,28 +961,42 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-11-3-agonizing-options-for-marlboro-college" data-depth="2">Case 11.3 Agonizing Options for Marlboro College</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-11-adaptive-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-11-adaptive-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-11-adaptive-leadership-leadership-instrument" data-depth="2">Adaptive Leadership Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-11-adaptive-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-12-inclusive-leadership" data-depth="0">Chapter 12 Inclusive Leadership</a>
+<li><a href="#chapter-12-inclusive-leadership" data-depth="0" class="has-children">Chapter 12 Inclusive Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-12-inclusive-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-12-inclusive-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#inclusion-defined" data-depth="2">Inclusion Defined</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#a-model-of-inclusive-leadership" data-depth="1">A Model of Inclusive Leadership</a>
+<li><a href="#a-model-of-inclusive-leadership" data-depth="1" class="has-children">A Model of Inclusive Leadership</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-10-servant-leadership-antecedent-conditions" data-depth="2">Antecedent Conditions</a>
+<li><a href="#chapter-10-servant-leadership-antecedent-conditions" data-depth="2" class="has-children">Antecedent Conditions</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-12-inclusive-leadership-description" data-depth="3">Leader Characteristics</a>
 </li>
@@ -803,12 +1005,14 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-12-inclusive-leadership-description" data-depth="3">Organizational Policies and Practices</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#inclusive-leadership-behaviors" data-depth="2">Inclusive Leadership Behaviors</a>
 </li>
 <li><a href="#chapter-10-servant-leadership-outcomes" data-depth="2">Outcomes</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-inclusive-leadership-work" data-depth="1">How Does Inclusive Leadership Work?</a>
 </li>
@@ -816,7 +1020,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-12-inclusive-leadership-criticisms" data-depth="1">Criticisms</a>
 </li>
-<li><a href="#chapter-12-inclusive-leadership-application" data-depth="1">Application</a>
+<li><a href="#chapter-12-inclusive-leadership-application" data-depth="1" class="has-children">Application</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#assessment" data-depth="2">Assessment</a>
 </li>
@@ -825,8 +1031,11 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#support" data-depth="2">Support</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-12-inclusive-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-12-inclusive-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-12-1-difficult-decision" data-depth="2">Case 12.1 Difficult Decision</a>
 </li>
@@ -835,26 +1044,37 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-12-3-inclusive-leadership-during-a-crisis" data-depth="2">Case 12.3 Inclusive Leadership During a Crisis</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-12-inclusive-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-12-inclusive-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-12-inclusive-leadership-leadership-instrument" data-depth="2">Inclusive Leadership Reflection Instrument</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-12-inclusive-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-13-followership" data-depth="0">Chapter 13 Followership</a>
+<li><a href="#chapter-13-followership" data-depth="0" class="has-children">Chapter 13 Followership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-13-followership-description" data-depth="1">Description</a>
+<li><a href="#chapter-13-followership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#followership-defined" data-depth="2">Followership Defined</a>
 </li>
 <li><a href="#role-based-and-relational-based-perspectives" data-depth="2">Role-Based and Relational-Based Perspectives</a>
 </li>
-<li><a href="#typologies-of-followership" data-depth="2">Typologies of Followership</a>
+<li><a href="#typologies-of-followership" data-depth="2" class="has-children">Typologies of Followership</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-13-followership-description" data-depth="3">The Zaleznik Typology</a>
 </li>
@@ -865,16 +1085,22 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-13-followership-description" data-depth="3">The Kellerman Typology</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#theoretical-approaches-to-followership" data-depth="1">Theoretical Approaches to Followership</a>
+<li><a href="#theoretical-approaches-to-followership" data-depth="1" class="has-children">Theoretical Approaches to Followership</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#reversing-the-lens" data-depth="2">Reversing the Lens</a>
 </li>
 <li><a href="#the-leadership-co-created-process" data-depth="2">The Leadership Co-Created Process</a>
 </li>
-<li><a href="#new-perspectives-on-followership" data-depth="2">New Perspectives on Followership</a>
+<li><a href="#new-perspectives-on-followership" data-depth="2" class="has-children">New Perspectives on Followership</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-13-followership-description" data-depth="3">Perspective 1: Followers Get the Job Done</a>
 </li>
@@ -887,8 +1113,11 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-13-followership-description" data-depth="3">Perspective 5: Followers Learn From Leaders</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#followership-and-destructive-leaders" data-depth="2">Followership and Destructive Leaders</a>
+<li><a href="#followership-and-destructive-leaders" data-depth="2" class="has-children">Followership and Destructive Leaders</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-13-followership-description" data-depth="3">1. Our Need for Reassuring Authority Figures</a>
 </li>
@@ -903,8 +1132,10 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#chapter-13-followership-description" data-depth="3">6. Our Fear of Powerlessness to Challenge a Bad Leader</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-followership-work" data-depth="1">How Does Followership Work?</a>
 </li>
@@ -914,7 +1145,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-13-followership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-13-followership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-13-followership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-13-1-bluebird-care" data-depth="2">Case 13.1 Bluebird Care</a>
 </li>
@@ -923,36 +1156,52 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-13-3-penn-state-sexual-abuse-scandal" data-depth="2">Case 13.3 Penn State Sexual Abuse Scandal</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-13-followership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-13-followership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-13-followership-leadership-instrument" data-depth="2">Followership Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-13-followership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-14-gender-and-leadership" data-depth="0">Chapter 14 Gender and Leadership</a>
+<li><a href="#chapter-14-gender-and-leadership" data-depth="0" class="has-children">Chapter 14 Gender and Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-14-gender-and-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-14-gender-and-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#the-glass-ceiling-turned-labyrinth" data-depth="2">The Glass Ceiling Turned Labyrinth</a>
+<li><a href="#the-glass-ceiling-turned-labyrinth" data-depth="2" class="has-children">The Glass Ceiling Turned Labyrinth</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#the-glass-ceiling-turned-labyrinth" data-depth="3">Evidence of the Leadership Labyrinth</a>
 </li>
 <li><a href="#the-glass-ceiling-turned-labyrinth" data-depth="3">Understanding the Labyrinth</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#gender-differences-in-leadership-styles-and" data-depth="1">Gender Differences in Leadership Styles and Effectiveness</a>
+<li><a href="#gender-differences-in-leadership-styles-and" data-depth="1" class="has-children">Gender Differences in Leadership Styles and Effectiveness</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#prejudice" data-depth="2">Navigating the Labyrinth</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-14-gender-and-leadership-strengths" data-depth="1">Strengths</a>
 </li>
@@ -960,7 +1209,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-14-gender-and-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-14-gender-and-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-14-gender-and-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-14-1-the-glass-ceiling" data-depth="2">Case 14.1 The “Glass Ceiling”</a>
 </li>
@@ -969,22 +1220,33 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-14-3-jacinda-ardern-prime-minister-of-new-zealand" data-depth="2">Case 14.3 Jacinda Ardern, Prime Minister of New Zealand</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-14-gender-and-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-14-gender-and-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-14-gender-and-leadership-leadership-instrument" data-depth="2">Gender-Leader Bias Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-14-gender-and-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-15-leadership-ethics" data-depth="0">Chapter 15 Leadership Ethics</a>
+<li><a href="#chapter-15-leadership-ethics" data-depth="0" class="has-children">Chapter 15 Leadership Ethics</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-15-leadership-ethics-description" data-depth="1">Description</a>
+<li><a href="#chapter-15-leadership-ethics-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#ethics-defined" data-depth="2">Ethics Defined</a>
+<li><a href="#ethics-defined" data-depth="2" class="has-children">Ethics Defined</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#ethical-theories" data-depth="3">Level 1. Preconventional Morality</a>
 </li>
@@ -993,6 +1255,7 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#ethical-theories" data-depth="3">Level 3. Postconventional Morality</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#ethical-theories" data-depth="2">Ethical Theories</a>
 </li>
@@ -1004,7 +1267,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#the-dark-side-of-leadership" data-depth="2">The Dark Side of Leadership</a>
 </li>
-<li><a href="#principles-of-ethical-leadership" data-depth="2">Principles of Ethical Leadership</a>
+<li><a href="#principles-of-ethical-leadership" data-depth="2" class="has-children">Principles of Ethical Leadership</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#principles-of-ethical-leadership" data-depth="3">Ethical Leaders Respect Others</a>
 </li>
@@ -1017,8 +1282,10 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#principles-of-ethical-leadership" data-depth="3">Ethical Leaders Build Community</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-15-leadership-ethics-strengths" data-depth="1">Strengths</a>
 </li>
@@ -1026,7 +1293,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-15-leadership-ethics-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-15-leadership-ethics-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-15-leadership-ethics-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-15-1-choosing-a-research-assistant" data-depth="2">Case 15.1 Choosing a Research Assistant</a>
 </li>
@@ -1035,22 +1304,33 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-15-3-ship-shape" data-depth="2">Case 15.3 Ship Shape</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-15-leadership-ethics-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-15-leadership-ethics-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-15-leadership-ethics-leadership-instrument" data-depth="2">Ethical Leadership Style Questionnaire (Short Form)</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-15-leadership-ethics-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-16-team-leadership" data-depth="0">Chapter 16 Team Leadership</a>
+<li><a href="#chapter-16-team-leadership" data-depth="0" class="has-children">Chapter 16 Team Leadership</a>
+<details class="toc-details" data-parent-depth="0">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#chapter-16-team-leadership-description" data-depth="1">Description</a>
+<li><a href="#chapter-16-team-leadership-description" data-depth="1" class="has-children">Description</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
-<li><a href="#team-leadership-model" data-depth="2">Team Leadership Model</a>
+<li><a href="#team-leadership-model" data-depth="2" class="has-children">Team Leadership Model</a>
+<details class="toc-details" data-parent-depth="2">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#team-leadership-model" data-depth="3">Team Effectiveness</a>
 </li>
@@ -1059,8 +1339,10 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#team-leadership-model" data-depth="3">Leadership Actions</a>
 </li>
 </ol>
+</details>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#how-does-the-team-leadership-model-work" data-depth="1">How Does the Team Leadership Model Work?</a>
 </li>
@@ -1070,7 +1352,9 @@ details.image-descriptions p { margin: 8px 0; }
 </li>
 <li><a href="#chapter-16-team-leadership-application" data-depth="1">Application</a>
 </li>
-<li><a href="#chapter-16-team-leadership-case-studies-and-self-assessment" data-depth="1">Case Studies</a>
+<li><a href="#chapter-16-team-leadership-case-studies-and-self-assessment" data-depth="1" class="has-children">Case Studies</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#case-16-1-team-crisis-within-the-gates" data-depth="2">Case 16.1 Team Crisis Within the Gates</a>
 </li>
@@ -1079,16 +1363,21 @@ details.image-descriptions p { margin: 8px 0; }
 <li><a href="#case-16-3-1980-u-s-olympic-hockey-team" data-depth="2">Case 16.3 1980 U.S. Olympic Hockey Team</a>
 </li>
 </ol>
+</details>
 </li>
-<li><a href="#chapter-16-team-leadership-leadership-instrument" data-depth="1">Leadership Instrument</a>
+<li><a href="#chapter-16-team-leadership-leadership-instrument" data-depth="1" class="has-children">Leadership Instrument</a>
+<details class="toc-details" data-parent-depth="1">
+  <summary class="toc-summary" aria-label="Toggle section"></summary>
 <ol class="sub">
 <li><a href="#chapter-16-team-leadership-leadership-instrument" data-depth="2">Team Excellence and Collaborative Team Leader Questionnaire</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#chapter-16-team-leadership-summary" data-depth="1">Summary</a>
 </li>
 </ol>
+</details>
 </li>
 <li><a href="#references" data-depth="0">References</a>
 </li>
@@ -15616,9 +15905,82 @@ details.image-descriptions p { margin: 8px 0; }
     sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
   });
   overlay.addEventListener('click', closeSidebar);
+  // ── Accordion / collapsible TOC ──────────────────────────────────────
+  // DOM layout inside each chapter <li>:
+  //   <li>
+  //     <a href="#chapter-N-..." data-depth="0" class="has-children">Title</a>
+  //     <details class="toc-details" data-parent-depth="0">
+  //       <summary class="toc-summary">…</summary>
+  //       <ol class="sub"> … </ol>
+  //     </details>
+  //   </li>
+  // The <details> is a SIBLING of the <a>, not a parent.
+
+  // Get the <details data-parent-depth="0"> sibling of a link, if any
+  function getSiblingDetails(link) {
+    let node = link.nextElementSibling;
+    while (node) {
+      if (node.tagName === 'DETAILS') return node;
+      node = node.nextElementSibling;
+    }
+    return null;
+  }
+
+  // Get the nearest ancestor <details data-parent-depth="0"> of an element
+  function getAncestorChapterDetails(el) {
+    let node = el.parentElement;
+    while (node && node.id !== 'toc') {
+      if (node.tagName === 'DETAILS' && node.dataset.parentDepth === '0') return node;
+      node = node.parentElement;
+    }
+    return null;
+  }
+
+  // Close all chapter-level details except `keepOpen`
+  function closeOtherChapters(keepOpen) {
+    document.querySelectorAll('.toc-details[data-parent-depth="0"]').forEach(d => {
+      if (d !== keepOpen) d.open = false;
+    });
+  }
+
+  // Open the full chain of <details> ancestors for a given link (accordion at ch level)
+  function openChainTo(link) {
+    // First open the sibling details of this exact link (if it has children)
+    const sibDet = getSiblingDetails(link);
+    if (sibDet) {
+      if (sibDet.dataset.parentDepth === '0') closeOtherChapters(sibDet);
+      sibDet.open = true;
+    }
+    // Then walk up ancestors and open them too
+    let node = link.parentElement;
+    while (node && node.id !== 'toc') {
+      if (node.tagName === 'DETAILS') {
+        if (node.dataset.parentDepth === '0') closeOtherChapters(node);
+        node.open = true;
+      }
+      node = node.parentElement;
+    }
+  }
+
+  // Clicking a TOC link → open its chain
   document.querySelectorAll('#toc a').forEach(a => a.addEventListener('click', () => {
     if (window.innerWidth <= 768) closeSidebar();
+    openChainTo(a);
   }));
+
+  // Clicking the › arrow → toggle that details, accordion at chapter level.
+  // We must prevent the native <details> toggle and handle it ourselves,
+  // otherwise the browser toggles it AND our handler toggles it again (double-flip).
+  document.querySelectorAll('.toc-summary').forEach(summary => {
+    summary.addEventListener('click', e => {
+      e.preventDefault();   // stop browser from toggling <details> natively
+      e.stopPropagation();
+      const details = summary.parentElement;
+      const willOpen = !details.open;
+      if (willOpen && details.dataset.parentDepth === '0') closeOtherChapters(details);
+      details.open = willOpen;
+    });
+  });
 
   // Progress bar
   const progressBar = document.getElementById('progress-bar');
@@ -15646,11 +16008,20 @@ details.image-descriptions p { margin: 8px 0; }
           link.classList.add('active');
           link.scrollIntoView({ block: 'nearest' });
           currentActive = link;
+          // Auto-expand parent details for the active link (accordion)
+          openChainTo(link);
         }
       }
     });
   }, { rootMargin: '-10% 0px -80% 0px' });
   headings.forEach(h => obs.observe(h));
+
+  // On load: if there's a hash, open its parent details chain
+  function openParentDetails(id) {
+    const link = tocByHash.get('#' + id);
+    if (link) openChainTo(link);
+  }
+  if (location.hash) openParentDetails(location.hash.slice(1));
 
   // Bookmarks
   const bookmarks = new Map();
