@@ -317,14 +317,24 @@
 
         // --- PHYSICS CANVAS COMPONENT ---
         // Curated pool of 80 positive emoji — one assigned randomly to each new token
-        // 55 emojis — 13 each for main 4 categories, 3 for other
-        const DISC_EMOJIS_BY_REASON = {
-          fold:  ['🛡️','🧘','☯️','🕉️','🌿','🍃','🌸','🍀','🎋','🌴','🪷','🌾','🧊'],  // patience & discipline
-          call:  ['💎','🔮','🧿','🌊','💫','🦉','🔭','🧠','⚖️','🌐','🔬','🧬','🪬'],  // insight & precision
-          value: ['👑','🏆','🥇','🔥','⚡','💥','⭐','🌟','✨','🎯','💰','🏅','🎖️'],  // power & reward
-          bluff: ['🎭','🃏','🦊','🎩','🌪️','🎪','🧙','🦅','☄️','🐍','🦝','🎬','🌑'],  // cunning & deception
-          other: ['🎉','🥂','🤸'],                                                         // rare catch-all
-        };
+        const DISC_EMOJIS = [
+          // Power & mastery
+          '👑','🏆','🥇','💎','🔱','⚜️','🎖️','🏅','🌟','✨',
+          // Fire & energy
+          '🔥','⚡','💥','☄️','🌪️','🌊','🌈','🌤️','⭐','💫',
+          // Animals — courage & cunning
+          '🦁','🐉','🦅','🦊','🐯','🦋','🦚','🦜','🐺','🦈',
+          // Zen & discipline
+          '🧘','🎯','🪄','🎩','🔮','🧿','☯️','🕉️','🌸','🍀',
+          // Poker / cards / game
+          '🃏','🎰','🎲','♠️','♣️','🂡','🎪','🎭','🎬','🎵',
+          // Mythical & legendary
+          '🦄','🧙','🧜','🧚','🧝','🐲','🧞','🦸','⚔️','🛡️',
+          // Nature & growth
+          '🌿','🌺','🌻','🍃','🎋','🌴','🪸','🌵','🎍','🍁',
+          // Celebration & joy
+          '🎆','🎇','🎊','🎉','🥂','🏄','🤸','🧗','🤺','🥋',
+        ];
 
         // tokens: array of { id, emoji, ... } — persistent objects from localStorage
         function TokenPhysicsArea({ tokens, onAddToken, onRemove, onShake, onTokenTap }) {
@@ -553,6 +563,12 @@
                     💥
                   </button>
                 </div>
+                <button
+                  onClick={onRemove}
+                  className="flex-1 w-full flex items-center justify-center text-neutral-500 hover:bg-neutral-800 active:bg-neutral-700 active:scale-95 transition-all"
+                >
+                  <Minus size={28} />
+                </button>
               </div>
             </div>
           );
@@ -603,16 +619,11 @@
             const total = hands.length;
             const played = hands.filter(h => h.isVPIP).length;
             const vpip = total > 0 ? Math.round((played / total) * 100) : 0;
-            const handsSorted = [...hands].sort((a, b) => (a.ts || 0) - (b.ts || 0));
-            const firstTs = handsSorted.length > 0 ? handsSorted[0].ts : startTime;
-            const lastTs  = handsSorted.length > 0 ? handsSorted[handsSorted.length - 1].ts : Date.now();
-
+            
             const newSession = {
               id: startTime,
-              date: new Date(firstTs).toLocaleDateString(),
-              dateMs: firstTs,
-              firstTs,
-              lastTs,
+              date: new Date(startTime).toLocaleDateString(),
+              dateMs: startTime,
               hands: [...hands],
               totalHands: total,
               vpip,
@@ -831,8 +842,7 @@
 
           const confirmAddToken = () => {
             if (!tokenReason) return;
-            const pool = DISC_EMOJIS_BY_REASON[tokenReason] || DISC_EMOJIS_BY_REASON.other;
-            const emoji = pool[Math.floor(Math.random() * pool.length)];
+            const emoji = DISC_EMOJIS[Math.floor(Math.random() * DISC_EMOJIS.length)];
             const attachedHand = hands.find(h => h.id === tokenHandId) || null;
             const newToken = {
               id: Date.now().toString(36) + Math.random().toString(36).substr(2,4),
@@ -948,11 +958,12 @@
 
                 {/* Discipline Physics Playground */}
                 <div className="mb-2 pl-2 text-[11px] font-bold uppercase tracking-widest text-neutral-500">
-                  Well-Played tokens
+                  🎯 Well-Played tokens — great fold, good call, nice bluff, max value
                 </div>
                 <TokenPhysicsArea
                   tokens={discTokens}
                   onAddToken={openAddTokenModal}
+                  onRemove={() => setDiscTokens(prev => prev.slice(0, -1))}
                   onShake={shakeRef}
                   onTokenTap={(tokenId) => setViewingTokenId(tokenId)}
                 />
@@ -1000,18 +1011,6 @@
                             {h.total > 0 ? `${h.total} chips in` : 'No chips in'}
                           </div>
                         </div>
-                        {h.playRating && (
-                          <div className="flex items-center self-stretch">
-                            <span className="text-[11px] tracking-tight leading-none">
-                              {[1,2,3,4,5].map(n => {
-                                const filledColor = ['text-red-500','text-purple-500','text-neutral-400','text-yellow-400','text-green-400'][h.playRating - 1];
-                                return (
-                                  <span key={n} className={n <= h.playRating ? filledColor : 'text-neutral-700'}>★</span>
-                                );
-                              })}
-                            </span>
-                          </div>
-                        )}
                       </div>
                     ))
                   )}
@@ -1025,7 +1024,7 @@
                   <div className="fixed inset-0 bg-black/85 z-50 flex items-end justify-center">
                     <div className="bg-neutral-900 rounded-t-2xl w-full max-w-md border-t border-neutral-700 pb-8">
                       <div className="p-5 border-b border-neutral-800">
-                        <div className="text-base font-semibold text-white mb-0.5">Well play mate!</div>
+                        <div className="text-base font-semibold text-white mb-0.5">🎯 Great discipline moment!</div>
                         <div className="text-xs text-neutral-500">What made this a well-played hand?</div>
                       </div>
 
@@ -1121,13 +1120,7 @@
                       ) : (
                         <div className="text-center text-xs text-neutral-600 mb-4">No hand attached</div>
                       )}
-                      <div className="flex gap-2">
-                        <button onClick={() => setViewingTokenId(null)} className="flex-1 py-3 rounded-xl border border-neutral-700 text-neutral-300 text-sm font-medium active:scale-95 transition-transform">Close</button>
-                        <button onClick={() => { setDiscTokens(prev => prev.filter(t => t.id !== viewingTokenId)); setViewingTokenId(null); showToast('Token removed'); }}
-                          className="flex-1 py-3 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-sm font-medium active:scale-95 transition-transform">
-                          Delete
-                        </button>
-                      </div>
+                      <button onClick={() => setViewingTokenId(null)} className="w-full py-3 rounded-xl border border-neutral-700 text-neutral-300 text-sm font-medium active:scale-95 transition-transform">Close</button>
                     </div>
                   </div>
                 );
@@ -1186,7 +1179,6 @@
           const [position, setPosition] = useState(initialHand ? (initialHand.position || null) : null);
           const [playRating, setPlayRating] = useState(initialHand ? (initialHand.playRating || null) : null);
           const [isMiracle, setIsMiracle] = useState(initialHand ? (initialHand.isMiracle || false) : false);
-          const [handNote, setHandNote] = useState(initialHand ? (initialHand.note || '') : '');
           
           const [bets, setBets] = useState(initialHand ? {
             preflop: initialHand.bets.preflop.amount || '',
@@ -1270,8 +1262,7 @@
             if (initialHand) {
               setHands(hands.map(h => h.id === initialHand.id ? {
                 ...h, card1, card2, bets: formattedBets, total: totalIn, isVPIP, result,
-                position: position || null, playRating: playRating || null, isMiracle,
-                note: handNote.trim() || null, ts: Date.now()
+                position: position || null, playRating: playRating || null, isMiracle, ts: Date.now()
               } : h));
               showToast(`Hand #${initialHand.num} updated`);
             } else {
@@ -1287,7 +1278,6 @@
                 position: position || null,
                 playRating: playRating || null,
                 isMiracle,
-                note: handNote.trim() || null,
                 ts: Date.now()
               };
               setHands([...hands, newHand]);
@@ -1439,37 +1429,6 @@
                   </div>
                 </div>
 
-                {/* Miracle Call Toggle */}
-                {(() => {
-                  const miraclesUsed = hands.filter(h => h.isMiracle && h.id !== (editingHandId || -1)).length;
-                  const budgetExhausted = !isMiracle && miraclesUsed >= miracleBudget;
-                  return budgetExhausted ? (
-                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-400 flex items-center gap-2">
-                      <span>🎲</span>
-                      <span>Miracle budget exhausted ({miraclesUsed}/{miracleBudget}). Are you sure this is worth it?</span>
-                    </div>
-                  ) : null;
-                })()}
-                <button
-                  onClick={() => setIsMiracle(!isMiracle)}
-                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all
-                    ${isMiracle
-                      ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
-                      : 'bg-neutral-900 border-neutral-800 text-neutral-500'}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🎲</span>
-                    <div className="text-left">
-                      <div className={`text-sm font-medium ${isMiracle ? 'text-orange-400' : 'text-neutral-300'}`}>Miracle call</div>
-                      <div className="text-[10px] text-neutral-500 mt-0.5">Low-odds call — knew it was risky</div>
-                    </div>
-                  </div>
-                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
-                    ${isMiracle ? 'bg-orange-500 border-orange-400' : 'border-neutral-600'}`}>
-                    {isMiracle && <span className="text-black text-xs font-black">✓</span>}
-                  </div>
-                </button>
-
                 {/* Result */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
                   <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Outcome</div>
@@ -1513,17 +1472,36 @@
                   </div>
                 </div>
 
-                {/* Hand Note */}
-                <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
-                  <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Note <span className="normal-case text-neutral-600">(optional)</span></div>
-                  <textarea
-                    value={handNote}
-                    onChange={e => setHandNote(e.target.value)}
-                    placeholder="Any thought about this hand…"
-                    rows={2}
-                    className="w-full bg-neutral-950 border border-neutral-700 rounded-lg px-3 py-2 text-sm text-white placeholder:text-neutral-600 focus:border-yellow-500 outline-none resize-none"
-                  />
-                </div>
+                {/* Miracle Call Toggle */}
+                {(() => {
+                  const miraclesUsed = hands.filter(h => h.isMiracle && h.id !== (editingHandId || -1)).length;
+                  const budgetExhausted = !isMiracle && miraclesUsed >= miracleBudget;
+                  return budgetExhausted ? (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-sm text-red-400 flex items-center gap-2">
+                      <span>🎲</span>
+                      <span>Miracle budget exhausted ({miraclesUsed}/{miracleBudget}). Are you sure this is worth it?</span>
+                    </div>
+                  ) : null;
+                })()}
+                <button
+                  onClick={() => setIsMiracle(!isMiracle)}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all
+                    ${isMiracle
+                      ? 'bg-orange-500/10 border-orange-500/40 text-orange-400'
+                      : 'bg-neutral-900 border-neutral-800 text-neutral-500'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">🎲</span>
+                    <div className="text-left">
+                      <div className={`text-sm font-medium ${isMiracle ? 'text-orange-400' : 'text-neutral-300'}`}>Miracle call</div>
+                      <div className="text-[10px] text-neutral-500 mt-0.5">Low-odds call — knew it was risky</div>
+                    </div>
+                  </div>
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all
+                    ${isMiracle ? 'bg-orange-500 border-orange-400' : 'border-neutral-600'}`}>
+                    {isMiracle && <span className="text-black text-xs font-black">✓</span>}
+                  </div>
+                </button>
 
                 {/* Actions */}
                 <div className="mt-6 flex flex-col gap-3">
@@ -1654,46 +1632,23 @@
 
         // --- SCREEN: SESSIONS (Archive) ---
         function ScreenSessions({ sessions, setSessions, showToast }) {
-          const [openIds, setOpenIds] = useState(new Set());
-          const [viewingHand, setViewingHand] = useState(null);
-
-          const toggleOpen = (idx) => {
-            setOpenIds(prev => {
-              const next = new Set(prev);
-              next.has(idx) ? next.delete(idx) : next.add(idx);
-              return next;
-            });
-          };
+          const [openId, setOpenId] = useState(null);
 
           const deleteSession = (e, sessionId) => {
             e.stopPropagation();
             if (!window.confirm('Delete this session? Data will be lost.')) return;
             setSessions(sessions.filter(s => s.id !== sessionId));
+            setOpenId(null);
             showToast('Session deleted');
           };
 
           const getHeatmapColor = (h) => {
-            if (h.result === 'skip') return 'bg-neutral-900 border-neutral-800';
-            if (!h.isVPIP)          return 'bg-slate-900 border-slate-800';
-            if (h.result === 'won') return 'bg-green-950 border-green-900';
-            if (h.result === 'lost') return 'bg-red-950 border-red-900';
-            return 'bg-orange-950/60 border-orange-900/50';
+            if (h.result === 'skip') return 'bg-neutral-900 border-neutral-800';          // skip — no VPIP
+            if (!h.isVPIP)          return 'bg-slate-900 border-slate-800';               // non-VPIP fold
+            if (h.result === 'won') return 'bg-green-950 border-green-900';               // VPIP won
+            if (h.result === 'lost') return 'bg-red-950 border-red-900';                  // VPIP lost
+            return 'bg-orange-950/60 border-orange-900/50';                               // VPIP fold
           };
-
-          const fmtTime = (ts) => {
-            if (!ts) return '—';
-            const d = new Date(ts);
-            return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          };
-
-          const fmtDuration = (a, b) => {
-            if (!a || !b) return null;
-            const mins = Math.round((b - a) / 60000);
-            if (mins < 60) return `${mins}m`;
-            return `${Math.floor(mins/60)}h ${mins%60}m`;
-          };
-
-          const STAR_COLOR = ['','text-red-500','text-purple-500','text-neutral-400','text-yellow-400','text-green-400'];
 
           return (
             <div className="flex flex-col h-full overflow-hidden">
@@ -1710,24 +1665,20 @@
                   </div>
                 ) : (
                   sessions.map((s, idx) => {
-                    const isOpen = openIds.has(idx);
+                    const isOpen = openId === idx;
                     const vpipColor = s.vpip <= 30 ? 'text-green-500' : s.vpip <= 50 ? 'text-yellow-500' : 'text-red-500';
                     const pnlColor = s.pnl >= 0 ? 'text-green-500' : 'text-red-500';
-                    const dur = fmtDuration(s.firstTs, s.lastTs);
 
                     return (
-                      <div key={s.id} className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-                        <button
-                          onClick={() => toggleOpen(idx)}
+                      <div key={s.id} className="bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden transition-all">
+                        <button 
+                          onClick={() => setOpenId(isOpen ? null : idx)}
                           className="w-full p-4 flex items-center justify-between hover:bg-neutral-800/50 transition-colors text-left"
                         >
                           <div>
                             <div className="font-medium text-white">{s.date}</div>
-                            <div className="text-[11px] text-neutral-500 font-mono mt-1 flex items-center gap-2 flex-wrap">
-                              <span>{s.totalHands} hands</span>
-                              {s.firstTs && <span>· {fmtTime(s.firstTs)}–{fmtTime(s.lastTs)}</span>}
-                              {dur && <span>· {dur}</span>}
-                              <span>· ★{s.discTokens || 0}</span>
+                            <div className="text-[11px] text-neutral-500 font-mono mt-1">
+                              {s.totalHands} hands · ★{s.discTokens || 0} discipline
                             </div>
                           </div>
                           <div className="flex items-center gap-4">
@@ -1743,15 +1694,14 @@
                           <div className="p-4 pt-0 border-t border-neutral-800 bg-neutral-950/50">
                             <div className="mt-4 mb-3 flex flex-wrap gap-1">
                               {(s.hands || []).map((h, i) => (
-                                <button
-                                  key={i}
-                                  onClick={() => setViewingHand(h)}
-                                  title={`Hand #${h.num}`}
-                                  className={`w-[22px] h-[22px] rounded-[3px] border ${getHeatmapColor(h)} active:scale-90 transition-transform cursor-pointer`}
-                                />
+                                <div 
+                                  key={i} 
+                                  title={`Hand #${h.num}: ${h.result === 'skip' ? 'Skip' : h.isVPIP ? 'VPIP' : 'Fold'} - ${h.result}`}
+                                  className={`w-[18px] h-[18px] rounded-[3px] border ${getHeatmapColor(h)}`}
+                                ></div>
                               ))}
                             </div>
-
+                            
                             {(() => {
                               const hs = s.hands || [];
                               const counts = {
@@ -1770,7 +1720,7 @@
                               );
                             })()}
 
-                            <button
+                            <button 
                               onClick={(e) => deleteSession(e, s.id)}
                               className="flex items-center gap-2 text-xs text-red-500 bg-red-500/10 border border-red-500/20 px-3 py-2 rounded hover:bg-red-500/20 transition-colors"
                             >
@@ -1783,89 +1733,6 @@
                   })
                 )}
               </div>
-
-              {/* Hand detail modal */}
-              {viewingHand && (() => {
-                const h = viewingHand;
-                const resultColor = h.result === 'won' ? 'text-green-400' : h.result === 'lost' ? 'text-red-400' : h.result === 'fold' ? 'text-orange-400' : 'text-neutral-400';
-                const resultLabel = h.result === 'won' ? 'Won' : h.result === 'lost' ? 'Lost' : h.result === 'fold' ? 'Fold' : 'Skip';
-                const starColor = h.playRating ? STAR_COLOR[h.playRating] : '';
-                return (
-                  <div className="fixed inset-0 bg-black/80 z-50 flex items-end justify-center" onClick={() => setViewingHand(null)}>
-                    <div className="bg-neutral-900 rounded-t-2xl w-full max-w-md border-t border-neutral-700 pb-8 p-5" onClick={e => e.stopPropagation()}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="text-base font-semibold text-white">Hand #{h.num}</div>
-                        <button onClick={() => setViewingHand(null)} className="text-neutral-500 hover:text-white transition-colors text-xl leading-none">×</button>
-                      </div>
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className="flex gap-2">
-                          {h.card1 ? (
-                            <div className={`w-10 h-14 rounded-lg border font-mono text-sm font-bold flex flex-col items-center justify-center gap-0.5 ${['♥','♦'].includes(h.card1.suit) ? 'text-red-400 bg-neutral-800 border-neutral-600' : 'text-white bg-neutral-800 border-neutral-600'}`}>
-                              <span>{h.card1.rank}</span><span>{h.card1.suit}</span>
-                            </div>
-                          ) : <div className="w-10 h-14 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center text-neutral-600 text-xl">?</div>}
-                          {h.card2 ? (
-                            <div className={`w-10 h-14 rounded-lg border font-mono text-sm font-bold flex flex-col items-center justify-center gap-0.5 ${['♥','♦'].includes(h.card2.suit) ? 'text-red-400 bg-neutral-800 border-neutral-600' : 'text-white bg-neutral-800 border-neutral-600'}`}>
-                              <span>{h.card2.rank}</span><span>{h.card2.suit}</span>
-                            </div>
-                          ) : <div className="w-10 h-14 rounded-lg border border-neutral-700 bg-neutral-800 flex items-center justify-center text-neutral-600 text-xl">?</div>}
-                        </div>
-                        <div>
-                          <div className={`text-lg font-bold ${resultColor}`}>{resultLabel}</div>
-                          <div className="flex items-center gap-2 mt-1">
-                            {h.isVPIP && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-yellow-500/10 text-yellow-500">VPIP</span>}
-                            {h.position && <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400">{h.position}</span>}
-                            {h.isMiracle && <span className="text-[10px] text-orange-400">🎲 miracle</span>}
-                          </div>
-                        </div>
-                        {h.playRating && (
-                          <div className={`ml-auto text-sm tracking-tight ${starColor}`}>
-                            {[1,2,3,4,5].map(n => <span key={n}>{n <= h.playRating ? '★' : '☆'}</span>)}
-                          </div>
-                        )}
-                      </div>
-                      {/* Streets */}
-                      {h.bets && (() => {
-                        const streets = [
-                          { id: 'preflop', label: 'Pre-flop', color: 'text-yellow-500' },
-                          { id: 'flop',    label: 'Flop',     color: 'text-cyan-400'   },
-                          { id: 'turn',    label: 'Turn',     color: 'text-purple-400' },
-                          { id: 'river',   label: 'River',    color: 'text-green-500'  },
-                        ];
-                        const active = streets.filter(s => h.bets[s.id] && (h.bets[s.id].amount > 0));
-                        if (active.length === 0 && h.total === 0) return null;
-                        return (
-                          <div className="bg-neutral-800 rounded-xl p-3 mb-3 border border-neutral-700">
-                            <div className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">Streets</div>
-                            {active.length === 0 ? (
-                              <div className="text-xs text-neutral-600 font-mono">No chips committed</div>
-                            ) : (
-                              <div className="flex flex-col gap-1.5">
-                                {active.map(s => (
-                                  <div key={s.id} className="flex items-center justify-between">
-                                    <span className={`text-xs font-medium ${s.color}`}>{s.label}</span>
-                                    <span className="text-xs font-mono text-white">{h.bets[s.id].amount} chips</span>
-                                  </div>
-                                ))}
-                                {active.length > 1 && (
-                                  <div className="border-t border-neutral-700 mt-1 pt-1.5 flex items-center justify-between">
-                                    <span className="text-xs text-neutral-500">Total</span>
-                                    <span className="text-xs font-mono font-semibold text-yellow-400">{h.total} chips</span>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })()}
-                      {/* Note */}
-                      {h.note && (
-                        <div className="bg-neutral-800 rounded-lg px-3 py-2 text-sm text-neutral-300 italic border border-neutral-700">"{h.note}"</div>
-                      )}
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
           );
         }
@@ -1968,7 +1835,7 @@
                   </div>
                   <div className="bg-neutral-900 p-4 rounded-xl border border-neutral-800 text-center">
                     <div className="text-3xl font-mono font-medium text-yellow-500">{lifetimeDisc}</div>
-                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">★ Tokens</div>
+                    <div className="text-[10px] text-neutral-500 uppercase tracking-widest mt-1">★ Discipline</div>
                   </div>
                   {avgRating && (
                     <div className="bg-neutral-900 p-4 rounded-xl border border-neutral-800 text-center">
