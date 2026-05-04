@@ -1168,6 +1168,114 @@
         }
 
         // --- SCREEN: ADD HAND ---
+        function HandStrengthMeter({ card1, card2, position, stack, preflopBet }) {
+          if (!card1 || !card2) return null;
+
+          const RV = {'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,'9':9,'T':10,'J':11,'Q':12,'K':13,'A':14};
+          const r1 = RV[card1.rank]||0, r2 = RV[card2.rank]||0;
+          const hi = Math.max(r1,r2), lo = Math.min(r1,r2);
+          const isPair = r1===r2, isSuited = card1.suit===card2.suit, gap = hi-lo;
+
+          let base;
+          if (isPair) {
+            if (hi===14) base=10; else if (hi===13) base=9.5; else if (hi===12) base=9;
+            else if (hi===11) base=8.5; else if (hi===10) base=7.5; else if (hi===9) base=6.5;
+            else if (hi===8) base=5.5; else if (hi===7) base=4.5; else if (hi===6) base=3.5;
+            else if (hi===5) base=3.0; else base=2.5;
+          } else if (hi===14) {
+            if (lo===13)      base=isSuited?9.5:8.5;
+            else if (lo===12) base=isSuited?8.0:7.0;
+            else if (lo===11) base=isSuited?7.5:6.0;
+            else if (lo===10) base=isSuited?6.5:5.0;
+            else if (lo>=7)   base=isSuited?5.0:3.0;
+            else              base=isSuited?4.0:2.0;
+          } else if (hi===13) {
+            if (lo===12)      base=isSuited?7.5:6.0;
+            else if (lo===11) base=isSuited?6.5:5.0;
+            else if (lo===10) base=isSuited?5.5:4.0;
+            else if (lo>=7)   base=isSuited?4.0:2.5;
+            else              base=isSuited?3.0:1.5;
+          } else if (hi===12) {
+            if (lo===11)      base=isSuited?6.5:5.0;
+            else if (lo===10) base=isSuited?5.5:4.0;
+            else if (lo===9)  base=isSuited?5.0:3.5;
+            else              base=isSuited?3.5:2.0;
+          } else if (hi===11) {
+            if (lo===10)      base=isSuited?6.0:4.5;
+            else if (lo===9)  base=isSuited?5.5:3.5;
+            else if (lo===8)  base=isSuited?5.0:3.0;
+            else              base=isSuited?3.5:1.5;
+          } else {
+            // T and below — offsuit disconnected hands are genuinely trash
+            if (gap===1)      base=isSuited?5.5:3.5;
+            else if (gap===2) base=isSuited?4.5:2.5;
+            else if (gap===3) base=isSuited?4.0:2.0;
+            else              base=isSuited?2.5:0.5;  // gap>=4: offsuit junk = near-zero
+          }
+
+          // Tightened position mods — position can't rescue genuinely bad hands
+          const POS_MOD = {BTN:0.8, CO:0.5, HJ:0.3, MP:0, UTG:-0.8, SB:-0.7, BB:0.1};
+          const posMod  = position ? (POS_MOD[position]||0) : 0;
+          const rawScore = base + posMod;
+
+          // Preflop call cost penalty — larger calls make weak hands unplayable
+          // Uses default stack of 200 if not entered (our cash game default)
+          const stackN  = parseFloat(stack) || 200;
+          const betN    = parseFloat(preflopBet) || 0;
+          const callPct = betN / stackN;
+          // Penalty grows with call size × hand weakness; premium hands barely affected
+          const betPenalty = callPct > 0 ? callPct * Math.max(0, 9 - rawScore) * 0.45 : 0;
+
+          const score = Math.max(0, Math.min(10, rawScore - betPenalty));
+
+          const TIERS = [
+            {min:9,   emoji:'🌋', label:'Monster',       color:'text-red-400',     bar:'bg-red-500',     segs:5, bg:'from-red-950/40',     border:'border-red-900/50'},
+            {min:7,   emoji:'🔥', label:'Premium',       color:'text-orange-400',  bar:'bg-orange-500',  segs:4, bg:'from-orange-950/40', border:'border-orange-900/50'},
+            {min:5,   emoji:'⚡', label:'Strong',        color:'text-yellow-400',  bar:'bg-yellow-500',  segs:3, bg:'from-yellow-950/30', border:'border-yellow-900/50'},
+            {min:3,   emoji:'🎯', label:'Playable',      color:'text-green-400',   bar:'bg-green-500',   segs:2, bg:'from-green-950/30',  border:'border-green-900/50'},
+            {min:1.5, emoji:'🎲', label:'Speculative',   color:'text-blue-400',    bar:'bg-blue-500',    segs:1, bg:'from-blue-950/30',   border:'border-blue-900/50'},
+            {min:0,   emoji:'💀', label:'Fold Territory',color:'text-neutral-500', bar:'bg-neutral-700', segs:0, bg:'from-neutral-900',   border:'border-neutral-800'},
+          ];
+          const tier = TIERS.find(t => score >= t.min) || TIERS[TIERS.length-1];
+
+          // Display — callPct already computed above, reuse it
+          const committed = betN > 0 ? Math.round(callPct * 100) : null;
+          // >20% = premium-raise territory (~40 chips), >10% = strong raise (~20 chips)
+          const committedColor = committed >= 20 ? 'text-red-400 bg-red-500/10' : committed >= 10 ? 'text-orange-400 bg-orange-500/10' : 'text-neutral-400 bg-neutral-800';
+
+          const glowStyle = score>=9
+            ? {filter:'drop-shadow(0 0 10px rgba(239,68,68,0.7))'}
+            : score>=7 ? {filter:'drop-shadow(0 0 7px rgba(249,115,22,0.6))'} : {};
+
+          return (
+            <div className={`bg-gradient-to-b ${tier.bg} to-neutral-900 rounded-xl p-4 border ${tier.border} transition-all duration-300`}>
+              <div className="flex items-center gap-4">
+                <div className="text-4xl select-none leading-none" style={glowStyle}>{tier.emoji}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <span className={`text-sm font-bold ${tier.color}`}>{tier.label}</span>
+                    {position && (
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded font-semibold ${posMod>0?'bg-green-500/15 text-green-400':posMod<0?'bg-red-500/15 text-red-400':'bg-neutral-800 text-neutral-400'}`}>
+                        {posMod>0?'↑':posMod<0?'↓':'→'} {position}
+                      </span>
+                    )}
+                    {committed!==null && (
+                      <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ml-auto ${committedColor}`}>
+                        {committed}% stk
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex gap-1">
+                    {[1,2,3,4,5].map(n=>(
+                      <div key={n} className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${n<=tier.segs?tier.bar:'bg-neutral-800'}`}/>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        }
+
         function ScreenAddHand({ hands, setHands, navigate, showToast, editingHandId, miracleBudget = 3 }) {
           const initialHand = editingHandId ? hands.find(h => h.id === editingHandId) : null;
 
@@ -1187,6 +1295,7 @@
           const [playRating, setPlayRating] = useState(initialHand ? (initialHand.playRating || null) : null);
           const [isMiracle, setIsMiracle] = useState(initialHand ? (initialHand.isMiracle || false) : false);
           const [handNote, setHandNote] = useState(initialHand ? (initialHand.note || '') : '');
+          const [stack, setStack] = useState(initialHand ? (initialHand.stack || '') : '');
           
           const [bets, setBets] = useState(initialHand ? {
             preflop: initialHand.bets.preflop.amount || '',
@@ -1271,7 +1380,7 @@
               setHands(hands.map(h => h.id === initialHand.id ? {
                 ...h, card1, card2, bets: formattedBets, total: totalIn, isVPIP, result,
                 position: position || null, playRating: playRating || null, isMiracle,
-                note: handNote.trim() || null, ts: Date.now()
+                note: handNote.trim() || null, stack: parseFloat(stack) || null, ts: Date.now()
               } : h));
               showToast(`Hand #${initialHand.num} updated`);
             } else {
@@ -1288,6 +1397,7 @@
                 playRating: playRating || null,
                 isMiracle,
                 note: handNote.trim() || null,
+                stack: parseFloat(stack) || null,
                 ts: Date.now()
               };
               setHands([...hands, newHand]);
@@ -1344,9 +1454,21 @@
               </div>
 
               <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 pb-12 space-y-4">
-                {/* Position Picker */}
+                {/* Position + Stack */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50">
-                  <div className="text-[11px] uppercase tracking-widest text-neutral-500 mb-3">Your Position</div>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="text-[11px] uppercase tracking-widest text-neutral-500">Position</div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-neutral-600 uppercase tracking-widest">Stack</span>
+                      <input
+                        type="number"
+                        placeholder="200"
+                        value={stack}
+                        onChange={e => setStack(e.target.value)}
+                        className="w-16 bg-neutral-950 border border-neutral-700 rounded px-2 py-1 text-white font-mono text-xs focus:border-yellow-500 outline-none placeholder:text-neutral-700 text-right"
+                      />
+                    </div>
+                  </div>
                   <div className="grid grid-cols-6 gap-1.5">
                     {POSITIONS.map(pos => (
                       <button
@@ -1410,6 +1532,9 @@
                     <span className="text-[10px] text-neutral-600">Tap a card to peek</span>
                   </div>
                 </div>
+
+                {/* Hand Strength Meter */}
+                <HandStrengthMeter card1={card1} card2={card2} position={position} stack={stack} preflopBet={bets.preflop} />
 
                 {/* Betting section */}
                 <div className="bg-neutral-900 rounded-xl p-4 border border-neutral-800/50 space-y-3">
@@ -1824,6 +1949,10 @@
                           </div>
                         )}
                       </div>
+                      {/* Stack */}
+                      {h.stack && (
+                        <div className="text-xs text-neutral-500 font-mono mb-3">Stack before hand: <span className="text-white">{h.stack} chips</span></div>
+                      )}
                       {/* Streets */}
                       {h.bets && (() => {
                         const streets = [
