@@ -1,0 +1,2463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poker Pool</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --color-felt: #1a6b3c;
+  --color-rail: #5a3a1a;
+  --color-rail-top: #7a5a3a;
+  --color-pocket-valid: #34c759;
+  --color-pocket-invalid: #ff453a;
+  --color-pocket-unclaimed: #f0c040;
+  --color-pocket-wild: #ffd700;
+  --color-bg: #1a1a2e;
+  --color-hud-bg: rgba(20,20,40,0.95);
+  --color-text: #e0e0e0;
+  --color-accent: #4fc3f7;
+  --color-p1: #4fc3f7;
+  --color-p2: #ff8a65;
+  --hud-height: 80px;
+  --motion-fast: 140ms;
+  --motion-normal: 300ms;
+}
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--color-bg); font-family: 'Segoe UI', system-ui, sans-serif; color: var(--color-text); }
+#game-container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+#hud-top { height: var(--hud-height); background: var(--color-hud-bg); display: flex; align-items: center; padding: 0 16px; border-bottom: 2px solid rgba(255,255,255,0.1); justify-content: space-between; }
+#hud-bottom { height: var(--hud-height); background: var(--color-hud-bg); display: flex; align-items: center; padding: 0 16px; border-top: 2px solid rgba(255,255,255,0.1); justify-content: space-between; }
+#phaser-mount { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+#phaser-mount canvas { display: block; }
+.player-section { display: flex; align-items: center; gap: 12px; flex: 1; }
+.player-section.right { justify-content: flex-end; }
+.player-name { font-weight: 700; font-size: 15px; min-width: 60px; }
+.player-name.active { color: var(--color-accent); text-shadow: 0 0 8px var(--color-accent); }
+.player-name.p1 { color: var(--color-p1); }
+.player-name.p2 { color: var(--color-p2); }
+.hand-cards { display: flex; gap: 4px; }
+.mini-card { width: 36px; height: 50px; background: #fff; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid #ccc; color: #333; line-height: 1.1; }
+.mini-card.red { color: #d32f2f; }
+.mini-card.black { color: #222; }
+.mini-card.empty { background: rgba(255,255,255,0.1); border: 2px dashed rgba(255,255,255,0.2); }
+.miss-pips { display: flex; gap: 4px; margin: 0 8px; }
+.miss-pip { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #888; background: transparent; transition: all var(--motion-fast); }
+.miss-pip.filled { background: #ff453a; border-color: #ff453a; }
+.miss-pip.warning { animation: pip-pulse 0.5s ease infinite alternate; }
+@keyframes pip-pulse { to { transform: scale(1.3); box-shadow: 0 0 8px #ff453a; } }
+.best-hand { font-size: 11px; color: #aaa; min-width: 80px; }
+.phase-indicator { font-size: 12px; padding: 4px 10px; border-radius: 12px; background: rgba(255,255,255,0.1); }
+.controls-bar { display: flex; gap: 8px; align-items: center; }
+.btn { padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all var(--motion-fast); }
+.btn:hover { filter: brightness(1.2); }
+.btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-primary { background: var(--color-accent); color: #000; }
+.btn-secondary { background: rgba(255,255,255,0.15); color: var(--color-text); }
+.btn-danger { background: #ff453a; color: #fff; }
+.btn-rules { background: rgba(255,255,255,0.1); color: var(--color-accent); font-size: 16px; width: 32px; height: 32px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; }
+.power-meter { width: 100px; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden; display: none; }
+.power-meter.visible { display: block; }
+.power-fill { height: 100%; background: linear-gradient(90deg, #4fc3f7, #ff8a65, #ff453a); transition: width 50ms; border-radius: 5px; }
+.turn-indicator { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); padding: 4px 16px; border-radius: 12px; font-size: 13px; font-weight: 600; z-index: 10; pointer-events: none; }
+.stand-countdown { font-size: 12px; padding: 4px 10px; border-radius: 12px; background: rgba(255,165,0,0.3); color: #ffa500; display: none; }
+.stand-countdown.visible { display: inline-block; }
+
+/* Modals */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 100; }
+.modal-overlay.visible { display: flex; }
+.modal { background: #2a2a4a; border-radius: 16px; padding: 24px; min-width: 320px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.modal h2 { font-size: 20px; margin-bottom: 16px; text-align: center; }
+.modal h3 { font-size: 16px; margin-bottom: 8px; }
+.suit-options { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.suit-btn { width: 64px; height: 80px; border: 3px solid rgba(255,255,255,0.2); border-radius: 12px; background: rgba(255,255,255,0.05); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 28px; transition: all var(--motion-fast); }
+.suit-btn:hover { border-color: var(--color-accent); background: rgba(79,195,247,0.15); transform: scale(1.05); }
+.suit-btn:disabled { opacity: 0.25; cursor: not-allowed; transform: none; }
+.suit-btn .suit-label { font-size: 11px; margin-top: 4px; }
+.swap-cards { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 16px 0; }
+.swap-card { width: 56px; height: 78px; background: #fff; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; border: 3px solid #ccc; cursor: pointer; transition: all var(--motion-fast); color: #333; }
+.swap-card:hover { border-color: #ff453a; transform: translateY(-4px); }
+.swap-card.selected { border-color: #ff453a; background: #ffe0e0; }
+.swap-card.red { color: #d32f2f; }
+.swap-card.new-card { box-shadow: 0 0 12px rgba(79,195,247,0.5); border-color: var(--color-accent); }
+.showdown-hands { display: flex; gap: 24px; justify-content: center; margin: 16px 0; }
+.showdown-player { text-align: center; }
+.showdown-player h3 { margin-bottom: 8px; }
+.showdown-player .hand-rank { font-size: 14px; color: var(--color-accent); margin-top: 4px; }
+.winner-text { text-align: center; font-size: 22px; font-weight: 700; margin: 16px 0; }
+.winner-text.p1 { color: var(--color-p1); }
+.winner-text.p2 { color: var(--color-p2); }
+.modal-actions { display: flex; gap: 8px; justify-content: center; margin-top: 16px; }
+.wildcard-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 12px 0; }
+.wc-option { padding: 8px 4px; border: 2px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.05); cursor: pointer; text-align: center; font-size: 14px; font-weight: 600; transition: all var(--motion-fast); }
+.wc-option:hover { border-color: var(--color-accent); background: rgba(79,195,247,0.15); }
+.wc-option.selected { border-color: var(--color-accent); background: rgba(79,195,247,0.25); }
+.wc-option:disabled, .wc-option.disabled { opacity: 0.2; cursor: not-allowed; pointer-events: none; }
+.wc-option.red { color: #ff6b6b; }
+
+/* Rules Panel */
+#rules-panel { position: fixed; right: -420px; top: 0; bottom: 0; width: 400px; background: #2a2a4a; z-index: 200; transition: right var(--motion-normal); box-shadow: -4px 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+#rules-panel.open { right: 0; }
+.rules-header { padding: 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.rules-tabs { display: flex; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.rules-tab { flex: 1; padding: 10px 8px; text-align: center; font-size: 12px; cursor: pointer; border: none; background: transparent; color: #888; font-weight: 600; transition: all var(--motion-fast); }
+.rules-tab.active { color: var(--color-accent); border-bottom: 2px solid var(--color-accent); }
+.rules-content { flex: 1; overflow-y: auto; padding: 16px; font-size: 13px; line-height: 1.6; }
+.rules-content h3 { color: var(--color-accent); margin: 12px 0 6px; font-size: 14px; }
+.rules-content p { margin-bottom: 8px; }
+.rules-content .rank-list { list-style: none; }
+.rules-content .rank-list li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.rules-content .rank-list li strong { color: var(--color-accent); }
+#rules-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 199; display: none; }
+#rules-backdrop.visible { display: block; }
+
+/* Coin Flip */
+.coin-flip-container { text-align: center; }
+.coin { width: 80px; height: 80px; border-radius: 50%; background: linear-gradient(135deg, #ffd700, #ffaa00); margin: 20px auto; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; color: #5a3a1a; animation: coin-spin 0.15s linear infinite; }
+@keyframes coin-spin { 0% { transform: scaleX(1); } 50% { transform: scaleX(0.1); } 100% { transform: scaleX(1); } }
+.coin.stopped { animation: none; }
+
+/* BIH indicator */
+.bih-indicator { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 8px 20px; background: rgba(79,195,247,0.9); color: #000; border-radius: 8px; font-weight: 600; font-size: 14px; z-index: 20; pointer-events: none; display: none; }
+
+/* Debug Panel */
+#debug-panel { position: fixed; left: 0; top: 0; bottom: 0; width: 300px; background: rgba(20,20,40,0.97); z-index: 300; overflow-y: auto; padding: 16px; font-size: 12px; display: none; border-right: 2px solid rgba(255,255,255,0.1); }
+#debug-panel.open { display: block; }
+#debug-panel h3 { color: var(--color-accent); margin: 12px 0 6px; font-size: 13px; }
+.debug-row { display: flex; align-items: center; justify-content: space-between; margin: 4px 0; }
+.debug-row label { flex: 1; }
+.debug-row input[type="range"] { width: 100px; }
+.debug-row .val { width: 40px; text-align: right; font-family: monospace; }
+.debug-btn { padding: 4px 10px; margin: 2px; font-size: 11px; }
+</style>
+</head>
+<body>
+<div id="game-container">
+  <div id="hud-top">
+    <div class="player-section">
+      <span class="player-name p2" id="p2-name">Player 2</span>
+      <div class="miss-pips" id="p2-pips"><div class="miss-pip"></div><div class="miss-pip"></div><div class="miss-pip"></div></div>
+      <div class="hand-cards" id="p2-hand"></div>
+      <div class="best-hand" id="p2-best"></div>
+    </div>
+    <div class="player-section right">
+      <span class="phase-indicator" id="phase-label">Setup</span>
+      <span class="stand-countdown" id="stand-countdown"></span>
+      <button class="btn btn-rules" id="btn-rules" title="Rules">?</button>
+    </div>
+  </div>
+  <div id="phaser-mount">
+    <div class="bih-indicator" id="bih-indicator">Click to place cue ball</div>
+  </div>
+  <div id="hud-bottom">
+    <div class="player-section">
+      <span class="player-name p1" id="p1-name">Player 1</span>
+      <div class="miss-pips" id="p1-pips"><div class="miss-pip"></div><div class="miss-pip"></div><div class="miss-pip"></div></div>
+      <div class="hand-cards" id="p1-hand"></div>
+      <div class="best-hand" id="p1-best"></div>
+    </div>
+    <div class="player-section right">
+      <div class="power-meter" id="power-meter"><div class="power-fill" id="power-fill"></div></div>
+      <div class="controls-bar">
+        <button class="btn btn-secondary" id="btn-end-turn" disabled>End Turn</button>
+        <button class="btn btn-primary" id="btn-stand" disabled>Stand</button>
+        <button class="btn btn-danger" id="btn-concede">Concede</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-coinflip">
+  <div class="modal coin-flip-container">
+    <h2>Who Breaks?</h2>
+    <div class="coin" id="coin">?</div>
+    <p id="coin-result" style="margin-top:12px; font-size:16px;"></p>
+    <div class="modal-actions" id="coin-actions" style="display:none">
+      <button class="btn btn-primary" id="coin-ok">Start Game</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-suit">
+  <div class="modal">
+    <h2>Choose Pocket Suit</h2>
+    <p style="text-align:center; margin-bottom:12px; font-size:13px; color:#aaa;">This pocket will produce cards of the chosen suit.</p>
+    <div class="suit-options" id="suit-options"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-wildcard">
+  <div class="modal">
+    <h2>Choose Wildcard Card</h2>
+    <p style="text-align:center; margin-bottom:8px; font-size:13px; color:#aaa;">Pick rank and suit for your wildcard.</p>
+    <h3>Suit</h3>
+    <div class="suit-options" id="wc-suit-options"></div>
+    <h3 style="margin-top:12px;">Rank</h3>
+    <div class="wildcard-grid" id="wc-rank-options"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="wc-confirm" disabled>Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-swap">
+  <div class="modal">
+    <h2>Discard One Card</h2>
+    <p style="text-align:center; margin-bottom:8px; font-size:13px; color:#aaa;">Your hand is full. Choose one card to discard.</p>
+    <div class="swap-cards" id="swap-cards"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="swap-confirm" disabled>Discard Selected</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-showdown">
+  <div class="modal" style="min-width:400px;">
+    <h2>Showdown!</h2>
+    <div class="showdown-hands" id="showdown-hands"></div>
+    <div class="winner-text" id="showdown-winner"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="showdown-ok">New Game</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-gameover">
+  <div class="modal">
+    <h2 id="gameover-title">Game Over</h2>
+    <p id="gameover-msg" style="text-align:center; font-size:16px; margin:12px 0;"></p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="gameover-ok">New Game</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-concede">
+  <div class="modal">
+    <h2>Concede?</h2>
+    <p style="text-align:center; margin:12px 0;">Are you sure you want to concede this match?</p>
+    <div class="modal-actions">
+      <button class="btn btn-danger" id="concede-yes">Yes, Concede</button>
+      <button class="btn btn-secondary" id="concede-no">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-illegal-break">
+  <div class="modal">
+    <h2>Illegal Break</h2>
+    <p style="text-align:center; margin:12px 0;">The break didn't contact enough rails or pocket any ball.</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="illegal-accept">Accept Table</button>
+      <button class="btn btn-secondary" id="illegal-rerack">Re-rack & Re-break</button>
+    </div>
+  </div>
+</div>
+
+<!-- Rules Panel -->
+<div id="rules-backdrop"></div>
+<div id="rules-panel">
+  <div class="rules-header">
+    <h2>Rules</h2>
+    <button class="btn btn-secondary" id="rules-close">✕</button>
+  </div>
+  <div class="rules-tabs">
+    <button class="rules-tab active" data-tab="howto">How To Play</button>
+    <button class="rules-tab" data-tab="poker">Poker Ranks</button>
+    <button class="rules-tab" data-tab="pockets">Pockets</button>
+    <button class="rules-tab" data-tab="controls">Controls</button>
+  </div>
+  <div class="rules-content" id="rules-content"></div>
+</div>
+
+<!-- Debug Panel -->
+<div id="debug-panel"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════
+// SECTION 1: CONFIGURATION
+// ═══════════════════════════════════════════════════
+
+const GAMEPLAY = {
+  missLimit: 3,               // 3 consecutive misses = elimination
+  standResponseTurns: 3,      // Opponent gets 3 turns after Stand
+  maxHandSize: 5,             // Max cards in hand
+  wildcardCount: 2,           // Balls 14-15
+  breakRequiredRailContactCount: 4, // Rails needed for legal break
+  duplicateCardsAllowed: false,
+  allowVoluntaryEndTurn: true,
+  allowStandOnlyAtTurnStart: true,
+};
+
+const PHYSICS_CFG = {
+  // Table dimensions (play area inside rails)
+  tableWidth: 860,            // Bigger = more room. Safe: 700-1000. Match start only.
+  tableHeight: 430,           // Bigger = more room. Safe: 350-500. Match start only.
+  railThickness: 22,          // Visual rail width. Safe: 15-30. Match start only.
+
+  // Ball physics
+  ballRadius: 11,             // Bigger = easier aiming. Safe: 8-14. Match start only.
+  ballRestitution: 0.85,      // Bigger = bouncier balls. Safe: 0.7-0.95. Live safe.
+  railRestitution: 0.7,       // Bigger = bouncier rails. Safe: 0.5-0.9. Live safe.
+  feltFriction: 0.02,         // Bigger = more friction. Safe: 0.005-0.05. Live safe.
+  linearDamping: 0.04,        // Bigger = balls slow faster. Safe: 0.02-0.08. Live safe.
+
+  // Shot power
+  maxShotPower: 18,           // Bigger = harder max shot. Safe: 12-25. Live safe.
+  minShotPower: 1.5,          // Minimum shot force. Safe: 0.5-3. Live safe.
+  maxDragDistance: 200,        // Pixels of drag for max power. Safe: 120-300. Live safe.
+
+  // Pocket geometry (FORGIVING!)
+  pocketRadiusMultiplier: 1.5, // Bigger = easier pocketing. Safe: 1.35-1.6. Match start only.
+  pocketCaptureRadiusMultiplier: 2.2, // Bigger = wider capture zone. Safe: 1.8-2.8. Live safe.
+  pocketCaptureMaxAngle: 70,   // Degrees from pocket center. Bigger = more forgiving angle. Safe: 50-90. Live safe.
+  pocketCapturePullStrength: 0.0025, // Bigger = stronger pull once in zone. Safe: 0.001-0.004. Live safe.
+
+  // Aim assist
+  aimLineLength: 600,          // Pixels of aim line. Safe: 200-800. Live safe.
+  objectBallPreviewLength: 150, // Predicted ball path length. Safe: 80-300. Live safe.
+
+  // Settling
+  physicsSettleVelocityThreshold: 0.15, // Below this = at rest. Safe: 0.1-0.3. Live safe.
+  physicsSettleTimeMs: 300,     // Must be still this long. Safe: 200-500. Live safe.
+
+  // Respawn
+  respawnDropDurationMs: 400,   // Animation duration. Safe: 200-800. Live safe.
+};
+
+const LAYOUT = {
+  canvasPadding: 40,
+};
+
+// ═══════════════════════════════════════════════════
+// SECTION 2: POKER HAND EVALUATOR
+// ═══════════════════════════════════════════════════
+
+const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const RANK_VALUES = { 'A':14, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, '10':10, 'J':11, 'Q':12, 'K':13 };
+const SUITS = ['spades','hearts','diamonds','clubs'];
+const SUIT_SYMBOLS = { spades:'♠', hearts:'♥', diamonds:'♦', clubs:'♣' };
+const SUIT_FROM_SYMBOL = { '♠':'spades', '♥':'hearts', '♦':'diamonds', '♣':'clubs' };
+
+const HAND_RANKS = {
+  ROYAL_FLUSH: 10, STRAIGHT_FLUSH: 9, FOUR_KIND: 8, FULL_HOUSE: 7,
+  FLUSH: 6, STRAIGHT: 5, THREE_KIND: 4, TWO_PAIR: 3, ONE_PAIR: 2, HIGH_CARD: 1
+};
+const HAND_NAMES = {
+  10:'Royal Flush', 9:'Straight Flush', 8:'Four of a Kind', 7:'Full House',
+  6:'Flush', 5:'Straight', 4:'Three of a Kind', 3:'Two Pair', 2:'One Pair', 1:'High Card'
+};
+
+function evaluatePokerHand(cards) {
+  if (!cards || cards.length === 0) return { rank: 0, name: 'No Cards', values: [] };
+  if (cards.length < 5) return evaluatePartialHand(cards);
+
+  const vals = cards.map(c => RANK_VALUES[c.rank]).sort((a,b) => b - a);
+  const suits = cards.map(c => c.suit);
+  const isFlush = suits.every(s => s === suits[0]);
+
+  // Check straight
+  let isStraight = false;
+  let straightHigh = 0;
+  const uniqueVals = [...new Set(vals)].sort((a,b) => b - a);
+  if (uniqueVals.length >= 5) {
+    // Normal straight check
+    if (uniqueVals[0] - uniqueVals[4] === 4 && uniqueVals.length === 5) {
+      isStraight = true;
+      straightHigh = uniqueVals[0];
+    }
+    // Ace-low straight: A-2-3-4-5
+    if (!isStraight && uniqueVals.includes(14) && uniqueVals.includes(2) &&
+        uniqueVals.includes(3) && uniqueVals.includes(4) && uniqueVals.includes(5)) {
+      isStraight = true;
+      straightHigh = 5; // 5-high straight
+    }
+  }
+
+  // Count ranks
+  const counts = {};
+  vals.forEach(v => counts[v] = (counts[v]||0) + 1);
+  const groups = Object.entries(counts).map(([v,c]) => ({val:+v, count:c}))
+    .sort((a,b) => b.count - a.count || b.val - a.val);
+
+  if (isFlush && isStraight && straightHigh === 14) {
+    return { rank: HAND_RANKS.ROYAL_FLUSH, name: 'Royal Flush', values: [14] };
+  }
+  if (isFlush && isStraight) {
+    return { rank: HAND_RANKS.STRAIGHT_FLUSH, name: 'Straight Flush', values: [straightHigh] };
+  }
+  if (groups[0].count === 4) {
+    const kicker = groups[1].val;
+    return { rank: HAND_RANKS.FOUR_KIND, name: 'Four of a Kind', values: [groups[0].val, kicker] };
+  }
+  if (groups[0].count === 3 && groups[1].count === 2) {
+    return { rank: HAND_RANKS.FULL_HOUSE, name: 'Full House', values: [groups[0].val, groups[1].val] };
+  }
+  if (isFlush) {
+    return { rank: HAND_RANKS.FLUSH, name: 'Flush', values: vals };
+  }
+  if (isStraight) {
+    return { rank: HAND_RANKS.STRAIGHT, name: 'Straight', values: [straightHigh] };
+  }
+  if (groups[0].count === 3) {
+    const kickers = groups.filter(g => g.count === 1).map(g => g.val).sort((a,b) => b - a);
+    return { rank: HAND_RANKS.THREE_KIND, name: 'Three of a Kind', values: [groups[0].val, ...kickers] };
+  }
+  if (groups[0].count === 2 && groups[1].count === 2) {
+    const pairs = [groups[0].val, groups[1].val].sort((a,b) => b - a);
+    const kicker = groups[2].val;
+    return { rank: HAND_RANKS.TWO_PAIR, name: 'Two Pair', values: [...pairs, kicker] };
+  }
+  if (groups[0].count === 2) {
+    const kickers = groups.filter(g => g.count === 1).map(g => g.val).sort((a,b) => b - a);
+    return { rank: HAND_RANKS.ONE_PAIR, name: 'One Pair', values: [groups[0].val, ...kickers] };
+  }
+  return { rank: HAND_RANKS.HIGH_CARD, name: 'High Card', values: vals };
+}
+
+function evaluatePartialHand(cards) {
+  if (cards.length === 0) return { rank: 0, name: 'No Cards', values: [] };
+  const vals = cards.map(c => RANK_VALUES[c.rank]).sort((a,b) => b - a);
+  const counts = {};
+  vals.forEach(v => counts[v] = (counts[v]||0) + 1);
+  const groups = Object.entries(counts).map(([v,c]) => ({val:+v, count:c}))
+    .sort((a,b) => b.count - a.count || b.val - a.val);
+
+  if (groups[0].count >= 4) return { rank: HAND_RANKS.FOUR_KIND, name: 'Four of a Kind', values: [groups[0].val] };
+  if (groups[0].count === 3 && groups.length >= 2 && groups[1].count >= 2)
+    return { rank: HAND_RANKS.FULL_HOUSE, name: 'Full House', values: [groups[0].val, groups[1].val] };
+  if (groups[0].count === 3) return { rank: HAND_RANKS.THREE_KIND, name: 'Three of a Kind', values: [groups[0].val] };
+  if (groups[0].count === 2 && groups.length >= 2 && groups[1].count === 2)
+    return { rank: HAND_RANKS.TWO_PAIR, name: 'Two Pair', values: [groups[0].val, groups[1].val] };
+  if (groups[0].count === 2) return { rank: HAND_RANKS.ONE_PAIR, name: 'One Pair', values: [groups[0].val] };
+  return { rank: HAND_RANKS.HIGH_CARD, name: 'High Card', values: vals };
+}
+
+function compareHands(eval1, eval2) {
+  if (eval1.rank !== eval2.rank) return eval1.rank > eval2.rank ? 1 : -1;
+  for (let i = 0; i < Math.max(eval1.values.length, eval2.values.length); i++) {
+    const a = eval1.values[i] || 0, b = eval2.values[i] || 0;
+    if (a !== b) return a > b ? 1 : -1;
+  }
+  return 0; // tie
+}
+
+function ballNumberToRank(num) {
+  if (num === 1) return 'A';
+  if (num >= 2 && num <= 10) return '' + num;
+  if (num === 11) return 'J';
+  if (num === 12) return 'Q';
+  if (num === 13) return 'K';
+  return null; // wildcards
+}
+
+function cardDisplayStr(card) {
+  return card.rank + SUIT_SYMBOLS[card.suit];
+}
+
+function isRedSuit(suit) {
+  return suit === 'hearts' || suit === 'diamonds';
+}
+
+
+// ═══════════════════════════════════════════════════
+// SECTION 3: GAME STATE & RULES ENGINE
+// ═══════════════════════════════════════════════════
+
+function createPocketDefinitions() {
+  // 6 pockets: 4 corners + 2 sides. Positions relative to table play area.
+  const tw = PHYSICS_CFG.tableWidth, th = PHYSICS_CFG.tableHeight;
+  return [
+    { id: 'TL', kind: 'unclaimed', suit: null, x: 0,    y: 0,    label: 'Top-Left' },
+    { id: 'TR', kind: 'unclaimed', suit: null, x: tw,   y: 0,    label: 'Top-Right' },
+    { id: 'BL', kind: 'unclaimed', suit: null, x: 0,    y: th,   label: 'Bottom-Left' },
+    { id: 'BR', kind: 'unclaimed', suit: null, x: tw,   y: th,   label: 'Bottom-Right' },
+    { id: 'ML', kind: 'unclaimed', suit: null, x: 0,    y: th/2, label: 'Mid-Left' },
+    { id: 'MR', kind: 'unclaimed', suit: null, x: tw,   y: th/2, label: 'Mid-Right' },
+  ];
+}
+
+function createInitialGameState() {
+  return {
+    phase: 'setup', // setup, break, suit-mapping, hand-race, stand-countdown, showdown, game-over
+    players: [
+      { id: 0, name: 'Player 1', hand: [], missCount: 0, hasStood: false, isEliminated: false },
+      { id: 1, name: 'Player 2', hand: [], missCount: 0, hasStood: false, isEliminated: false },
+    ],
+    activePlayerIndex: 0,
+    pockets: createPocketDefinitions(),
+    balls: [], // managed by physics layer
+    stand: null,
+    breakerIndex: 0,
+    isBreakShot: true,
+    turnShotCount: 0, // shots taken this turn
+    lastShotSuccessful: false,
+    ballInHand: false,
+    waitingForSuitChoice: false,
+    waitingForWildcardChoice: false,
+    waitingForSwap: false,
+    pendingPocketEvents: [],
+    suitsClaimed: 0,
+    breakRailContacts: 0,
+    breakPocketed: 0,
+    turnHasRegisteredCard: false,
+  };
+}
+
+function getActivePlayer(state) {
+  return state.players[state.activePlayerIndex];
+}
+
+function getInactivePlayer(state) {
+  return state.players[1 - state.activePlayerIndex];
+}
+
+function countClaimedSuits(state) {
+  return state.pockets.filter(p => p.kind === 'suit').length;
+}
+
+function isPocketValidForPlayer(state, pocketId, ballNumber, playerIndex) {
+  const pocket = state.pockets.find(p => p.id === pocketId);
+  const player = state.players[playerIndex];
+  const isWildcard = ballNumber >= 14;
+
+  if (state.phase === 'break') return false; // break never registers
+
+  if (isWildcard) {
+    // Wildcards only valid in Wild Holes during hand-race phase
+    return (state.phase === 'hand-race' || state.phase === 'stand-countdown') && pocket.kind === 'wild';
+  }
+
+  // Rank ball (1-13)
+  if (pocket.kind === 'unclaimed') {
+    // Valid in unclaimed pockets during suit-mapping (triggers suit selection)
+    return state.phase === 'suit-mapping';
+  }
+  if (pocket.kind === 'wild') return false; // Rank balls can't go in Wild Holes
+  if (pocket.kind === 'suit') {
+    // Check for duplicate card
+    const rank = ballNumberToRank(ballNumber);
+    const suit = pocket.suit;
+    const isDuplicate = player.hand.some(c => c.rank === rank && c.suit === suit);
+    return !isDuplicate;
+  }
+  return false;
+}
+
+function getResponsSpots() {
+  const tw = PHYSICS_CFG.tableWidth, th = PHYSICS_CFG.tableHeight;
+  return [
+    { x: tw * 0.25, y: th * 0.15 },
+    { x: tw * 0.50, y: th * 0.12 },
+    { x: tw * 0.75, y: th * 0.15 },
+    { x: tw * 0.20, y: th * 0.50 },
+    { x: tw * 0.50, y: th * 0.50 },
+    { x: tw * 0.80, y: th * 0.50 },
+    { x: tw * 0.25, y: th * 0.85 },
+    { x: tw * 0.50, y: th * 0.88 },
+    { x: tw * 0.75, y: th * 0.85 },
+  ];
+}
+
+function findRespawnPosition(occupiedPositions) {
+  const spots = getResponsSpots();
+  // Shuffle
+  for (let i = spots.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [spots[i], spots[j]] = [spots[j], spots[i]];
+  }
+  const minDist = PHYSICS_CFG.ballRadius * 3;
+  for (const spot of spots) {
+    const clear = occupiedPositions.every(p =>
+      Math.hypot(p.x - spot.x, p.y - spot.y) > minDist
+    );
+    if (clear) return spot;
+  }
+  // Foot spot fallback
+  const foot = { x: PHYSICS_CFG.tableWidth * 0.75, y: PHYSICS_CFG.tableHeight * 0.5 };
+  const footClear = occupiedPositions.every(p => Math.hypot(p.x - foot.x, p.y - foot.y) > minDist);
+  if (footClear) return foot;
+  // Last resort - center
+  return { x: PHYSICS_CFG.tableWidth * 0.5, y: PHYSICS_CFG.tableHeight * 0.5 };
+}
+
+function generateRack() {
+  // Triangle rack at foot spot (right side of table)
+  // Rack positions in rows, apex pointing left toward head
+  const br = PHYSICS_CFG.ballRadius;
+  const spacing = br * 2.05;
+  const footX = PHYSICS_CFG.tableWidth * 0.73;
+  const footY = PHYSICS_CFG.tableHeight * 0.5;
+
+  const positions = [];
+  for (let row = 0; row < 5; row++) {
+    for (let col = 0; col <= row; col++) {
+      const x = footX + row * spacing * Math.cos(Math.PI/6);
+      const y = footY + (col - row/2) * spacing;
+      positions.push({ x, y, row, col });
+    }
+  }
+
+  // Indices: row0=[0], row1=[1,2], row2=[3,4,5], row3=[6,7,8,9], row4=[10,11,12,13,14]
+  // Center cluster positions (inner balls): 4, 7, 8, 12
+  const centerIndices = [4, 7, 8, 12];
+  // Outer indices (everything else): 0,1,2,3,5,6,9,10,11,13,14
+  const outerIndices = [0,1,2,3,5,6,9,10,11,13,14];
+
+  const centerBalls = [1, 11, 12, 13]; // shuffle
+  shuffle(centerBalls);
+
+  const outerBalls = [2,3,4,5,6,7,8,9,10,14,15]; // shuffle
+  shuffle(outerBalls);
+  // Apex (index 0) must come from outer set - it already will since index 0 is in outerIndices
+
+  const result = [];
+  centerIndices.forEach((posIdx, i) => {
+    result.push({ ballNumber: centerBalls[i], x: positions[posIdx].x, y: positions[posIdx].y });
+  });
+  outerIndices.forEach((posIdx, i) => {
+    result.push({ ballNumber: outerBalls[i], x: positions[posIdx].x, y: positions[posIdx].y });
+  });
+
+  return result;
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+
+// ═══════════════════════════════════════════════════
+// SECTION 4: PHASER GAME SCENE
+// ═══════════════════════════════════════════════════
+
+let gameState;
+let scene; // reference to active Phaser scene
+
+class PoolScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'PoolScene' });
+    this.ballBodies = {};    // ballNumber -> matter body
+    this.ballSprites = {};   // ballNumber -> graphics group
+    this.cueBall = null;
+    this.pocketGraphics = [];
+    this.aimGraphics = null;
+    this.tableOffsetX = 0;
+    this.tableOffsetY = 0;
+
+    // Aiming state
+    this.isAiming = false;
+    this.aimStart = null;
+    this.aimAngle = 0;
+    this.aimPower = 0;
+    this.fineAimOffset = 0;
+
+    // State flags
+    this.isPhysicsSettling = false;
+    this.settleTimer = 0;
+    this.shotInProgress = false;
+    this.ballInHandMode = false;
+    this.pocketedThisShot = []; // {ballNumber, pocketId}
+    this.railContactsThisShot = new Set();
+    this.scratchedThisShot = false;
+
+    // Debug
+    this.showPhysicsOverlay = false;
+    this.showPocketLabels = true;
+  }
+
+  create() {
+    scene = this;
+    const tw = PHYSICS_CFG.tableWidth;
+    const th = PHYSICS_CFG.tableHeight;
+    const pad = LAYOUT.canvasPadding;
+    this.tableOffsetX = pad;
+    this.tableOffsetY = pad;
+
+    // Disable gravity
+    this.matter.world.setGravity(0, 0);
+
+    // Draw table
+    this.drawTable();
+
+    // Create pocket zones (visual only, detection is distance-based)
+    this.createPocketVisuals();
+
+    // Aim line graphics
+    this.aimGraphics = this.add.graphics();
+    this.aimGraphics.setDepth(50);
+
+    // Input handlers
+    this.input.on('pointerdown', this.onPointerDown, this);
+    this.input.on('pointermove', this.onPointerMove, this);
+    this.input.on('pointerup', this.onPointerUp, this);
+
+    // Keyboard
+    this.input.keyboard.on('keydown-LEFT', () => { if (this.isAiming) this.fineAimOffset -= 0.01; });
+    this.input.keyboard.on('keydown-RIGHT', () => { if (this.isAiming) this.fineAimOffset += 0.01; });
+    this.input.keyboard.on('keydown-ESC', () => {
+      if (this.isAiming) { this.isAiming = false; this.aimGraphics.clear(); updatePowerMeter(0, false); }
+    });
+    this.input.keyboard.on('keydown-BACKQUOTE', toggleDebugPanel);
+
+    // Start game
+    this.startNewGame();
+  }
+
+  drawTable() {
+    const tw = PHYSICS_CFG.tableWidth;
+    const th = PHYSICS_CFG.tableHeight;
+    const rt = PHYSICS_CFG.railThickness;
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+
+    // Felt background
+    const felt = this.add.graphics();
+    felt.fillStyle(0x1a6b3c);
+    felt.fillRect(ox, oy, tw, th);
+    felt.setDepth(0);
+
+    // Rail color
+    const railColor = 0x5a3a1a;
+    const pr = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketRadiusMultiplier;
+    const pocketGap = pr * 1.8; // gap in rails for pockets
+
+    // Create rail bodies (static rectangles with gaps for pockets)
+    // We'll create individual rail segments between pockets
+    const railOpts = {
+      isStatic: true,
+      restitution: PHYSICS_CFG.railRestitution,
+      friction: 0.1,
+      label: 'rail'
+    };
+
+    // Top rail: from TL pocket to ML... wait, top rail goes TL to TR with no side pocket
+    // Top rail: gap at TL, straight to TR, gap at TR
+    // Bottom rail: gap at BL, straight to BR, gap at BR
+    // Left rail: gap at TL, to ML gap, ML gap to BL gap
+    // Right rail: gap at TR, to MR gap, MR gap to BR gap
+
+    const rails = this.add.graphics();
+    rails.fillStyle(railColor);
+    rails.setDepth(1);
+
+    // We build rail collider segments
+    const segments = [];
+
+    // Top rail
+    segments.push({ x1: pocketGap, y1: -rt, x2: tw/2 - 0, y2: 0 }); // no side pocket on top
+    segments.push({ x1: tw/2 + 0, y1: -rt, x2: tw - pocketGap, y2: 0 });
+
+    // Bottom rail
+    segments.push({ x1: pocketGap, y1: th, x2: tw/2 - 0, y2: th + rt });
+    segments.push({ x1: tw/2 + 0, y1: th, x2: tw - pocketGap, y2: th + rt });
+
+    // Left rail
+    segments.push({ x1: -rt, y1: pocketGap, x2: 0, y2: th/2 - pocketGap });
+    segments.push({ x1: -rt, y1: th/2 + pocketGap, x2: 0, y2: th - pocketGap });
+
+    // Right rail
+    segments.push({ x1: tw, y1: pocketGap, x2: tw + rt, y2: th/2 - pocketGap });
+    segments.push({ x1: tw, y1: th/2 + pocketGap, x2: tw + rt, y2: th - pocketGap });
+
+    segments.forEach(seg => {
+      const w = Math.abs(seg.x2 - seg.x1);
+      const h = Math.abs(seg.y2 - seg.y1);
+      const cx = (seg.x1 + seg.x2) / 2 + ox;
+      const cy = (seg.y1 + seg.y2) / 2 + oy;
+      if (w > 1 && h > 1) {
+        this.matter.add.rectangle(cx, cy, w, h, railOpts);
+        rails.fillRect(Math.min(seg.x1, seg.x2) + ox, Math.min(seg.y1, seg.y2) + oy, w, h);
+      }
+    });
+
+    // Outer border (decorative)
+    const border = this.add.graphics();
+    border.lineStyle(3, 0x3a2210);
+    border.strokeRect(ox - rt, oy - rt, tw + rt*2, th + rt*2);
+    border.setDepth(2);
+  }
+
+  createPocketVisuals() {
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const pr = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketRadiusMultiplier;
+
+    this.pocketGraphicsObjs = [];
+    gameState.pockets.forEach(p => {
+      const g = this.add.graphics();
+      g.setDepth(3);
+      this.pocketGraphicsObjs.push({ graphics: g, pocket: p });
+    });
+    this.updatePocketVisuals();
+  }
+
+  updatePocketVisuals() {
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const pr = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketRadiusMultiplier;
+
+    this.pocketGraphicsObjs.forEach(({ graphics: g, pocket: p }) => {
+      g.clear();
+      const px = p.x + ox;
+      const py = p.y + oy;
+
+      // Pocket hole (dark)
+      g.fillStyle(0x111111, 0.9);
+      g.fillCircle(px, py, pr);
+
+      // Validity glow
+      if (p.kind === 'suit') {
+        const suitColor = this.getSuitColor(p.suit);
+        g.lineStyle(3, suitColor, 0.8);
+        g.strokeCircle(px, py, pr + 3);
+      } else if (p.kind === 'wild') {
+        g.lineStyle(3, 0xffd700, 0.9);
+        g.strokeCircle(px, py, pr + 3);
+        // Star indicator
+        g.fillStyle(0xffd700, 0.7);
+        this.drawStar(g, px, py - pr - 8, 5, 6, 3);
+      } else {
+        // Unclaimed - yellow pulse handled by update
+        g.lineStyle(2, 0xf0c040, 0.5);
+        g.strokeCircle(px, py, pr + 2);
+      }
+
+      // Suit label
+      if (p.suit && this.showPocketLabels) {
+        const label = this.add.text(px, py, SUIT_SYMBOLS[p.suit], {
+          fontSize: '16px', fontFamily: 'serif', color: this.getSuitHexColor(p.suit)
+        }).setOrigin(0.5).setDepth(5);
+        // Store for cleanup
+        if (p._label) p._label.destroy();
+        p._label = label;
+      } else if (p.kind === 'wild') {
+        if (p._label) p._label.destroy();
+        const label = this.add.text(px, py, '★', {
+          fontSize: '14px', color: '#ffd700'
+        }).setOrigin(0.5).setDepth(5);
+        p._label = label;
+      }
+    });
+  }
+
+  drawStar(g, cx, cy, spikes, outerR, innerR) {
+    let rot = Math.PI / 2 * 3;
+    const step = Math.PI / spikes;
+    g.beginPath();
+    g.moveTo(cx, cy - outerR);
+    for (let i = 0; i < spikes; i++) {
+      g.lineTo(cx + Math.cos(rot) * outerR, cy + Math.sin(rot) * outerR);
+      rot += step;
+      g.lineTo(cx + Math.cos(rot) * innerR, cy + Math.sin(rot) * innerR);
+      rot += step;
+    }
+    g.closePath();
+    g.fillPath();
+  }
+
+  getSuitColor(suit) {
+    const colors = { spades: 0x4488ff, hearts: 0xff4444, diamonds: 0xff8844, clubs: 0x44bb44 };
+    return colors[suit] || 0xffffff;
+  }
+
+  getSuitHexColor(suit) {
+    const colors = { spades: '#4488ff', hearts: '#ff4444', diamonds: '#ff8844', clubs: '#44bb44' };
+    return colors[suit] || '#ffffff';
+  }
+
+  // ── Ball Management ──
+
+  createBall(num, x, y) {
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const br = PHYSICS_CFG.ballRadius;
+
+    const body = this.matter.add.circle(x + ox, y + oy, br, {
+      restitution: PHYSICS_CFG.ballRestitution,
+      friction: PHYSICS_CFG.feltFriction,
+      frictionAir: PHYSICS_CFG.linearDamping,
+      label: 'ball_' + num,
+      density: 0.002
+    });
+
+    // Visual
+    const container = this.add.container(x + ox, y + oy);
+    container.setDepth(10);
+
+    const circle = this.add.graphics();
+    const isWild = num >= 14;
+    const isCue = num === 0;
+
+    if (isCue) {
+      circle.fillStyle(0xffffff);
+      circle.fillCircle(0, 0, br);
+      circle.lineStyle(1, 0xcccccc);
+      circle.strokeCircle(0, 0, br);
+    } else if (isWild) {
+      circle.fillStyle(0xffd700);
+      circle.fillCircle(0, 0, br);
+      circle.lineStyle(1.5, 0xcc9900);
+      circle.strokeCircle(0, 0, br);
+      // Star overlay
+      circle.fillStyle(0xffffff, 0.3);
+    } else {
+      // Color based on ball number (solids/stripes style for visual variety)
+      const ballColors = [
+        0, // 0 = cue
+        0xf5e642, // 1 yellow
+        0x2255cc, // 2 blue
+        0xdd2222, // 3 red
+        0x7722aa, // 4 purple
+        0xff6600, // 5 orange
+        0x228833, // 6 green
+        0x882222, // 7 maroon
+        0x222222, // 8 black
+        0xf5e642, // 9 yellow stripe
+        0x2255cc, // 10 blue stripe
+        0xdd2222, // 11 red stripe
+        0x7722aa, // 12 purple stripe
+        0xff6600, // 13 orange stripe
+      ];
+      const color = ballColors[num] || 0xaaaaaa;
+      circle.fillStyle(color);
+      circle.fillCircle(0, 0, br);
+
+      // Stripe band for 9-13
+      if (num >= 9) {
+        circle.fillStyle(0xffffff);
+        circle.fillRect(-br, -br*0.35, br*2, br*0.7);
+        // Re-draw circle outline to clip
+        circle.lineStyle(1.5, 0x333333);
+        circle.strokeCircle(0, 0, br);
+      } else {
+        circle.lineStyle(1, 0x333333);
+        circle.strokeCircle(0, 0, br);
+      }
+    }
+
+    container.add(circle);
+
+    // Number label
+    if (!isCue) {
+      // White circle background for number
+      const numBg = this.add.graphics();
+      numBg.fillStyle(0xffffff);
+      numBg.fillCircle(0, 0, br * 0.5);
+      container.add(numBg);
+
+      const text = this.add.text(0, 0, '' + num, {
+        fontSize: (br * 0.8) + 'px',
+        fontFamily: 'Arial',
+        color: '#000',
+        fontStyle: 'bold'
+      }).setOrigin(0.5);
+      container.add(text);
+    }
+
+    this.ballBodies[num] = body;
+    this.ballSprites[num] = container;
+    if (isCue) this.cueBall = body;
+
+    return body;
+  }
+
+  removeBallVisual(num) {
+    if (this.ballSprites[num]) {
+      this.ballSprites[num].destroy();
+      delete this.ballSprites[num];
+    }
+    if (this.ballBodies[num]) {
+      this.matter.world.remove(this.ballBodies[num]);
+      delete this.ballBodies[num];
+    }
+  }
+
+  respawnBall(num, animate = true) {
+    const positions = [];
+    Object.entries(this.ballBodies).forEach(([n, b]) => {
+      if (+n !== num) {
+        positions.push({ x: b.position.x - this.tableOffsetX, y: b.position.y - this.tableOffsetY });
+      }
+    });
+    const spot = findRespawnPosition(positions);
+    this.removeBallVisual(num);
+    const body = this.createBall(num, spot.x, spot.y);
+
+    if (animate) {
+      const sprite = this.ballSprites[num];
+      sprite.setScale(0);
+      this.tweens.add({
+        targets: sprite,
+        scaleX: 1,
+        scaleY: 1,
+        duration: PHYSICS_CFG.respawnDropDurationMs,
+        ease: 'Back.easeOut'
+      });
+    }
+  }
+
+  getBallTablePos(num) {
+    const b = this.ballBodies[num];
+    if (!b) return null;
+    return { x: b.position.x - this.tableOffsetX, y: b.position.y - this.tableOffsetY };
+  }
+
+  getAllBallPositions() {
+    const positions = [];
+    Object.entries(this.ballBodies).forEach(([num, body]) => {
+      positions.push({ num: +num, x: body.position.x, y: body.position.y });
+    });
+    return positions;
+  }
+
+  // ── Rack & Setup ──
+
+  rackBalls() {
+    // Clear existing
+    Object.keys(this.ballBodies).forEach(n => this.removeBallVisual(+n));
+
+    // Create cue ball at head spot
+    const cueX = PHYSICS_CFG.tableWidth * 0.25;
+    const cueY = PHYSICS_CFG.tableHeight * 0.5;
+    this.createBall(0, cueX, cueY);
+
+    // Generate rack
+    const rack = generateRack();
+    rack.forEach(({ ballNumber, x, y }) => {
+      this.createBall(ballNumber, x, y);
+    });
+  }
+
+  // ── Aiming & Shooting ──
+
+  onPointerDown(pointer) {
+    if (gameState.phase === 'setup' || gameState.phase === 'showdown' || gameState.phase === 'game-over') return;
+    if (this.shotInProgress) return;
+    if (gameState.waitingForSuitChoice || gameState.waitingForWildcardChoice || gameState.waitingForSwap) return;
+    if (isModalOpen()) return;
+
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+
+    // Ball in hand mode
+    if (this.ballInHandMode) {
+      const tx = pointer.x - ox;
+      const ty = pointer.y - oy;
+      if (tx >= 0 && tx <= PHYSICS_CFG.tableWidth && ty >= 0 && ty <= PHYSICS_CFG.tableHeight) {
+        this.placeCueBall(tx, ty);
+      }
+      return;
+    }
+
+    // Check if clicking near cue ball
+    if (!this.cueBall) return;
+    const dist = Math.hypot(pointer.x - this.cueBall.position.x, pointer.y - this.cueBall.position.y);
+    if (dist < PHYSICS_CFG.ballRadius * 4) {
+      this.isAiming = true;
+      this.aimStart = { x: pointer.x, y: pointer.y };
+      this.fineAimOffset = 0;
+    }
+  }
+
+  onPointerMove(pointer) {
+    if (!this.isAiming || !this.cueBall) return;
+
+    const dx = pointer.x - this.cueBall.position.x;
+    const dy = pointer.y - this.cueBall.position.y;
+    const dist = Math.hypot(dx, dy);
+
+    // Aim in opposite direction of drag
+    this.aimAngle = Math.atan2(-dy, -dx) + this.fineAimOffset;
+    this.aimPower = Math.min(dist / PHYSICS_CFG.maxDragDistance, 1);
+
+    this.drawAimLine();
+    updatePowerMeter(this.aimPower, true);
+  }
+
+  onPointerUp(pointer) {
+    if (!this.isAiming) return;
+    this.isAiming = false;
+    this.aimGraphics.clear();
+
+    if (this.aimPower < 0.05) {
+      updatePowerMeter(0, false);
+      return;
+    }
+
+    this.shoot();
+    updatePowerMeter(0, false);
+  }
+
+  drawAimLine() {
+    const g = this.aimGraphics;
+    g.clear();
+    if (!this.cueBall) return;
+
+    const cx = this.cueBall.position.x;
+    const cy = this.cueBall.position.y;
+    const br = PHYSICS_CFG.ballRadius;
+
+    // Aim line from cue ball
+    const lineLen = PHYSICS_CFG.aimLineLength * this.aimPower;
+    const endX = cx + Math.cos(this.aimAngle) * lineLen;
+    const endY = cy + Math.sin(this.aimAngle) * lineLen;
+
+    // Dashed aim line
+    g.lineStyle(1.5, 0xffffff, 0.4);
+    const dashLen = 8, gapLen = 6;
+    let d = 0;
+    while (d < lineLen) {
+      const s = d / lineLen;
+      const e = Math.min((d + dashLen) / lineLen, 1);
+      g.beginPath();
+      g.moveTo(cx + Math.cos(this.aimAngle) * d, cy + Math.sin(this.aimAngle) * d);
+      g.lineTo(cx + Math.cos(this.aimAngle) * (d + dashLen), cy + Math.sin(this.aimAngle) * (d + dashLen));
+      g.strokePath();
+      d += dashLen + gapLen;
+    }
+
+    // Find first ball in path (ray-circle intersection)
+    const hitResult = this.findFirstBallInPath(cx, cy, this.aimAngle, lineLen);
+
+    if (hitResult) {
+      // Ghost ball position
+      g.lineStyle(1, 0xffffff, 0.3);
+      g.strokeCircle(hitResult.ghostX, hitResult.ghostY, br);
+
+      // Predicted object ball direction
+      const objAngle = Math.atan2(hitResult.ballY - hitResult.ghostY, hitResult.ballX - hitResult.ghostX);
+      const prevLen = PHYSICS_CFG.objectBallPreviewLength;
+      g.lineStyle(1.5, 0xffff00, 0.4);
+      g.beginPath();
+      g.moveTo(hitResult.ballX, hitResult.ballY);
+      g.lineTo(hitResult.ballX + Math.cos(objAngle) * prevLen,
+               hitResult.ballY + Math.sin(objAngle) * prevLen);
+      g.strokePath();
+    }
+
+    // Draw pocket validity indicators
+    this.drawPocketValidity();
+  }
+
+  findFirstBallInPath(cx, cy, angle, maxDist) {
+    const br = PHYSICS_CFG.ballRadius;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
+    let closest = null;
+    let closestDist = Infinity;
+
+    Object.entries(this.ballBodies).forEach(([num, body]) => {
+      if (+num === 0) return; // skip cue ball
+      const bx = body.position.x;
+      const by = body.position.y;
+
+      // Ray-circle intersection
+      const ocx = bx - cx;
+      const ocy = by - cy;
+      const proj = ocx * dx + ocy * dy;
+      if (proj < 0) return; // behind
+
+      const perpDistSq = (ocx * ocx + ocy * ocy) - proj * proj;
+      const hitRadius = br * 2; // two ball radii
+      if (perpDistSq > hitRadius * hitRadius) return;
+
+      const hitDist = proj - Math.sqrt(hitRadius * hitRadius - perpDistSq);
+      if (hitDist > 0 && hitDist < closestDist && hitDist < maxDist) {
+        closestDist = hitDist;
+        closest = {
+          ballNum: +num,
+          ghostX: cx + dx * hitDist,
+          ghostY: cy + dy * hitDist,
+          ballX: bx,
+          ballY: by,
+          dist: hitDist
+        };
+      }
+    });
+
+    return closest;
+  }
+
+  drawPocketValidity() {
+    if (gameState.phase === 'break' || gameState.phase === 'setup') return;
+
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const pr = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketRadiusMultiplier;
+    const g = this.aimGraphics;
+
+    gameState.pockets.forEach(p => {
+      const px = p.x + ox;
+      const py = p.y + oy;
+
+      if (p.kind === 'suit') {
+        // Check if any rank ball could validly go here for active player
+        const isValid = isPocketValidForPlayer(gameState, p.id, 5, gameState.activePlayerIndex); // test with a generic ball
+        g.lineStyle(2, isValid ? 0x34c759 : 0xff453a, 0.5);
+        g.strokeCircle(px, py, pr + 6);
+      } else if (p.kind === 'wild') {
+        g.lineStyle(2, 0xffd700, 0.6);
+        g.strokeCircle(px, py, pr + 6);
+      } else if (p.kind === 'unclaimed' && gameState.phase === 'suit-mapping') {
+        const pulse = 0.3 + Math.sin(this.time.now / 300) * 0.2;
+        g.lineStyle(2, 0xf0c040, pulse);
+        g.strokeCircle(px, py, pr + 6);
+      }
+    });
+  }
+
+  shoot() {
+    if (!this.cueBall) return;
+    const power = PHYSICS_CFG.minShotPower + this.aimPower * (PHYSICS_CFG.maxShotPower - PHYSICS_CFG.minShotPower);
+    const vx = Math.cos(this.aimAngle) * power;
+    const vy = Math.sin(this.aimAngle) * power;
+
+    this.matter.body.setVelocity(this.cueBall, { x: vx, y: vy });
+
+    this.shotInProgress = true;
+    this.pocketedThisShot = [];
+    this.scratchedThisShot = false;
+    this.railContactsThisShot = new Set();
+    this.settleTimer = 0;
+  }
+
+  placeCueBall(tx, ty) {
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const br = PHYSICS_CFG.ballRadius;
+
+    // Check not too close to other balls
+    const tooClose = Object.entries(this.ballBodies).some(([num, body]) => {
+      if (+num === 0) return false;
+      return Math.hypot(body.position.x - (tx + ox), body.position.y - (ty + oy)) < br * 3;
+    });
+
+    if (tooClose) return; // can't place here
+
+    // Remove old cue ball and create new one
+    this.removeBallVisual(0);
+    this.createBall(0, tx, ty);
+    this.ballInHandMode = false;
+    gameState.ballInHand = false;
+    document.getElementById('bih-indicator').style.display = 'none';
+  }
+
+  // ── Physics Update ──
+
+  update(time, delta) {
+    // Sync sprites to physics bodies
+    Object.entries(this.ballBodies).forEach(([num, body]) => {
+      const sprite = this.ballSprites[+num];
+      if (sprite) {
+        sprite.setPosition(body.position.x, body.position.y);
+      }
+    });
+
+    if (!this.shotInProgress) return;
+
+    // Check for pocketed balls
+    this.checkPockets();
+
+    // Check for rail contacts (for break rule)
+    this.checkRailContacts();
+
+    // Check if all balls have settled
+    if (this.areAllBallsSettled()) {
+      this.settleTimer += delta;
+      if (this.settleTimer >= PHYSICS_CFG.physicsSettleTimeMs) {
+        this.shotInProgress = false;
+        this.settleTimer = 0;
+        this.onShotComplete();
+      }
+    } else {
+      this.settleTimer = 0;
+    }
+  }
+
+  checkPockets() {
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const pr = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketRadiusMultiplier;
+    const captureR = PHYSICS_CFG.ballRadius * PHYSICS_CFG.pocketCaptureRadiusMultiplier;
+
+    Object.entries(this.ballBodies).forEach(([num, body]) => {
+      num = +num;
+      // Skip already-pocketed balls this shot
+      if (this.pocketedThisShot.some(e => e.ballNumber === num)) return;
+
+      const bx = body.position.x - ox;
+      const by = body.position.y - oy;
+
+      gameState.pockets.forEach(pocket => {
+        const dist = Math.hypot(bx - pocket.x, by - pocket.y);
+
+        // Pocket capture zone - apply pull force
+        if (dist < captureR && dist > pr * 0.5) {
+          const vx = body.velocity.x;
+          const vy = body.velocity.y;
+          const speed = Math.hypot(vx, vy);
+
+          if (speed > 0.2) {
+            // Check angle - ball should be moving somewhat toward pocket
+            const toPocketX = pocket.x - bx;
+            const toPocketY = pocket.y - by;
+            const toPocketDist = Math.hypot(toPocketX, toPocketY);
+            const dot = (vx * toPocketX + vy * toPocketY) / (speed * toPocketDist);
+            const angleDeg = Math.acos(Math.max(-1, Math.min(1, dot))) * 180 / Math.PI;
+
+            if (angleDeg < PHYSICS_CFG.pocketCaptureMaxAngle) {
+              // Apply pull force toward pocket center
+              const pullX = toPocketX / toPocketDist * PHYSICS_CFG.pocketCapturePullStrength;
+              const pullY = toPocketY / toPocketDist * PHYSICS_CFG.pocketCapturePullStrength;
+              this.matter.body.applyForce(body, body.position, { x: pullX, y: pullY });
+            }
+          }
+        }
+
+        // Check if pocketed (center within pocket radius)
+        if (dist < pr) {
+          this.onBallPocketed(num, pocket.id);
+        }
+      });
+    });
+  }
+
+  onBallPocketed(ballNumber, pocketId) {
+    if (this.pocketedThisShot.some(e => e.ballNumber === ballNumber)) return;
+    this.pocketedThisShot.push({ ballNumber, pocketId });
+
+    if (ballNumber === 0) {
+      this.scratchedThisShot = true;
+    }
+
+    // Stop the ball and hide it
+    const body = this.ballBodies[ballNumber];
+    if (body) {
+      this.matter.body.setVelocity(body, { x: 0, y: 0 });
+      // Move off-screen temporarily
+      this.matter.body.setPosition(body, { x: -200, y: -200 });
+    }
+    if (this.ballSprites[ballNumber]) {
+      this.ballSprites[ballNumber].setVisible(false);
+    }
+  }
+
+  checkRailContacts() {
+    // Simplified: check if any ball is very close to a rail edge
+    const tw = PHYSICS_CFG.tableWidth;
+    const th = PHYSICS_CFG.tableHeight;
+    const ox = this.tableOffsetX;
+    const oy = this.tableOffsetY;
+    const br = PHYSICS_CFG.ballRadius;
+    const margin = br + 3;
+
+    Object.entries(this.ballBodies).forEach(([num, body]) => {
+      if (+num === 0) return;
+      const bx = body.position.x - ox;
+      const by = body.position.y - oy;
+      const speed = Math.hypot(body.velocity.x, body.velocity.y);
+
+      if (speed > 0.5 && (bx <= margin || bx >= tw - margin || by <= margin || by >= th - margin)) {
+        this.railContactsThisShot.add(+num);
+      }
+    });
+  }
+
+  areAllBallsSettled() {
+    const threshold = PHYSICS_CFG.physicsSettleVelocityThreshold;
+    return Object.values(this.ballBodies).every(body => {
+      if (body.position.x < -100) return true; // pocketed/off-screen
+      const speed = Math.hypot(body.velocity.x, body.velocity.y);
+      return speed < threshold;
+    });
+  }
+
+  // ── Shot Resolution ──
+
+  onShotComplete() {
+    resolveShot(this);
+  }
+
+  startNewGame() {
+    gameState = createInitialGameState();
+    this.rackBalls();
+    this.ballInHandMode = false;
+    document.getElementById('bih-indicator').style.display = 'none';
+    updateHUD();
+    this.updatePocketVisuals();
+
+    // Coin flip
+    showCoinFlip();
+  }
+}
+
+
+// ═══════════════════════════════════════════════════
+// SECTION 5: SHOT RESOLUTION & MATCH FLOW
+// ═══════════════════════════════════════════════════
+
+function resolveShot(sceneRef) {
+  const pocketed = sceneRef.pocketedThisShot;
+  const scratched = sceneRef.scratchedThisShot;
+  const isBreak = gameState.isBreakShot;
+
+  console.log('Shot resolved:', { pocketed, scratched, isBreak, phase: gameState.phase });
+
+  // ── BREAK SHOT ──
+  if (isBreak) {
+    resolveBreakShot(sceneRef, pocketed, scratched);
+    return;
+  }
+
+  // ── NORMAL SHOT ──
+
+  // 1. Scratch overrides everything
+  if (scratched) {
+    resolveScratch(sceneRef, pocketed);
+    return;
+  }
+
+  // 2. Classify each pocketed ball
+  const validEvents = [];
+  const invalidEvents = [];
+
+  pocketed.forEach(evt => {
+    if (evt.ballNumber === 0) return; // cue ball handled above
+    const isValid = isPocketValidForPlayer(gameState, evt.pocketId, evt.ballNumber, gameState.activePlayerIndex);
+    if (isValid) {
+      validEvents.push(evt);
+    } else {
+      invalidEvents.push(evt);
+    }
+  });
+
+  // 3. Respawn invalid balls
+  invalidEvents.forEach(evt => {
+    sceneRef.respawnBall(evt.ballNumber);
+  });
+
+  // 4. If no valid events - miss
+  if (validEvents.length === 0) {
+    resolveMiss(sceneRef);
+    return;
+  }
+
+  // 5. Register valid cards (process one at a time for suit selection / wildcard modals)
+  gameState.pendingPocketEvents = validEvents;
+  gameState.turnHasRegisteredCard = true;
+  processNextPocketEvent(sceneRef);
+}
+
+function resolveBreakShot(sceneRef, pocketed, scratched) {
+  const objectBallsPocketed = pocketed.filter(e => e.ballNumber !== 0);
+  const railContacts = sceneRef.railContactsThisShot.size;
+
+  // Check break legality
+  const isLegal = railContacts >= GAMEPLAY.breakRequiredRailContactCount || objectBallsPocketed.length > 0;
+
+  if (scratched) {
+    // Scratch on break: respawn all pocketed, 1 miss, turn passes, ball in hand
+    pocketed.forEach(evt => {
+      if (evt.ballNumber !== 0) sceneRef.respawnBall(evt.ballNumber);
+    });
+    // Respawn cue ball for opponent
+    sceneRef.removeBallVisual(0);
+    gameState.players[gameState.activePlayerIndex].missCount++;
+    gameState.isBreakShot = false;
+    gameState.phase = 'suit-mapping';
+    switchTurn(sceneRef);
+    startBallInHand(sceneRef);
+    updateHUD();
+    return;
+  }
+
+  if (!isLegal) {
+    // Respawn pocketed balls first
+    objectBallsPocketed.forEach(evt => sceneRef.respawnBall(evt.ballNumber));
+    // Show illegal break modal - opponent decides
+    gameState.isBreakShot = false;
+    showIllegalBreakModal(sceneRef);
+    return;
+  }
+
+  // Legal break - respawn any pocketed balls (break never awards cards)
+  objectBallsPocketed.forEach(evt => sceneRef.respawnBall(evt.ballNumber));
+
+  gameState.isBreakShot = false;
+  gameState.phase = 'suit-mapping';
+
+  if (objectBallsPocketed.length > 0) {
+    // Breaker keeps turn (pocketed at least one ball without scratch)
+    gameState.turnShotCount = 0;
+    gameState.turnHasRegisteredCard = false;
+    updateHUD();
+  } else {
+    // No ball pocketed - turn passes
+    switchTurn(sceneRef);
+    updateHUD();
+  }
+}
+
+function resolveScratch(sceneRef, pocketed) {
+  // All pocketed object balls respawn
+  pocketed.forEach(evt => {
+    if (evt.ballNumber !== 0) {
+      sceneRef.respawnBall(evt.ballNumber);
+    }
+  });
+
+  // Active player gains 1 miss
+  const player = getActivePlayer(gameState);
+  player.missCount++;
+
+  // Check elimination
+  if (player.missCount >= GAMEPLAY.missLimit) {
+    eliminatePlayer(sceneRef, gameState.activePlayerIndex);
+    return;
+  }
+
+  // Turn passes, opponent gets ball in hand
+  switchTurn(sceneRef);
+
+  // Respawn cue ball off-screen, then enter ball-in-hand mode
+  sceneRef.removeBallVisual(0);
+  startBallInHand(sceneRef);
+  updateHUD();
+}
+
+function startBallInHand(sceneRef) {
+  gameState.ballInHand = true;
+  sceneRef.ballInHandMode = true;
+  document.getElementById('bih-indicator').style.display = 'block';
+}
+
+function resolveMiss(sceneRef) {
+  const player = getActivePlayer(gameState);
+  player.missCount++;
+
+  if (player.missCount >= GAMEPLAY.missLimit) {
+    eliminatePlayer(sceneRef, gameState.activePlayerIndex);
+    return;
+  }
+
+  // If in stand countdown, decrement
+  if (gameState.phase === 'stand-countdown' && gameState.stand) {
+    gameState.stand.responderTurnsRemaining--;
+    if (gameState.stand.responderTurnsRemaining <= 0) {
+      triggerShowdown(sceneRef);
+      return;
+    }
+  }
+
+  switchTurn(sceneRef);
+  updateHUD();
+}
+
+function processNextPocketEvent(sceneRef) {
+  if (gameState.pendingPocketEvents.length === 0) {
+    // All events processed - shot was successful
+    finishSuccessfulShot(sceneRef);
+    return;
+  }
+
+  const evt = gameState.pendingPocketEvents.shift();
+  const ballNum = evt.ballNumber;
+  const pocket = gameState.pockets.find(p => p.id === evt.pocketId);
+  const player = getActivePlayer(gameState);
+  const isWildcard = ballNum >= 14;
+
+  if (isWildcard) {
+    // Wildcard - show rank/suit selection
+    sceneRef.removeBallVisual(ballNum); // permanently removed
+    gameState.waitingForWildcardChoice = true;
+    showWildcardModal(sceneRef, player);
+    return;
+  }
+
+  // Rank ball
+  if (pocket.kind === 'unclaimed' && gameState.phase === 'suit-mapping') {
+    // Need to choose suit for this pocket first
+    gameState.waitingForSuitChoice = true;
+    gameState._pendingSuitPocket = pocket;
+    gameState._pendingSuitBall = ballNum;
+    showSuitSelectionModal(sceneRef, pocket, ballNum);
+    return;
+  }
+
+  // Pocket already has a suit - register card directly
+  const rank = ballNumberToRank(ballNum);
+  const card = { rank, suit: pocket.suit };
+  registerCard(sceneRef, player, card, ballNum);
+}
+
+function onSuitChosen(sceneRef, suit) {
+  const pocket = gameState._pendingSuitPocket;
+  const ballNum = gameState._pendingSuitBall;
+
+  pocket.kind = 'suit';
+  pocket.suit = suit;
+  gameState.suitsClaimed = countClaimedSuits(gameState);
+  gameState.waitingForSuitChoice = false;
+
+  // Check if all 4 suits assigned → remaining become wild
+  if (gameState.suitsClaimed === 4) {
+    gameState.pockets.forEach(p => {
+      if (p.kind === 'unclaimed') p.kind = 'wild';
+    });
+    gameState.phase = 'hand-race';
+  }
+
+  // Now register the card
+  const rank = ballNumberToRank(ballNum);
+  const card = { rank, suit };
+  const player = getActivePlayer(gameState);
+  registerCard(sceneRef, player, card, ballNum);
+
+  sceneRef.updatePocketVisuals();
+  hideSuitModal();
+}
+
+function onWildcardChosen(sceneRef, rank, suit) {
+  gameState.waitingForWildcardChoice = false;
+  const player = getActivePlayer(gameState);
+  const card = { rank, suit };
+  registerCard(sceneRef, player, card, -1); // -1 = no ball to respawn
+  hideWildcardModal();
+}
+
+function registerCard(sceneRef, player, card, ballNum) {
+  if (player.hand.length < GAMEPLAY.maxHandSize) {
+    player.hand.push(card);
+    // Respawn the rank ball (wildcards already removed)
+    if (ballNum > 0 && ballNum <= 13) {
+      sceneRef.respawnBall(ballNum);
+    }
+    updateHUD();
+    // Process next pending event
+    processNextPocketEvent(sceneRef);
+  } else {
+    // Hand full - swap decision needed
+    gameState.waitingForSwap = true;
+    gameState._pendingNewCard = card;
+    gameState._pendingSwapBallNum = ballNum;
+    showSwapModal(sceneRef, player, card);
+  }
+}
+
+function onSwapDecision(sceneRef, discardIndex) {
+  const player = getActivePlayer(gameState);
+  const newCard = gameState._pendingNewCard;
+  const ballNum = gameState._pendingSwapBallNum;
+
+  // Add new card, then remove selected
+  const allCards = [...player.hand, newCard]; // 6 cards
+  allCards.splice(discardIndex, 1); // back to 5
+  player.hand = allCards;
+
+  // Respawn the rank ball
+  if (ballNum > 0 && ballNum <= 13) {
+    sceneRef.respawnBall(ballNum);
+  }
+
+  gameState.waitingForSwap = false;
+  hideSwapModal();
+  updateHUD();
+
+  // Check if both players have 5 cards → immediate showdown
+  if (gameState.players[0].hand.length === 5 && gameState.players[1].hand.length === 5) {
+    if (gameState.phase !== 'stand-countdown') {
+      triggerShowdown(sceneRef);
+      return;
+    }
+  }
+
+  // Process next pending event
+  processNextPocketEvent(sceneRef);
+}
+
+function finishSuccessfulShot(sceneRef) {
+  const player = getActivePlayer(gameState);
+  player.missCount = 0; // reset on success
+
+  // Check if both players have 5 cards → immediate showdown
+  if (gameState.players[0].hand.length === 5 && gameState.players[1].hand.length === 5) {
+    triggerShowdown(sceneRef);
+    return;
+  }
+
+  // Check stand countdown - if responder reached 5 cards
+  if (gameState.phase === 'stand-countdown' && gameState.stand) {
+    if (player.hand.length === 5) {
+      triggerShowdown(sceneRef);
+      return;
+    }
+  }
+
+  // Bonus shot! Player can shoot again or end turn
+  gameState.turnShotCount++;
+  gameState.lastShotSuccessful = true;
+  updateHUD();
+  enableEndTurnButton(true);
+}
+
+function switchTurn(sceneRef) {
+  // Stand countdown tracking
+  if (gameState.phase === 'stand-countdown' && gameState.stand) {
+    if (gameState.activePlayerIndex !== gameState.stand.declarerIndex) {
+      // Responder just finished a turn
+      gameState.stand.responderTurnsRemaining--;
+      if (gameState.stand.responderTurnsRemaining <= 0) {
+        triggerShowdown(sceneRef);
+        return;
+      }
+    }
+  }
+
+  gameState.activePlayerIndex = 1 - gameState.activePlayerIndex;
+  gameState.turnShotCount = 0;
+  gameState.lastShotSuccessful = false;
+  gameState.turnHasRegisteredCard = false;
+  enableEndTurnButton(false);
+  updateHUD();
+}
+
+function declareStand(sceneRef) {
+  const player = getActivePlayer(gameState);
+  if (player.hand.length !== 5) return;
+  if (!GAMEPLAY.allowStandOnlyAtTurnStart) return;
+
+  player.hasStood = true;
+  gameState.phase = 'stand-countdown';
+  gameState.stand = {
+    declarerIndex: gameState.activePlayerIndex,
+    responderTurnsRemaining: GAMEPLAY.standResponseTurns,
+  };
+
+  // Turn passes to opponent
+  switchTurn(sceneRef);
+  updateHUD();
+}
+
+function eliminatePlayer(sceneRef, playerIndex) {
+  gameState.players[playerIndex].isEliminated = true;
+  gameState.phase = 'game-over';
+  const winner = gameState.players[1 - playerIndex];
+  showGameOverModal(winner.name + ' wins!', gameState.players[playerIndex].name + ' was eliminated (3 misses).');
+  updateHUD();
+}
+
+function triggerShowdown(sceneRef) {
+  gameState.phase = 'showdown';
+
+  const eval0 = evaluatePokerHand(gameState.players[0].hand);
+  const eval1 = evaluatePokerHand(gameState.players[1].hand);
+  const cmp = compareHands(eval0, eval1);
+
+  let winnerIndex;
+  if (cmp > 0) winnerIndex = 0;
+  else if (cmp < 0) winnerIndex = 1;
+  else {
+    // Tie - player who triggered endgame wins
+    if (gameState.stand) {
+      winnerIndex = gameState.stand.declarerIndex;
+    } else {
+      winnerIndex = gameState.activePlayerIndex;
+    }
+  }
+
+  showShowdownModal(eval0, eval1, winnerIndex);
+  updateHUD();
+}
+
+function voluntaryEndTurn(sceneRef) {
+  if (!gameState.lastShotSuccessful) return;
+  enableEndTurnButton(false);
+
+  if (gameState.phase === 'stand-countdown' && gameState.stand) {
+    // Count this as end of a responder turn
+  }
+
+  switchTurn(sceneRef);
+  updateHUD();
+}
+
+function concedeMatch(sceneRef) {
+  const loserIndex = gameState.activePlayerIndex;
+  gameState.players[loserIndex].isEliminated = true;
+  gameState.phase = 'game-over';
+  const winner = gameState.players[1 - loserIndex];
+  showGameOverModal(winner.name + ' wins!', gameState.players[loserIndex].name + ' conceded.');
+  updateHUD();
+}
+
+
+// ═══════════════════════════════════════════════════
+// SECTION 6: UI MANAGEMENT
+// ═══════════════════════════════════════════════════
+
+function isModalOpen() {
+  return document.querySelector('.modal-overlay.visible') !== null ||
+         document.getElementById('rules-panel').classList.contains('open');
+}
+
+function updateHUD() {
+  // Player names & active indicator
+  const p1Name = document.getElementById('p1-name');
+  const p2Name = document.getElementById('p2-name');
+  p1Name.textContent = gameState.players[0].name;
+  p2Name.textContent = gameState.players[1].name;
+  p1Name.classList.toggle('active', gameState.activePlayerIndex === 0);
+  p2Name.classList.toggle('active', gameState.activePlayerIndex === 1);
+
+  // Hands
+  renderHand('p1-hand', gameState.players[0].hand);
+  renderHand('p2-hand', gameState.players[1].hand);
+
+  // Best hand labels
+  const eval0 = evaluatePokerHand(gameState.players[0].hand);
+  const eval1 = evaluatePokerHand(gameState.players[1].hand);
+  document.getElementById('p1-best').textContent = eval0.name;
+  document.getElementById('p2-best').textContent = eval1.name;
+
+  // Miss pips
+  renderPips('p1-pips', gameState.players[0].missCount);
+  renderPips('p2-pips', gameState.players[1].missCount);
+
+  // Phase indicator
+  const phaseLabel = document.getElementById('phase-label');
+  const phaseNames = {
+    'setup': 'Setup', 'break': 'Break', 'suit-mapping': 'Suit Mapping',
+    'hand-race': 'Hand Race', 'stand-countdown': 'Stand Countdown',
+    'showdown': 'Showdown', 'game-over': 'Game Over'
+  };
+  phaseLabel.textContent = phaseNames[gameState.phase] || gameState.phase;
+
+  // Stand countdown
+  const scEl = document.getElementById('stand-countdown');
+  if (gameState.phase === 'stand-countdown' && gameState.stand) {
+    scEl.textContent = 'Turns left: ' + gameState.stand.responderTurnsRemaining;
+    scEl.classList.add('visible');
+  } else {
+    scEl.classList.remove('visible');
+  }
+
+  // Stand button
+  const standBtn = document.getElementById('btn-stand');
+  const activePlayer = getActivePlayer(gameState);
+  standBtn.disabled = !(
+    activePlayer.hand.length === 5 &&
+    !activePlayer.hasStood &&
+    gameState.phase !== 'stand-countdown' &&
+    gameState.phase !== 'showdown' &&
+    gameState.phase !== 'game-over' &&
+    gameState.phase !== 'break' &&
+    gameState.turnShotCount === 0
+  );
+}
+
+function renderHand(containerId, hand) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  for (let i = 0; i < GAMEPLAY.maxHandSize; i++) {
+    const div = document.createElement('div');
+    if (i < hand.length) {
+      const card = hand[i];
+      const isRed = isRedSuit(card.suit);
+      div.className = 'mini-card ' + (isRed ? 'red' : 'black');
+      div.innerHTML = `<span>${card.rank}</span><span>${SUIT_SYMBOLS[card.suit]}</span>`;
+    } else {
+      div.className = 'mini-card empty';
+    }
+    container.appendChild(div);
+  }
+}
+
+function renderPips(containerId, missCount) {
+  const container = document.getElementById(containerId);
+  const pips = container.querySelectorAll('.miss-pip');
+  pips.forEach((pip, i) => {
+    pip.classList.toggle('filled', i < missCount);
+    pip.classList.toggle('warning', missCount === 2 && i < missCount);
+  });
+}
+
+function updatePowerMeter(power, visible) {
+  const meter = document.getElementById('power-meter');
+  const fill = document.getElementById('power-fill');
+  meter.classList.toggle('visible', visible);
+  fill.style.width = (power * 100) + '%';
+}
+
+function enableEndTurnButton(enabled) {
+  document.getElementById('btn-end-turn').disabled = !enabled;
+}
+
+// ── Coin Flip Modal ──
+
+function showCoinFlip() {
+  const modal = document.getElementById('modal-coinflip');
+  modal.classList.add('visible');
+  const coin = document.getElementById('coin');
+  const result = document.getElementById('coin-result');
+  const actions = document.getElementById('coin-actions');
+
+  coin.classList.remove('stopped');
+  coin.textContent = '?';
+  result.textContent = '';
+  actions.style.display = 'none';
+
+  // Animate for 1.5s then reveal
+  setTimeout(() => {
+    const breaker = Math.random() < 0.5 ? 0 : 1;
+    gameState.breakerIndex = breaker;
+    gameState.activePlayerIndex = breaker;
+    gameState.phase = 'break';
+    gameState.isBreakShot = true;
+
+    coin.classList.add('stopped');
+    coin.textContent = breaker === 0 ? 'P1' : 'P2';
+    result.textContent = gameState.players[breaker].name + ' breaks!';
+    actions.style.display = 'flex';
+    updateHUD();
+  }, 1500);
+}
+
+document.getElementById('coin-ok').addEventListener('click', () => {
+  document.getElementById('modal-coinflip').classList.remove('visible');
+});
+
+// ── Suit Selection Modal ──
+
+function showSuitSelectionModal(sceneRef, pocket, ballNum) {
+  const modal = document.getElementById('modal-suit');
+  modal.classList.add('visible');
+  const container = document.getElementById('suit-options');
+  container.innerHTML = '';
+
+  const claimed = gameState.pockets.filter(p => p.suit).map(p => p.suit);
+
+  SUITS.forEach(suit => {
+    const btn = document.createElement('button');
+    btn.className = 'suit-btn';
+    btn.innerHTML = `<span style="color:${isRedSuit(suit) ? '#ff4444' : '#4488ff'}">${SUIT_SYMBOLS[suit]}</span><span class="suit-label">${suit}</span>`;
+    btn.disabled = claimed.includes(suit);
+    btn.addEventListener('click', () => {
+      onSuitChosen(sceneRef, suit);
+    });
+    container.appendChild(btn);
+  });
+}
+
+function hideSuitModal() {
+  document.getElementById('modal-suit').classList.remove('visible');
+}
+
+// ── Wildcard Modal ──
+
+function showWildcardModal(sceneRef, player) {
+  const modal = document.getElementById('modal-wildcard');
+  modal.classList.add('visible');
+
+  let selectedSuit = null;
+  let selectedRank = null;
+
+  // Suit options
+  const suitContainer = document.getElementById('wc-suit-options');
+  suitContainer.innerHTML = '';
+  SUITS.forEach(suit => {
+    const btn = document.createElement('button');
+    btn.className = 'suit-btn';
+    btn.innerHTML = `<span style="color:${isRedSuit(suit) ? '#ff4444' : '#4488ff'}">${SUIT_SYMBOLS[suit]}</span><span class="suit-label">${suit}</span>`;
+    btn.addEventListener('click', () => {
+      selectedSuit = suit;
+      suitContainer.querySelectorAll('.suit-btn').forEach(b => b.style.borderColor = 'rgba(255,255,255,0.2)');
+      btn.style.borderColor = '#4fc3f7';
+      updateWCConfirm();
+      updateRankDisabled();
+    });
+    suitContainer.appendChild(btn);
+  });
+
+  // Rank options
+  const rankContainer = document.getElementById('wc-rank-options');
+  rankContainer.innerHTML = '';
+  RANKS.forEach(rank => {
+    const btn = document.createElement('button');
+    btn.className = 'wc-option';
+    btn.textContent = rank;
+    btn.addEventListener('click', () => {
+      if (btn.classList.contains('disabled')) return;
+      selectedRank = rank;
+      rankContainer.querySelectorAll('.wc-option').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      updateWCConfirm();
+    });
+    rankContainer.appendChild(btn);
+  });
+
+  function updateRankDisabled() {
+    rankContainer.querySelectorAll('.wc-option').forEach(btn => {
+      const rank = btn.textContent;
+      const isDupe = selectedSuit && player.hand.some(c => c.rank === rank && c.suit === selectedSuit);
+      btn.classList.toggle('disabled', isDupe);
+      if (isDupe && selectedRank === rank) {
+        selectedRank = null;
+        btn.classList.remove('selected');
+      }
+    });
+  }
+
+  function updateWCConfirm() {
+    document.getElementById('wc-confirm').disabled = !(selectedSuit && selectedRank);
+  }
+
+  document.getElementById('wc-confirm').onclick = () => {
+    if (selectedSuit && selectedRank) {
+      onWildcardChosen(sceneRef, selectedRank, selectedSuit);
+    }
+  };
+}
+
+function hideWildcardModal() {
+  document.getElementById('modal-wildcard').classList.remove('visible');
+}
+
+// ── Swap Modal ──
+
+function showSwapModal(sceneRef, player, newCard) {
+  const modal = document.getElementById('modal-swap');
+  modal.classList.add('visible');
+
+  const container = document.getElementById('swap-cards');
+  container.innerHTML = '';
+
+  let selectedIndex = -1;
+  const allCards = [...player.hand, newCard]; // 6 cards
+
+  allCards.forEach((card, i) => {
+    const div = document.createElement('div');
+    const isNew = (i === allCards.length - 1);
+    div.className = 'swap-card ' + (isRedSuit(card.suit) ? 'red' : '') + (isNew ? ' new-card' : '');
+    div.innerHTML = `<span style="font-size:18px">${card.rank}</span><span style="font-size:22px">${SUIT_SYMBOLS[card.suit]}</span>`;
+    if (isNew) {
+      const tag = document.createElement('div');
+      tag.style.cssText = 'font-size:9px; color:#4fc3f7; margin-top:2px;';
+      tag.textContent = 'NEW';
+      div.appendChild(tag);
+    }
+    div.addEventListener('click', () => {
+      selectedIndex = i;
+      container.querySelectorAll('.swap-card').forEach(c => c.classList.remove('selected'));
+      div.classList.add('selected');
+      document.getElementById('swap-confirm').disabled = false;
+    });
+    container.appendChild(div);
+  });
+
+  document.getElementById('swap-confirm').disabled = true;
+  document.getElementById('swap-confirm').onclick = () => {
+    if (selectedIndex >= 0) {
+      onSwapDecision(sceneRef, selectedIndex);
+    }
+  };
+}
+
+function hideSwapModal() {
+  document.getElementById('modal-swap').classList.remove('visible');
+}
+
+// ── Showdown Modal ──
+
+function showShowdownModal(eval0, eval1, winnerIndex) {
+  const modal = document.getElementById('modal-showdown');
+  modal.classList.add('visible');
+
+  const container = document.getElementById('showdown-hands');
+  container.innerHTML = '';
+
+  [0, 1].forEach(i => {
+    const player = gameState.players[i];
+    const evalResult = i === 0 ? eval0 : eval1;
+    const div = document.createElement('div');
+    div.className = 'showdown-player';
+    div.innerHTML = `
+      <h3 style="color:${i === 0 ? 'var(--color-p1)' : 'var(--color-p2)'}">${player.name}</h3>
+      <div class="hand-cards" style="justify-content:center">
+        ${player.hand.map(c => `<div class="mini-card ${isRedSuit(c.suit) ? 'red' : 'black'}"><span>${c.rank}</span><span>${SUIT_SYMBOLS[c.suit]}</span></div>`).join('')}
+      </div>
+      <div class="hand-rank">${evalResult.name}</div>
+    `;
+    container.appendChild(div);
+  });
+
+  const winnerEl = document.getElementById('showdown-winner');
+  winnerEl.textContent = gameState.players[winnerIndex].name + ' wins!';
+  winnerEl.className = 'winner-text ' + (winnerIndex === 0 ? 'p1' : 'p2');
+
+  gameState.phase = 'game-over';
+}
+
+document.getElementById('showdown-ok').addEventListener('click', () => {
+  document.getElementById('modal-showdown').classList.remove('visible');
+  if (scene) scene.startNewGame();
+});
+
+// ── Game Over Modal ──
+
+function showGameOverModal(title, msg) {
+  const modal = document.getElementById('modal-gameover');
+  modal.classList.add('visible');
+  document.getElementById('gameover-title').textContent = title;
+  document.getElementById('gameover-msg').textContent = msg;
+}
+
+document.getElementById('gameover-ok').addEventListener('click', () => {
+  document.getElementById('modal-gameover').classList.remove('visible');
+  if (scene) scene.startNewGame();
+});
+
+// ── Illegal Break Modal ──
+
+function showIllegalBreakModal(sceneRef) {
+  const modal = document.getElementById('modal-illegal-break');
+  modal.classList.add('visible');
+
+  document.getElementById('illegal-accept').onclick = () => {
+    modal.classList.remove('visible');
+    gameState.phase = 'suit-mapping';
+    switchTurn(sceneRef);
+    updateHUD();
+  };
+
+  document.getElementById('illegal-rerack').onclick = () => {
+    modal.classList.remove('visible');
+    // Re-rack and re-break (same breaker)
+    gameState.phase = 'break';
+    gameState.isBreakShot = true;
+    sceneRef.rackBalls();
+    updateHUD();
+  };
+}
+
+// ── Concede ──
+
+document.getElementById('btn-concede').addEventListener('click', () => {
+  if (gameState.phase === 'game-over' || gameState.phase === 'showdown') return;
+  document.getElementById('modal-concede').classList.add('visible');
+});
+
+document.getElementById('concede-yes').addEventListener('click', () => {
+  document.getElementById('modal-concede').classList.remove('visible');
+  if (scene) concedeMatch(scene);
+});
+
+document.getElementById('concede-no').addEventListener('click', () => {
+  document.getElementById('modal-concede').classList.remove('visible');
+});
+
+// ── End Turn & Stand Buttons ──
+
+document.getElementById('btn-end-turn').addEventListener('click', () => {
+  if (scene) voluntaryEndTurn(scene);
+});
+
+document.getElementById('btn-stand').addEventListener('click', () => {
+  if (scene) declareStand(scene);
+});
+
+
+// ═══════════════════════════════════════════════════
+// SECTION 7: RULES PANEL
+// ═══════════════════════════════════════════════════
+
+const RULES_CONTENT = {
+  howto: `
+    <h3>Goal</h3>
+    <p>Build the best 5-card poker hand by pocketing pool balls. Each pocketed ball becomes a card in your hand.</p>
+    <h3>Turn Structure</h3>
+    <p>Aim and shoot the cue ball to pocket numbered balls. A successful pocket gives you a bonus shot. Missing passes your turn and adds a miss pip.</p>
+    <h3>Suit Mapping (Phase 1)</h3>
+    <p>The first ball pocketed in each pocket lets you assign a suit. After all 4 suits are placed, the 2 remaining pockets become Wild Holes.</p>
+    <h3>Hand Race (Phase 2)</h3>
+    <p>Pocket rank balls (1-13) into Suit Holes to gain cards. Pocket wildcard balls (14-15) into Wild Holes to choose any rank and suit.</p>
+    <h3>Winning</h3>
+    <p>Win by having the better poker hand at Showdown, by your opponent getting 3 consecutive misses, or by your opponent conceding.</p>
+    <h3>Stand</h3>
+    <p>When you have 5 cards, you may declare Stand at the start of your turn. Your opponent then gets 3 more turns to finish their hand before Showdown.</p>
+  `,
+  poker: `
+    <h3>Poker Hand Rankings</h3>
+    <p>From strongest to weakest:</p>
+    <ul class="rank-list">
+      <li><strong>1. Royal Flush</strong> — A K Q J 10 of one suit</li>
+      <li><strong>2. Straight Flush</strong> — Five consecutive cards of one suit</li>
+      <li><strong>3. Four of a Kind</strong> — Four cards of the same rank</li>
+      <li><strong>4. Full House</strong> — Three of a kind + a pair</li>
+      <li><strong>5. Flush</strong> — Five cards of the same suit</li>
+      <li><strong>6. Straight</strong> — Five consecutive cards, any suits</li>
+      <li><strong>7. Three of a Kind</strong> — Three cards of the same rank</li>
+      <li><strong>8. Two Pair</strong> — Two different pairs</li>
+      <li><strong>9. One Pair</strong> — Two cards of the same rank</li>
+      <li><strong>10. High Card</strong> — No combination; highest card wins</li>
+    </ul>
+    <h3>Special Rules</h3>
+    <p>Ace can be high (A-K-Q-J-10) or low (A-2-3-4-5) in straights. Wraparound (Q-K-A-2-3) is not valid.</p>
+    <p>If hands are tied, kicker cards break the tie.</p>
+  `,
+  pockets: `
+    <h3>Pocket Types</h3>
+    <p><strong style="color:#f0c040">Unclaimed (Yellow)</strong> — No suit yet. Pocketing a rank ball here lets you assign a suit.</p>
+    <p><strong style="color:#34c759">Suit Hole (Colored)</strong> — Assigned a suit. Rank balls pocketed here become cards of that suit.</p>
+    <p><strong style="color:#ffd700">Wild Hole (Gold ★)</strong> — The 2 pockets left after all suits are assigned. Only wildcard balls (14-15) register here. You choose any rank and suit.</p>
+    <h3>Valid vs Invalid</h3>
+    <p><strong style="color:#34c759">Green glow</strong> = valid pocket. The ball will register as a card.</p>
+    <p><strong style="color:#ff453a">Red glow</strong> = invalid pocket. The ball will respawn.</p>
+    <h3>Important</h3>
+    <p>Suits are equal in poker scoring. Assigning suits only maps card suits to table positions — it creates the strategic board you must exploit.</p>
+    <p>Duplicate exact cards (same rank + suit) cannot exist in one hand.</p>
+  `,
+  controls: `
+    <h3>Aiming & Shooting</h3>
+    <p><strong>Aim:</strong> Click and drag from the cue ball. The shot goes opposite your drag direction.</p>
+    <p><strong>Power:</strong> Drag farther for more power. Watch the power meter.</p>
+    <p><strong>Shoot:</strong> Release the mouse button.</p>
+    <p><strong>Fine aim:</strong> Use ← → arrow keys while aiming.</p>
+    <h3>Actions</h3>
+    <p><strong>End Turn:</strong> After a successful shot, you may end your turn voluntarily.</p>
+    <p><strong>Stand:</strong> Declare at the start of your turn when you have 5 cards. Triggers endgame countdown.</p>
+    <p><strong>Concede:</strong> Forfeit the match.</p>
+    <h3>Ball in Hand</h3>
+    <p>After a scratch (cue ball pocketed), the next player clicks anywhere on the table to place the cue ball.</p>
+    <h3>Shortcuts</h3>
+    <p><strong>Esc:</strong> Cancel aiming / Open menu</p>
+    <p><strong>Backtick (\`):</strong> Toggle debug panel</p>
+  `
+};
+
+// Rules panel interaction
+document.getElementById('btn-rules').addEventListener('click', () => {
+  document.getElementById('rules-panel').classList.add('open');
+  document.getElementById('rules-backdrop').classList.add('visible');
+  showRulesTab('howto');
+});
+
+document.getElementById('rules-close').addEventListener('click', closeRulesPanel);
+document.getElementById('rules-backdrop').addEventListener('click', closeRulesPanel);
+
+function closeRulesPanel() {
+  document.getElementById('rules-panel').classList.remove('open');
+  document.getElementById('rules-backdrop').classList.remove('visible');
+}
+
+document.querySelectorAll('.rules-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    showRulesTab(tab.dataset.tab);
+  });
+});
+
+function showRulesTab(tabId) {
+  document.querySelectorAll('.rules-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tabId));
+  document.getElementById('rules-content').innerHTML = RULES_CONTENT[tabId] || '';
+}
+
+// Close rules on Esc
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    if (document.getElementById('rules-panel').classList.contains('open')) {
+      closeRulesPanel();
+    }
+  }
+});
+
+// ═══════════════════════════════════════════════════
+// SECTION 8: DEBUG PANEL
+// ═══════════════════════════════════════════════════
+
+function toggleDebugPanel() {
+  document.getElementById('debug-panel').classList.toggle('open');
+}
+
+function initDebugPanel() {
+  const panel = document.getElementById('debug-panel');
+  panel.innerHTML = `
+    <h2 style="color:var(--color-accent); margin-bottom:12px;">Debug Panel</h2>
+    <h3>Physics</h3>
+    ${debugSlider('pocketRadiusMultiplier', 1.0, 2.0, 0.05)}
+    ${debugSlider('pocketCaptureRadiusMultiplier', 1.5, 3.5, 0.1)}
+    ${debugSlider('pocketCapturePullStrength', 0.0005, 0.006, 0.0005)}
+    ${debugSlider('maxShotPower', 8, 30, 1)}
+    ${debugSlider('feltFriction', 0.005, 0.1, 0.005)}
+    ${debugSlider('ballRestitution', 0.5, 1.0, 0.05)}
+    ${debugSlider('linearDamping', 0.01, 0.1, 0.005)}
+    ${debugSlider('aimLineLength', 100, 800, 50)}
+    <h3>Toggles</h3>
+    <div class="debug-row">
+      <label>Pocket Labels</label>
+      <input type="checkbox" id="dbg-pocket-labels" checked>
+    </div>
+    <h3>Actions</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:4px;">
+      <button class="btn btn-secondary debug-btn" id="dbg-force-suit-mapping">Force Suit Map</button>
+      <button class="btn btn-secondary debug-btn" id="dbg-force-hand-race">Force Hand Race</button>
+      <button class="btn btn-secondary debug-btn" id="dbg-deal-p1">Deal 5 to P1</button>
+      <button class="btn btn-secondary debug-btn" id="dbg-deal-p2">Deal 5 to P2</button>
+      <button class="btn btn-secondary debug-btn" id="dbg-trigger-stand">Trigger Stand</button>
+      <button class="btn btn-secondary debug-btn" id="dbg-trigger-showdown">Trigger Showdown</button>
+      <button class="btn btn-danger debug-btn" id="dbg-reset-defaults">Reset Defaults</button>
+    </div>
+    <h3>State</h3>
+    <pre id="dbg-state" style="font-size:10px; max-height:200px; overflow:auto; background:rgba(0,0,0,0.3); padding:8px; border-radius:4px;"></pre>
+  `;
+
+  // Wire up sliders
+  panel.querySelectorAll('input[type="range"]').forEach(slider => {
+    slider.addEventListener('input', () => {
+      const key = slider.dataset.key;
+      const val = parseFloat(slider.value);
+      PHYSICS_CFG[key] = val;
+      slider.parentElement.querySelector('.val').textContent = val.toFixed(slider.step < 0.01 ? 4 : slider.step < 1 ? 2 : 0);
+    });
+  });
+
+  // Toggles
+  document.getElementById('dbg-pocket-labels').addEventListener('change', e => {
+    if (scene) scene.showPocketLabels = e.target.checked;
+  });
+
+  // Action buttons
+  document.getElementById('dbg-force-suit-mapping').addEventListener('click', () => {
+    gameState.phase = 'suit-mapping';
+    gameState.isBreakShot = false;
+    updateHUD();
+  });
+
+  document.getElementById('dbg-force-hand-race').addEventListener('click', () => {
+    // Assign all suits
+    const unassigned = SUITS.filter(s => !gameState.pockets.some(p => p.suit === s));
+    gameState.pockets.forEach(p => {
+      if (p.kind === 'unclaimed' && unassigned.length > 0) {
+        p.kind = 'suit';
+        p.suit = unassigned.shift();
+      }
+    });
+    gameState.pockets.forEach(p => { if (p.kind === 'unclaimed') p.kind = 'wild'; });
+    gameState.phase = 'hand-race';
+    gameState.isBreakShot = false;
+    if (scene) scene.updatePocketVisuals();
+    updateHUD();
+  });
+
+  document.getElementById('dbg-deal-p1').addEventListener('click', () => {
+    dealTestHand(0);
+  });
+  document.getElementById('dbg-deal-p2').addEventListener('click', () => {
+    dealTestHand(1);
+  });
+
+  document.getElementById('dbg-trigger-stand').addEventListener('click', () => {
+    if (scene) declareStand(scene);
+  });
+
+  document.getElementById('dbg-trigger-showdown').addEventListener('click', () => {
+    if (scene) triggerShowdown(scene);
+  });
+
+  document.getElementById('dbg-reset-defaults').addEventListener('click', () => {
+    Object.assign(PHYSICS_CFG, {
+      pocketRadiusMultiplier: 1.5,
+      pocketCaptureRadiusMultiplier: 2.2,
+      pocketCapturePullStrength: 0.0025,
+      maxShotPower: 18,
+      feltFriction: 0.02,
+      ballRestitution: 0.85,
+      linearDamping: 0.04,
+      aimLineLength: 600,
+    });
+    initDebugPanel(); // refresh sliders
+  });
+
+  // Update state display periodically
+  setInterval(() => {
+    if (!document.getElementById('debug-panel').classList.contains('open')) return;
+    const stateEl = document.getElementById('dbg-state');
+    if (stateEl && gameState) {
+      stateEl.textContent = JSON.stringify({
+        phase: gameState.phase,
+        active: gameState.activePlayerIndex,
+        p1Hand: gameState.players[0].hand.map(cardDisplayStr),
+        p2Hand: gameState.players[1].hand.map(cardDisplayStr),
+        p1Miss: gameState.players[0].missCount,
+        p2Miss: gameState.players[1].missCount,
+        pockets: gameState.pockets.map(p => p.id + ':' + (p.suit || p.kind)),
+        stand: gameState.stand,
+      }, null, 2);
+    }
+  }, 500);
+}
+
+function debugSlider(key, min, max, step) {
+  const val = PHYSICS_CFG[key];
+  return `<div class="debug-row">
+    <label>${key}</label>
+    <input type="range" min="${min}" max="${max}" step="${step}" value="${val}" data-key="${key}">
+    <span class="val">${val.toFixed(step < 0.01 ? 4 : step < 1 ? 2 : 0)}</span>
+  </div>`;
+}
+
+function dealTestHand(playerIndex) {
+  const suits = ['spades','hearts','diamonds','clubs'];
+  const ranks = ['A','K','Q','J','10','9','8','7','6','5','4','3','2'];
+  const player = gameState.players[playerIndex];
+  player.hand = [];
+  for (let i = 0; i < 5; i++) {
+    player.hand.push({
+      rank: ranks[Math.floor(Math.random() * ranks.length)],
+      suit: suits[Math.floor(Math.random() * suits.length)]
+    });
+  }
+  updateHUD();
+}
+
+// ═══════════════════════════════════════════════════
+// SECTION 9: PHASER INITIALIZATION
+// ═══════════════════════════════════════════════════
+
+const canvasW = PHYSICS_CFG.tableWidth + LAYOUT.canvasPadding * 2;
+const canvasH = PHYSICS_CFG.tableHeight + LAYOUT.canvasPadding * 2;
+
+const phaserConfig = {
+  type: Phaser.AUTO,
+  width: canvasW,
+  height: canvasH,
+  parent: 'phaser-mount',
+  backgroundColor: '#1a1a2e',
+  physics: {
+    default: 'matter',
+    matter: {
+      gravity: { x: 0, y: 0 },
+      debug: false,
+      setBounds: false
+    }
+  },
+  scene: PoolScene,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  }
+};
+
+const game = new Phaser.Game(phaserConfig);
+
+// Init debug panel after DOM ready
+initDebugPanel();
+
+</script>
+</body>
+</html>
