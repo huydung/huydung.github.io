@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="lang-en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,6 +18,17 @@
 html { scroll-behavior:smooth; }
 body { margin:0; font-family:var(--sans); color:var(--hd-ink); line-height:1.6; background:var(--hd-gray-page); }
 
+/* ---- Language switch ---- */
+/* !important needed: later rules like .check li .why and .callout .tag have higher/equal specificity */
+.lang-en .vi { display:none !important; }
+.lang-vi .en { display:none !important; }
+
+/* ---- Language toggle button ---- */
+.lang-toggle { display:flex; align-items:center; gap:2px; background:rgba(255,255,255,.13); border-radius:20px; padding:3px 4px; flex-shrink:0; }
+.lang-btn { font-size:12px; font-weight:700; color:rgba(255,255,255,.55); padding:4px 11px; border-radius:16px; transition:.15s; cursor:pointer; border:none; background:none; letter-spacing:.06em; font-family:var(--sans); }
+.lang-btn.active { background:var(--hd-cream); color:var(--hd-red-deep); }
+.lang-btn:hover:not(.active) { color:rgba(255,255,255,.9); }
+
 /* ---- Cover ---- */
 .cover { background:var(--hd-red-deep); color:#fff; padding:80px 8vw 70px; position:relative; }
 .cover .kicker { font-family:var(--sans); color:var(--hd-cream); letter-spacing:.08em; text-transform:uppercase; font-size:13px; font-weight:500; margin:0 0 18px; }
@@ -27,6 +38,7 @@ body { margin:0; font-family:var(--sans); color:var(--hd-ink); line-height:1.6; 
 .cover .byline { color:var(--hd-cream); font-size:15px; margin-top:26px; }
 .cover .byline b { font-weight:700; }
 .hdi-logo { position:absolute; bottom:24px; right:32px; height:35px; width:auto; }
+.cover-lang-toggle { margin-top:28px; display:inline-flex; }
 
 /* ---- Layout ---- */
 .wrap { max-width:980px; margin:0 auto; padding:0 24px; }
@@ -74,12 +86,48 @@ code { font-family:Consolas,Menlo,monospace; font-size:.92em; background:var(--h
 
 /* ---- Prompt block ---- */
 .prompt { margin:18px 0 26px; border:1px solid var(--hd-gray-border); border-radius:6px; overflow:hidden; }
-.prompt-head { display:flex; justify-content:space-between; align-items:center; background:var(--hd-red-deep); padding:9px 14px; }
-.prompt-label { color:#fff; font-family:var(--serif); font-weight:700; font-size:14px; }
+.prompt-head { display:flex; justify-content:space-between; align-items:center; background:var(--hd-red-deep); padding:9px 14px; cursor:pointer; user-select:none; gap:10px; }
+.prompt-label { color:#fff; font-family:var(--serif); font-weight:700; font-size:14px; flex:1; min-width:0; }
+.prompt-head-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
 .copy-btn { font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--hd-red-deep); background:var(--hd-cream); border:none; padding:6px 14px; border-radius:14px; cursor:pointer; transition:.15s; }
 .copy-btn:hover { background:#fff; }
 .copy-btn.done { background:var(--hd-green); color:#fff; }
+/* chevron injected by JS */
+.prompt-chevron { color:rgba(255,255,255,.7); font-size:13px; display:inline-block; transition:transform .2s ease; line-height:1; flex-shrink:0; }
+.prompt.collapsed .prompt-chevron { transform:rotate(-90deg); }
+/* header glow on hover when collapsed — hints at interactivity */
+.prompt.collapsed .prompt-head:hover { background:var(--hd-red-bright); }
 pre { margin:0; padding:16px 18px; background:#fdfdfb; font-family:Consolas,Menlo,monospace; font-size:13px; line-height:1.55; color:var(--hd-ink); white-space:pre-wrap; word-wrap:break-word; }
+
+/* ---- Collapsible prompt body ----
+   pre font-size=13px, line-height=1.55 → 1 line ≈ 20.2px; padding-top=16px
+   2 lines + top-pad = 16 + 40.4 = ~57px; we use 58px so text isn't cut mid-pixel */
+.prompt.collapsed pre {
+  max-height: 58px;
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
+  mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
+}
+
+/* ---- Expand bar (injected by JS, shown only when collapsed) ---- */
+.prompt-expand-bar {
+  display: none;
+  background: linear-gradient(to bottom, #fdfdfb, var(--hd-gray-page));
+  border-top: 1px solid var(--hd-gray-border);
+  text-align: center;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 400;
+  font-family: var(--sans);
+  color: var(--hd-red-bright);
+  letter-spacing: .06em;
+  cursor: pointer;
+  user-select: none;
+  transition: background .15s, color .15s;
+}
+.prompt.collapsed .prompt-expand-bar { display: block; }
+.prompt-expand-bar:hover { background: var(--hd-cream); color: var(--hd-red-deep); }
 .fill { color:var(--hd-red-bright); font-weight:700; }
 
 /* ---- Tool table ---- */
@@ -118,6 +166,7 @@ footer .hdi-logo { bottom:24px; }
 #stickyhead .sh-wrap { max-width:980px; margin:0 auto; padding:11px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
 #stickyhead .sh-title { font-family:var(--serif); font-weight:700; font-size:15px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 #stickyhead .sh-title span { color:var(--hd-cream); font-weight:400; }
+#stickyhead .sh-right { display:flex; align-items:center; gap:14px; flex-shrink:0; }
 #stickyhead .sh-pct { font-size:12.5px; font-weight:600; color:var(--hd-cream); white-space:nowrap; }
 /* the progress bar IS the bottom border of the header */
 #sh-progress { height:4px; width:0%; background:var(--hd-cream); transition:width .35s ease; }
@@ -128,17 +177,33 @@ footer .hdi-logo { bottom:24px; }
 
 <div id="stickyhead">
   <div class="sh-wrap">
-    <div class="sh-title">Prototyping Games with AI <span>· The Checklist</span></div>
-    <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
+    <!-- ═══ EN ═══ --><div class="sh-title en">Prototyping Games with AI <span>· The Checklist</span></div>
+    <!-- ═══ VI ═══ --><div class="sh-title vi">Prototype Game với AI <span>· Checklist</span></div>
+    <div class="sh-right">
+      <div class="lang-toggle" id="lang-toggle-head">
+        <button class="lang-btn" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="vi">VI</button>
+      </div>
+      <div class="sh-pct"><span id="pb-pct">0%</span> <span class="en">complete</span><span class="vi">hoàn thành</span></div>
+    </div>
   </div>
   <div id="sh-progress"></div>
 </div>
 
 <header class="cover">
   <p class="kicker">Gameloft Hanoi · AI Workshop · 2026</p>
-  <h1>Prototyping Games with AI — <b>The Step-by-Step Checklist</b></h1>
-  <p class="sub">From a raw idea to a playable, shareable web prototype — with copy-paste prompts for every step.</p>
-  <p class="byline">A practical companion to the walkthrough · by <b>Huy Dũng (DaveHD)</b></p>
+  <!-- ═══ EN ═══ --><h1 class="en">Prototyping Games with AI — <b>The Step-by-Step Checklist</b></h1>
+  <!-- ═══ VI ═══ --><h1 class="vi">Prototype Game với AI — <b>Checklist Từng Bước</b></h1>
+  <!-- ═══ EN ═══ --><p class="sub en">From a raw idea to a playable, shareable web prototype — with copy-paste prompts for every step.</p>
+  <!-- ═══ VI ═══ --><p class="sub vi">Từ ý tưởng thô đến prototype chạy được trên web — kèm prompt copy-paste cho từng bước.</p>
+  <!-- ═══ EN ═══ --><p class="byline en">A practical companion to the walkthrough · by <b>Huy Dũng (DaveHD)</b></p>
+  <!-- ═══ VI ═══ --><p class="byline vi">Tài liệu đồng hành cho workshop · Huy Dũng (DaveHD)</p>
+  <div class="cover-lang-toggle">
+    <div class="lang-toggle" id="lang-toggle-cover">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="vi">VI</button>
+    </div>
+  </div>
   <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
 </header>
 
@@ -146,80 +211,195 @@ footer .hdi-logo { bottom:24px; }
 <div class="wrap">
 
   <section class="intro" id="how">
-    <h2>How to use this guide</h2>
-    <p class="lead">Work top to bottom. Each phase has a <b>checklist</b> (tick as you go) and one or more <b>ready-to-use prompts</b> — copy the prompt, paste it into your AI, and replace anything marked <span class="fill">[LIKE THIS]</span> with your own game's details. You stay the designer and director; the AI executes.</p>
+    <!-- ═══ EN ═══ --><h2 class="en">How to use this guide</h2>
+    <!-- ═══ VI ═══ --><h2 class="vi">Dùng tài liệu này như thế nào</h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Work top to bottom. Each phase has a <b>checklist</b> (tick as you go) and one or more <b>ready-to-use prompts</b> — copy the prompt, paste it into your AI, and replace anything marked <span class="fill">[LIKE THIS]</span> with your own game's details. You stay the designer and director; the AI executes.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Làm theo thứ tự từ trên xuống dưới. Mỗi phase có một <b>checklist</b> (tick khi xong từng bước) và một hoặc nhiều <b>prompt dùng được ngay</b> — copy prompt, paste vào AI, rồi thay những phần <span class="fill">[LIKE THIS]</span> bằng thông tin game của bạn. Bạn là designer và director; AI là người thực thi.</p>
 
     <div class="principles">
-      <div class="principle"><b>You direct, AI executes</b>The idea and the judgment are yours. The AI is a thinking partner and a coder.</div>
-      <div class="principle"><b>Plan first, then build small</b>Lock the design before any code. Build in small, testable steps — never one giant request.</div>
-      <div class="principle"><b>Prototype scope only</b>You are proving the core mechanic is fun. Resist polishing, feature-creep, and chasing tiny bugs.</div>
-      <div class="principle"><b>Keep docs lean</b>Keep things clear, and simple, and focused. That helps both for human reader and AI coder.</div>
+      <div class="principle">
+        <!-- ═══ EN ═══ --><b class="en">You direct, AI executes</b><b class="vi">Bạn chỉ đạo, AI thực thi</b>
+        <!-- ═══ EN ═══ --><span class="en">The idea and the judgment are yours. The AI is a thinking partner and a coder.</span>
+        <!-- ═══ VI ═══ --><span class="vi">Ý tưởng và phán xét là của bạn. AI là đối tác tư duy và là coder — không hơn, không kém.</span>
+      </div>
+      <div class="principle">
+        <!-- ═══ EN ═══ --><b class="en">Plan first, then build small</b><b class="vi">Plan trước, build từng bước nhỏ</b>
+        <!-- ═══ EN ═══ --><span class="en">Lock the design before any code. Build in small, testable steps — never one giant request.</span>
+        <!-- ═══ VI ═══ --><span class="vi">Chốt design trước khi viết dòng code nào. Build theo từng bước nhỏ, kiểm tra được — đừng bao giờ ném một request khổng lồ một lần.</span>
+      </div>
+      <div class="principle">
+        <!-- ═══ EN ═══ --><b class="en">Prototype scope only</b><b class="vi">Chỉ scope prototype thôi</b>
+        <!-- ═══ EN ═══ --><span class="en">You are proving the core mechanic is fun. Resist polishing, feature-creep, and chasing tiny bugs.</span>
+        <!-- ═══ VI ═══ --><span class="vi">Mục tiêu là chứng minh core mechanic có fun không. Kháng cự việc polish, thêm feature, và đuổi theo từng bug nhỏ.</span>
+      </div>
+      <div class="principle">
+        <!-- ═══ EN ═══ --><b class="en">Keep docs lean</b><b class="vi">Giữ docs gọn gàng</b>
+        <!-- ═══ EN ═══ --><span class="en">Keep things clear, and simple, and focused. That helps both for human reader and AI coder.</span>
+        <!-- ═══ VI ═══ --><span class="vi">Rõ ràng, đơn giản, tập trung. Tốt cho cả người đọc lẫn AI coder.</span>
+      </div>
     </div>
 
     <div class="phasebar">
-      <a href="#p0">0 · Setup</a>
-      <a href="#p1">1 · Idea</a>
-      <a href="#p2">2 · Game Design</a>
-      <a href="#p3">3 · Tech Design</a>
-      <a href="#p4">4 · Project Plan</a>
-      <a href="#p5">5 · Build</a>
-      <a href="#p6">6 · Fix bugs</a>
-      <a href="#p7">7 · Ship</a>
+      <a href="#p0"><span class="en">0 · Setup</span><span class="vi">0 · Cài đặt</span></a>
+      <a href="#p1"><span class="en">1 · Idea</span><span class="vi">1 · Ý tưởng</span></a>
+      <a href="#p2"><span class="en">2 · Game Design</span><span class="vi">2 · Thiết kế</span></a>
+      <a href="#p3"><span class="en">3 · Tech Design</span><span class="vi">3 · Thiết kế Kỹ thuật</span></a>
+      <a href="#p4"><span class="en">4 · Project Plan</span><span class="vi">4 · Kế hoạch</span></a>
+      <a href="#p5"><span class="en">5 · Build</span><span class="vi">5 · Xây dựng</span></a>
+      <a href="#p6"><span class="en">6 · Fix bugs</span><span class="vi">6 · Sửa lỗi</span></a>
+      <a href="#p7"><span class="en">7 · Ship</span><span class="vi">7 · Ship</span></a>
     </div>
   </section>
 
   <!-- PHASE 0 -->
   <section id="p0">
-    <h2><span class="num">0</span>Set up your tools</h2>
-    <p class="lead">One-time setup. You need a place to store code, a way to read it, and an AI coding agent.</p>
+    <h2>
+      <span class="num">0</span>
+      <!-- ═══ EN ═══ --><span class="en">Set up your tools</span>
+      <!-- ═══ VI ═══ --><span class="vi">Cài đặt công cụ</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">One-time setup. You need a place to store code, a way to read it, and an AI coding agent.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Setup một lần, dùng mãi. Bạn cần: nơi lưu code, cách đọc code đó, và một AI coding agent.</p>
     <ul class="check">
-      <li><b>Create a GitHub account</b> and a new <b>public</b> repository. <span class="why">This stores every step so you can compare, roll back, and host the game for free later.</span></li>
-      <li><b>Install GitHub Desktop</b> and clone the repo to your machine. <span class="why">A friendly UI for commits — you won't need the command line.</span></li>
-      <li><b>Install Visual Studio Code</b> with a Markdown preview extension. <span class="why">To read the code the AI writes and make tiny tweaks yourself — faster than asking the AI.</span></li>
-      <li><b>Pick and install ONE AI coding agent</b> (desktop app). See the comparison below. <span class="why">The workflow is nearly identical across all three.</span></li>
-      <li><b>Pick ONE chat AI</b> for design discussion (can be the same provider). <span class="why">Used for brainstorming and writing the design docs before any code.</span></li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Create a GitHub account</b><b class="vi">Tạo tài khoản GitHub</b>
+        <span class="en"> and a new <b>public</b> repository.</span><span class="vi"> và một repository <b>public</b> mới.</span>
+        <!-- ═══ EN ═══ --><span class="why en">This stores every step so you can compare, roll back, and host the game for free later.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Lưu từng bước đi, cho phép bạn so sánh, rollback, và host game miễn phí sau này.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Install GitHub Desktop</b><b class="vi">Cài GitHub Desktop</b>
+        <span class="en"> and clone the repo to your machine.</span><span class="vi"> và clone repo về máy.</span>
+        <!-- ═══ EN ═══ --><span class="why en">A friendly UI for commits — you won't need the command line.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Giao diện thân thiện cho việc commit — không cần đụng command line.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Install Visual Studio Code</b><b class="vi">Cài Visual Studio Code</b>
+        <span class="en"> with a Markdown preview extension.</span><span class="vi"> kèm extension preview Markdown.</span>
+        <!-- ═══ EN ═══ --><span class="why en">To read the code the AI writes and make tiny tweaks yourself — faster than asking the AI.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Để đọc code AI viết và tự chỉnh sửa những thứ nhỏ — nhanh hơn nhiều so với nhờ AI làm.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Pick and install ONE AI coding agent</b><b class="vi">Chọn và cài MỘT AI coding agent</b>
+        <span class="en"> (desktop app). See the comparison below.</span><span class="vi"> (desktop app). Xem bảng so sánh bên dưới.</span>
+        <!-- ═══ EN ═══ --><span class="why en">The workflow is nearly identical across all three.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Workflow gần như giống hệt nhau với cả ba lựa chọn.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Pick ONE chat AI</b><b class="vi">Chọn MỘT chat AI</b>
+        <span class="en"> for design discussion (can be the same provider).</span><span class="vi"> để thảo luận thiết kế (có thể cùng provider).</span>
+        <!-- ═══ EN ═══ --><span class="why en">Used for brainstorming and writing the design docs before any code.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Dùng cho việc brainstorm và viết design docs trước khi code bất cứ thứ gì.</span>
+      </li>
     </ul>
 
     <table class="tbl">
       <colgroup><col class="aspect"><col class="model"><col class="model"><col class="model"></colgroup>
-      <tr><th>Aspect</th><th>Claude (Claude Desktop)</th><th>ChatGPT (Codex)</th><th>Gemini (Antigravity)</th></tr>
-      <tr><td>Creating an account</td><td class="warn">⚠️ Harder — appears to block new Vietnam phone numbers</td><td class="yes">☑️ Easy</td><td class="yes">✅ Most people already have a Google account</td></tr>
-      <tr><td>Code &amp; reasoning power</td><td class="yes">✅ Strongest</td><td class="yes">✅ Strong</td><td>☑️ Solid, usable</td></tr>
-      <tr><td>Image generation</td><td class="warn">⚠️ None</td><td>☑️ Yes</td><td class="yes">✅ Top-tier</td></tr>
-      <tr><td>Video / music generation</td><td class="warn">⚠️ None</td><td class="warn">⚠️ None</td><td class="yes">✅ Yes</td></tr>
-      <tr><td>Connecting to other apps &amp; services</td><td class="yes">✅ Plugins, MCP, Office extensions</td><td>☑️ Plugins, MCP…</td><td class="yes">✅ Native connections to Google apps/services</td></tr>
-      <tr><td>Bundled perks</td><td>None</td><td>None</td><td class="yes">✅ YouTube Premium · 5TB Google Drive</td></tr>
+      <tr>
+        <th><span class="en">Aspect</span><span class="vi">Tiêu chí</span></th>
+        <th>Claude (Claude Desktop)</th>
+        <th>ChatGPT (Codex)</th>
+        <th>Gemini (Antigravity)</th>
+      </tr>
+      <tr>
+        <td><span class="en">Creating an account</span><span class="vi">Tạo tài khoản</span></td>
+        <td class="warn"><span class="en">⚠️ Harder — appears to block new Vietnam phone numbers</span><span class="vi">⚠️ Khó hơn — có vẻ chặn số điện thoại Việt Nam mới</span></td>
+        <td class="yes"><span class="en">☑️ Easy</span><span class="vi">☑️ Dễ</span></td>
+        <td class="yes"><span class="en">✅ Most people already have a Google account</span><span class="vi">✅ Hầu hết mọi người đã có sẵn tài khoản Google</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Code &amp; reasoning power</span><span class="vi">Sức mạnh code &amp; reasoning</span></td>
+        <td class="yes"><span class="en">✅ Strongest</span><span class="vi">✅ Mạnh nhất</span></td>
+        <td class="yes"><span class="en">✅ Strong</span><span class="vi">✅ Mạnh</span></td>
+        <td><span class="en">☑️ Solid, usable</span><span class="vi">☑️ Ổn, dùng được</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Image generation</span><span class="vi">Tạo ảnh</span></td>
+        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
+        <td><span class="en">☑️ Yes</span><span class="vi">☑️ Có</span></td>
+        <td class="yes"><span class="en">✅ Top-tier</span><span class="vi">✅ Hàng đầu</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Video / music generation</span><span class="vi">Tạo video / nhạc</span></td>
+        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
+        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
+        <td class="yes"><span class="en">✅ Yes</span><span class="vi">✅ Có</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Connecting to other apps &amp; services</span><span class="vi">Kết nối ứng dụng &amp; dịch vụ</span></td>
+        <td class="yes"><span class="en">✅ Plugins, MCP, Office extensions</span><span class="vi">✅ Plugins, MCP, Office extensions</span></td>
+        <td><span class="en">☑️ Plugins, MCP…</span><span class="vi">☑️ Plugins, MCP…</span></td>
+        <td class="yes"><span class="en">✅ Native connections to Google apps/services</span><span class="vi">✅ Kết nối trực tiếp với apps/services Google</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">Bundled perks</span><span class="vi">Quyền lợi đi kèm</span></td>
+        <td><span class="en">None</span><span class="vi">Không có</span></td>
+        <td><span class="en">None</span><span class="vi">Không có</span></td>
+        <td class="yes"><span class="en">✅ YouTube Premium · 5TB Google Drive</span><span class="vi">✅ YouTube Premium · 5TB Google Drive</span></td>
+      </tr>
     </table>
-    <p class="tbl-note">Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them; a team can share a single account for a month. <b>Quick take for mid-2026:</b> Gemini gives the best value for most people. Pick Claude if your use case is purely code/writing/agent work that demands the highest accuracy. ChatGPT is worth grabbing especially when there's a free Plus month. For this prototype workflow, the choice barely matters — the steps below are nearly identical across all three.</p>
+    <!-- ═══ EN ═══ --><p class="tbl-note en">Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them; a team can share a single account for a month. <b>Quick take for mid-2026:</b> Gemini gives the best value for most people. Pick Claude if your use case is purely code/writing/agent work that demands the highest accuracy. ChatGPT is worth grabbing especially when there's a free Plus month. For this prototype workflow, the choice barely matters — the steps below are nearly identical across all three.</p>
+    <!-- ═══ VI ═══ --><p class="tbl-note vi">Khoảng $20/tháng (~500K VND) cho gói Plus/Pro của bất kỳ công cụ nào; một nhóm có thể dùng chung một tài khoản cả tháng. <b>Nhận xét nhanh giữa 2026:</b> Gemini có giá trị tốt nhất cho hầu hết mọi người. Chọn Claude nếu use case của bạn thiên về code/writing/agent và đòi hỏi độ chính xác cao nhất. ChatGPT đáng thử — đặc biệt khi có tháng Plus miễn phí. Với workflow prototype này, lựa chọn gần như không quan trọng — các bước bên dưới gần như giống nhau với cả ba.</p>
 
     <div class="callout">
-      <span class="tag">Model selection — important</span>
-      <p>For <b>brainstorming &amp; design</b> (Phases 1–2), use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</p>
-      <p>For <b>technical &amp; design and planning</b> (Phases 1–2), use the <b>highest</b> (e.model and thinking effort.</p>
-      <p>For <b>the coding</b>, <b>start with the mid-level model too</b> — for a game prototype it works fine about 90% of the time. Only switch up to the strongest model (Opus, Gemini Pro, ChatGPT high reasoning) when you genuinely can't get the result you want.</p>
+      <!-- ═══ EN ═══ --><span class="tag en">Model selection — important</span>
+      <!-- ═══ VI ═══ --><span class="tag vi">Chọn model — quan trọng</span>
+      <!-- ═══ EN ═══ --><p class="en">For <b>brainstorming &amp; design</b> (Phases 1–2), use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</p>
+      <!-- ═══ VI ═══ --><p class="vi">Cho <b>brainstorming &amp; design</b> (Phase 1–2), dùng <b>model tầm trung / sáng tạo</b> (Claude Sonnet, Gemini Flash, ChatGPT reasoning "medium") — model đỉnh thường over-optimize cho logic và kém sáng tạo hơn.</p>
+      <!-- ═══ EN ═══ --><p class="en">For <b>technical &amp; design and planning</b> (Phases 1–2), use the <b>highest</b> (e.model and thinking effort.</p>
+      <!-- ═══ VI ═══ --><p class="vi">Cho <b>thiết kế kỹ thuật và lập kế hoạch</b>, dùng <b>model mạnh nhất</b> với effort tư duy cao nhất.</p>
+      <!-- ═══ EN ═══ --><p class="en">For <b>the coding</b>, <b>start with the mid-level model too</b> — for a game prototype it works fine about 90% of the time. Only switch up to the strongest model (Opus, Gemini Pro, ChatGPT high reasoning) when you genuinely can't get the result you want.</p>
+      <!-- ═══ VI ═══ --><p class="vi">Cho <b>phần code</b>, <b>bắt đầu với model tầm trung</b> — với prototype game, 90% trường hợp là đủ dùng. Chỉ escalate lên model mạnh nhất (Opus, Gemini Pro, ChatGPT high reasoning) khi bạn thực-sự bí.</p>
     </div>
   </section>
 
   <!-- PHASE 1 -->
   <section id="p1">
-    <h2><span class="num">1</span>Find the idea</h2>
-    <p class="lead">Use the chat AI as a thinking partner. Make it ask <i>you</i> questions — the best idea still comes from you. Pick whichever prompt matches your situation: an open brainstorm, or one anchored to a specific theme.</p>
+    <h2>
+      <span class="num">1</span>
+      <!-- ═══ EN ═══ --><span class="en">Find the idea</span>
+      <!-- ═══ VI ═══ --><span class="vi">Tìm ý tưởng</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Use the chat AI as a thinking partner. Make it ask <i>you</i> questions — the best idea still comes from you. Pick whichever prompt matches your situation: an open brainstorm, or one anchored to a specific theme.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Dùng chat AI như một đối tác tư duy. Bắt nó hỏi-ngược lại bạn — ý tưởng hay nhất vẫn phải xuất phát từ bạn. Chọn prompt phù hợp với tình huống: brainstorm mở hoàn toàn, hoặc gắn với một theme cụ thể.</p>
     <ul class="check">
-      <li><b>Use a creative (mid-tier) model</b>, in English if you can. <span class="why">Saves tokens and improves quality.</span></li>
-      <li><b>State who the players are</b> — both prompts ask for it, because a game for kids and a game for puzzle fans lead to very different ideas.</li>
-      <li><b>Make the AI ask you clarifying questions</b> before it proposes anything.</li>
-      <li><b>Demand a comparison table</b> of 10+ ideas scored on clear criteria, so you can choose objectively.</li>
-      <li><b>Pick ONE idea.</b> Don't expand two. Scope discipline starts here.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Use a creative (mid-tier) model</b><b class="vi">Dùng model sáng tạo (mid-tier)</b>
+        <span class="en">, in English if you can.</span><span class="vi">, bằng tiếng Anh nếu có thể.</span>
+        <!-- ═══ EN ═══ --><span class="why en">Saves tokens and improves quality.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Tiết kiệm token và cải thiện chất lượng đầu ra.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">State who the players are</b><b class="vi">Xác định rõ người chơi là ai</b>
+        <!-- ═══ EN ═══ --><span class="en"> — both prompts ask for it, because a game for kids and a game for puzzle fans lead to very different ideas.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — cả hai prompt đều hỏi điều này, vì game cho trẻ em và game cho puzzle fan sẽ ra ý tưởng rất khác nhau.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Make the AI ask you clarifying questions</b><b class="vi">Bắt AI hỏi-ngược bạn những câu làm rõ</b>
+        <!-- ═══ EN ═══ --><span class="en"> before it proposes anything.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> trước khi nó đề xuất bất cứ thứ gì.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Demand a comparison table</b><b class="vi">Yêu cầu một bảng so sánh</b>
+        <!-- ═══ EN ═══ --><span class="en"> of 10+ ideas scored on clear criteria, so you can choose objectively.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> 10+ ý tưởng được chấm điểm theo tiêu chí rõ ràng, để bạn chọn lựa một cách khách quan.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><span class="en">Pick a few ideas you like. Or ask for more. Discuss back and forth with AI until <b>you have a clear favorite.</b></span>
+        <!-- ═══ VI ═══ --><span class="vi">Chọn vài ý tưởng bạn thích. Hoặc yêu cầu thêm. Thảo luận qua lại với AI đến khi <b>bạn có một lựa chọn rõ ràng.</b></span>
+      </li>
     </ul>
 
-    <h3>Version A — open brainstorm (no fixed theme)</h3>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Brainstorm — open</span>
-            <button class="copy-btn" data-target="p-brain-open">Copy</button>
-          </div>
-          <pre id="p-brain-open">I want to prototype a game. Help me find ONE creative, fun game idea worth building.
+    <!-- ═══ EN ═══ --><h3 class="en">Version A — open brainstorm (no fixed theme)</h3>
+    <!-- ═══ VI ═══ --><h3 class="vi">Phiên bản A — brainstorm mở (không có theme cố định)</h3>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Brainstorm — open</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Brainstorm — mở</span>
+        <button class="copy-btn" data-target="p-brain-open">Copy</button>
+      </div>
+      <pre id="p-brain-open">I want to prototype a game. Help me find ONE creative, fun game idea worth building.
 
 The game is for this audience (the people who&#x27;ll play it): [DESCRIBE PLAYERS — e.g. &quot;casual mobile players&quot;, &quot;kids 8–12&quot;, &quot;puzzle fans&quot;].
 
@@ -235,16 +415,18 @@ My hobbies / interests to draw from (optional): [FILL IN — e.g. Poker, Pool, P
 When I say &quot;ready&quot;, present at least 10 ideas in a TABLE, in an artifact, comparing them on:
 Innovativeness | Mobile-first fit | Core mechanic clarity | Prototype feasibility (hours) | Appeal to my players.
 Then recommend your top 3 with one line on why each is a strong, fun prototype for this audience.</pre>
-        </div>
+    </div>
 
-    <h3>Version B — themed brainstorm (AI researches the theme first)</h3>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Brainstorm — with a theme</span>
-            <button class="copy-btn" data-target="p-brain-theme">Copy</button>
-          </div>
-          <pre id="p-brain-theme">I want to prototype a game built around a specific theme. Help me find ONE creative, fun idea worth building.
+    <!-- ═══ EN ═══ --><h3 class="en">Version B — themed brainstorm (AI researches the theme first)</h3>
+    <!-- ═══ VI ═══ --><h3 class="vi">Phiên bản B — brainstorm theo theme (AI nghiên cứu theme trước)</h3>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Brainstorm — with a theme</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Brainstorm — theo theme</span>
+        <button class="copy-btn" data-target="p-brain-theme">Copy</button>
+      </div>
+      <pre id="p-brain-theme">I want to prototype a game built around a specific theme. Help me find ONE creative, fun idea worth building.
 
 The game is for this audience (the people who&#x27;ll play it): [DESCRIBE PLAYERS — e.g. &quot;casual mobile players&quot;, &quot;fans of the theme&quot;, &quot;kids 8–12&quot;].
 
@@ -263,109 +445,129 @@ Then brainstorm with me. Ask clarifying questions if needed. Each idea must:
 When I say &quot;ready&quot;, present at least 10 theme-based ideas in a TABLE, in an artifact, comparing them on:
 Innovativeness | Mobile-first fit | Core mechanic clarity | Prototype feasibility (hours) | Theme authenticity | Appeal to my players.
 Then recommend your top 3 with one line each on why they&#x27;re a strong, fun prototype that fits the theme and this audience.</pre>
-        </div>
+    </div>
   </section>
 
   <!-- PHASE 2 -->
   <section id="p2">
-    <h2><span class="num">2</span>Lock the design — Concept Card, then GDD</h2>
-    <p class="lead">Design happens in two quick moves: first a one-page <b>Concept Card</b> (with a visual mockup) to nail the mechanic, then expand it into a lean <b>Prototype GDD</b>. This is the biggest scope-saver — discuss in chat until the loop feels fun on paper before writing anything down.</p>
+    <h2>
+      <span class="num">2</span>
+      <!-- ═══ EN ═══ --><span class="en">Lock the design — write the GDD</span>
+      <!-- ═══ VI ═══ --><span class="vi">Chốt thiết kế — viết GDD</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Discuss the idea in chat until the core loop feels fun on paper, then write a lean <b>Prototype GDD</b>. This is the biggest scope-saver — nail the mechanic in plain words before any code exists.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Thảo luận ý tưởng trong chat đến khi core loop cảm giác fun trên giấy, rồi viết <b>Prototype GDD</b> gọn nhẹ. Đây là bước tiết kiệm scope nhiều nhất — nail mechanic bằng ngôn ngữ thông thường trước khi code tồn tại.</p>
     <ul class="check">
-      <li><b>Concept Card stays ~1000 words max.</b> If it can't fit, the prototype is too big.</li>
-      <li><b>The core mechanic is one sentence</b> you can say out loud. If you can't, keep refining.</li>
-      <li><b>Get a visual mockup</b> of the main gameplay screen — a labelled wireframe shows layout problems before any code exists.</li>
-      <li><b>Define the vertical slice</b> — the smallest thing that proves the mechanic is fun.</li>
-      <li><b>Write the non-goals.</b> What you <i>won't</i> build matters as much as what you will.</li>
-      <li><b>GDD is design only, under ~2 pages</b> — no file names, code, formulas, or configs (that's the TDD's job).</li>
-      <li><b>Every rule is implementable by a stranger</b> — no "you know what I mean".</li>
-      <li><b>Review the GDD in VS Code</b> and fix small things yourself before moving on.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">The core mechanic is one sentence</b><b class="vi">Core mechanic là một câu</b>
+        <!-- ═══ EN ═══ --><span class="en"> you can say out loud. Keep refining until you can.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> bạn có thể nói to được. Tiếp tục tinh chỉnh cho đến khi làm được.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Ask the AI for a labelled wireframe</b><b class="vi">Bảo AI phác một wireframe có chú thích</b>
+        <!-- ═══ EN ═══ --><span class="en"> of the main screen — shows layout problems before any code exists.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> của màn hình chính — sẽ lộ ra vấn đề layout trước khi code tồn tại.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Define the vertical slice</b><b class="vi">Xác định vertical slice</b>
+        <!-- ═══ EN ═══ --><span class="en"> — the smallest thing that proves the mechanic is fun.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — thứ nhỏ nhất chứng minh được mechanic có fun hay không.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Write the non-goals.</b><b class="vi">Viết ra non-goals.</b>
+        <!-- ═══ EN ═══ --><span class="en"> What you <i>won't</i> build matters as much as what you will.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> Những thứ bạn <i>sẽ KHÔNG</i> xây dựng quan trọng không kém những thứ bạn sẽ xây dựng.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">GDD is design only, under ~2 pages</b><b class="vi">GDD chỉ là design, dưới ~2 trang</b>
+        <!-- ═══ EN ═══ --><span class="en"> — no file names, code, formulas, or configs (that's the TDD's job).</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — không có tên file, code, công thức, hay config (đó là việc của TDD).</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Every rule is implementable by a stranger</b><b class="vi">Mọi rule phải đủ rõ ràng để người lạ implement được</b>
+        <!-- ═══ EN ═══ --><span class="en"> — no "you know what I mean".</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — không có kiểu "bạn hiểu ý mình muốn nói chứ".</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Review the GDD in VS Code</b><b class="vi">Xem lại GDD trong VS Code</b>
+        <!-- ═══ EN ═══ --><span class="en"> and fix small things yourself before moving on.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> và tự sửa những thứ nhỏ trước khi chuyển sang bước tiếp theo.</span>
+      </li>
     </ul>
 
-    <h3>Step 2a — the Concept Card (+ mockup)</h3>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Write the Concept Card (+ mockup)</span>
-            <button class="copy-btn" data-target="p-concept">Copy</button>
-          </div>
-          <pre id="p-concept">Great — let&#x27;s lock the design. We are NOT writing a full GDD yet.
-
-Produce a CONCEPT CARD — concise, up to ~1000 words max — for: [GAME NAME / chosen idea]
-
-Use exactly these sections, concrete and specific:
-1. One-line pitch (≤ 25 words)
-2. Core mechanic (the ONE thing that makes it fun — describe the moment-to-moment interaction in detail)
-3. Core loop (a 4–6 step arrow chain, e.g. aim → shoot → pocket → assign → repeat)
-4. Win / lose (or &quot;no fail state&quot; — say which, and why)
-5. Controls (mobile tap/swipe AND desktop — be explicit for each)
-6. What&#x27;s IN the prototype (the vertical slice — the smallest thing that proves the mechanic is fun)
-7. What&#x27;s OUT / non-goals (everything we are deliberately NOT building yet)
-
-Then add a VISUAL MOCKUP of the main gameplay screen: produce it as a clean labelled wireframe (an inline SVG or a simple HTML/CSS mockup in an artifact) showing the core screen layout — where the play area, the player&#x27;s controls, the HUD/score, and any key UI elements sit. Keep it schematic, not polished art.
-
-Ask me up to 3 questions if anything is ambiguous BEFORE writing. Keep the whole thing tight enough to fit the scope of a prototype, not a commercial game.</pre>
-        </div>
-
-    <h3>Step 2b — expand into gdd.md</h3>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Generate gdd.md</span>
-            <button class="copy-btn" data-target="p-gdd">Copy</button>
-          </div>
-          <pre id="p-gdd">Now turn the Concept Card into a PROTOTYPE GDD as a Markdown file: gdd.md
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate gdd.md</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo gdd.md</span>
+        <button class="copy-btn" data-target="p-gdd">Copy</button>
+      </div>
+      <pre id="p-gdd">Let&#x27;s lock the design for [GAME NAME / chosen idea]. Write a PROTOTYPE GDD as a Markdown file: gdd.md
 
 Rules:
 - This is a PROTOTYPE design doc, not a commercial GDD. Keep it lean — aim for under ~2 pages.
 - Pure design only. NO technical content (no file names, no code, no formulas, no configs) — that goes in the TDD.
-- Structure: Pitch · Design Pillars (2–4) · Core Mechanic · Core Loop · Rules · Controls (mobile + desktop) · Win/Lose · In-Scope (vertical slice) · Non-Goals.
+- Structure: Pitch · Design Pillars (2–4) · Core Mechanic · Core Loop · Rules · Controls (mobile + desktop) · UI layout/elements · UX flow · Win/Lose · In-Scope (vertical slice) · Non-Goals.
 - Every rule must be unambiguous enough that a coder who never spoke to me could implement it.
 - Where a number matters (turn limit, hand size, timing window), state it — but keep it in plain language, not code.
 
-First research what a lightweight prototype GDD should contain, then write gdd.md. Ask me anything unclear before writing.</pre>
-        </div>
+Also produce a VISUAL MOCKUP of the main gameplay screen: a clean labelled wireframe (inline SVG or simple HTML/CSS in an artifact) showing where the play area, controls, HUD/score, and key UI elements sit. Keep it schematic, not polished art.
 
-    <div class="callout">
-      <span class="tag">Why a Concept Card before the GDD</span>
-      <p>Industry practice for prototypes: start with a one-pager and let the doc <b>grow only as the game proves itself</b>. Jumping straight to a heavy GDD locks in decisions you haven't tested and bloats the AI's context — which is exactly when AI starts to hallucinate and break things. The card forces the mechanic to be fun on one page first; the GDD just formalizes it.</p>
+Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
     </div>
   </section>
 
   <!-- PHASE 3 -->
   <section id="p3">
-    <h2><span class="num">3</span>Write the TDD — with all the rules baked in</h2>
-    <p class="lead">Don't ask for a "technical design document" generically — the AI will give you something bland. Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result as <code>tdd.md</code>.</p>
+    <h2>
+      <span class="num">3</span>
+      <!-- ═══ EN ═══ --><span class="en">Write the TDD — with all the rules baked in</span>
+      <!-- ═══ VI ═══ --><span class="vi">Viết TDD — với tất cả quy tắc được nhúng vào trong</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Don't ask for a "technical design document" generically — the AI will give you something bland. Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result as <code>tdd.md</code>.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Đừng hỏi AI "viết technical design document" một cách chung chung — nó sẽ cho bạn thứ gì đó nhạt nhẽo. Hãy đưa cho nó <b>các ràng-buộc kỹ thuật cụ thể của bạn</b>. Prompt này đã chứa tất cả rồi. Lưu kết quả với tên <code>tdd.md</code>.</p>
     <ul class="check">
-      <li><b>Centralized config + zero magic numbers</b> so non-coders can tweak and playtest.</li>
-      <li><b>Strict separation of concerns</b> (physics / render / rules) — keeps the AI from breaking everything on a refactor.</li>
-      <li><b>Incremental edits + commit after every turn</b> with conventional messages.</li>
-      <li><b>Logging, non-coder comments, and a test suite</b> run every turn.</li>
-      <li><b>Workspace &amp; build health checks</b> before the AI reports success.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Centralized config + zero magic numbers</b><b class="vi">Centralized config + không magic numbers</b>
+        <!-- ═══ EN ═══ --><span class="en"> so non-coders can tweak and playtest.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> để người không biết code vẫn có thể tinh chỉnh và playtest.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Strict separation of concerns</b><b class="vi">Tách biệt rõ ràng các concerns</b>
+        <!-- ═══ EN ═══ --><span class="en"> (physics / render / rules) — keeps the AI from breaking everything on a refactor.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> (physics / render / rules) — giúp AI không phá vỡ mọi thứ khi refactor.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Incremental edits + commit after every turn</b><b class="vi">Chỉnh sửa từng bước nhỏ + commit sau mỗi lượt</b>
+        <!-- ═══ EN ═══ --><span class="en"> with conventional messages.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> với commit message chuẩn.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Logging, non-coder comments, and a test suite</b><b class="vi">Logging, comment cho người không code, và test suite</b>
+        <!-- ═══ EN ═══ --><span class="en"> run every turn.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> chạy mỗi lượt.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Workspace &amp; build health checks</b><b class="vi">Kiểm tra workspace &amp; build</b>
+        <!-- ═══ EN ═══ --><span class="en"> before the AI reports success.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> trước khi AI báo xong.</span>
+      </li>
     </ul>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Generate tdd.md (rules baked in)</span>
-            <button class="copy-btn" data-target="p-tdd">Copy</button>
-          </div>
-          <pre id="p-tdd">Put on the Game Architect hat. Create tdd.md (Technical Design Document) for this prototype, based on gdd.md.
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate tdd.md (rules baked in)</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo tdd.md (quy tắc được nhúng vào)</span>
+        <button class="copy-btn" data-target="p-tdd">Copy</button>
+      </div>
+      <pre id="p-tdd">Put on the Game Architect hat. Create tdd.md (Technical Design Document) for this prototype, based on gdd.md.
 
 Move ALL technical content here: architecture, code conventions, math/formulas, and the full list of tunable configs.
 
-The TDD MUST explicitly encode every one of these requirements — do not paraphrase them away:
-
-ARCHITECTURE &amp; CONFIG
+The TDD MUST explicitly encode these requirements:
 1. Single centralized configuration file. ALL mechanical, physical, and rules-based constants live in one dedicated config file (e.g. src/config.js) so non-coders can tweak and playtest.
 2. Zero Magic Numbers. No pixel dimensions, speeds, friction, colors, or turn limits hardcoded in game loop, physics, or render files.
 3. Self-documenting config. Every config key has a natural-language comment explaining what it changes and its recommended range.
-4. Maximum separation of concerns — decoupled source files. As a model:
-   - Physics layer: rigid-body coords, collisions, momentum ONLY. Zero knowledge of rules/turns/score.
-   - Render layer: turns physics coordinates into visible entities; animations, HUD, particles.
-   - Rules &amp; State engine: evaluates state, turns, win conditions; driven by physics events but physically decoupled.
-   (Adapt these layers to MY game&#x27;s mechanic, but keep the strict decoupling.)
-
-AI WORKING DISCIPLINE
-5. Incremental edits only. No massive sweeping rewrites across the codebase. Small, testable changes.
+4. Maximum separation of concerns — decoupled source files between game states, physics, ui, etc..
 6. Commit after every turn. On completing a request: run a local compile/build check, and if it passes, do a Git commit with a clear conventional message (feat:/fix:/chore:/test:). If the build fails, fix it first.
 7. Automated workspace diagnostics. Before reporting done, verify the local dev server is running; if not, start it. Note any sandbox limitation that blocks running the server/tests locally and tell me to run it on my machine instead.
 8. Health &amp; compilation check. Confirm the build compiles cleanly with no errors before reporting success.
@@ -373,44 +575,52 @@ AI WORKING DISCIPLINE
 10. Comments for non-coders. Add enough code comments to guide a non-coder on how to modify important behavior.
 11. Tests. Write a test suite for all logic-based code and run it every turn. Update tests for each new feature or design change.
 
-Write tdd.md now. Ask me about my game&#x27;s specific layers/mechanic if you need to before finalizing.</pre>
-        </div>
-    <div class="callout">
-      <span class="tag">Git discipline — run this once, early</span>
-      <p>Before the agent writes much code, set up version tracking and the commit habit:</p>
+IMPORTANT: The TDD should be concise, clear, but not too details. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game&#x27;s specific layers/mechanic if you need to before finalizing.</pre>
     </div>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Initialize git + commit habit</span>
-            <button class="copy-btn" data-target="p-git">Copy</button>
-          </div>
-          <pre id="p-git">Initialize a git repo and commit all current files in this folder.
-
-From now on, in ALL of our conversations: after each turn, run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:), and push to this repo: [PASTE YOUR GITHUB REPO LINK]
-
-If the build fails, fix it before committing.</pre>
-        </div>
   </section>
 
   <!-- PHASE 4 -->
   <section id="p4">
-    <h2><span class="num">4</span>Build plan — 3 milestones</h2>
-    <p class="lead">Three milestones, not five — but split them <b>around your game's own mechanic</b>, not a fixed template. The AI proposes the division and explains its reasoning; you sanity-check it. Each milestone ends in something you can actually play or test.</p>
+    <h2>
+      <span class="num">4</span>
+      <!-- ═══ EN ═══ --><span class="en">Build plan — 3 milestones</span>
+      <!-- ═══ VI ═══ --><span class="vi">Kế hoạch build — 3 milestones</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Three milestones, not five — but split them <b>around your game's own mechanic</b>, not a fixed template. The AI proposes the division and explains its reasoning; you sanity-check it. Each milestone ends in something you can actually play or test.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Ba milestones, không phải năm — nhưng chia dựa trên <b>mechanic của chính game bạn</b>, không theo template cố định. AI đề xuất cách chia và giải thích lý do; bạn kiểm tra lại. Mỗi milestone kết thúc bằng thứ gì đó bạn thực sự có thể chơi hoặc test.</p>
     <ul class="check">
-      <li><b>Exactly 3 functional milestones</b>, each building on the last.</li>
-      <li><b>Divided by what THIS game needs</b> — the mechanic drives the split, not a generic "setup / build / polish" template.</li>
-      <li><b>Every milestone delivers real functionality</b> — "polish" is not a milestone. This is a prototype; milestone 3 is the rules + win/lose + full loop + deploy, not a cosmetic pass.</li>
-      <li><b>Each milestone has a user-facing test checklist and a copy-paste agent prompt.</b></li>
-      <li><b>Sanity-check the plan</b> — have the AI summarize the 3 milestones and its reasoning back to you before building.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Exactly 3 functional milestones</b><b class="vi">Đúng 3 milestones thực chức năng</b>
+        <!-- ═══ EN ═══ --><span class="en">, each building on the last.</span>
+        <!-- ═══ VI ═══ --><span class="vi">, mỗi cái build trên cái trước.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Divided by what THIS game needs</b><b class="vi">Chia dựa trên những gì game NÀY cần</b>
+        <!-- ═══ EN ═══ --><span class="en"> — the mechanic drives the split, not a generic "setup / build / polish" template.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — mechanic dẫn dắt cách chia, không phải template "setup / build / polish" chung chung.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Every milestone delivers real functionality progression</b>
+        <!-- ═══ VI ═══ --><b class="vi">Mỗi milestone mang lại tiến triển chức năng thực sự</b>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Each milestone has a user-facing test checklist and a copy-paste agent prompt.</b>
+        <!-- ═══ VI ═══ --><b class="vi">Mỗi milestone có checklist test từ góc độ người dùng và prompt copy-paste cho agent.</b>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Sanity-check the plan</b><b class="vi">Kiểm tra lại kế hoạch</b>
+        <!-- ═══ EN ═══ --><span class="en"> — have the AI summarize the 3 milestones and its reasoning back to you before building.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — bảo AI tóm tắt lại 3 milestones và lý do chia như vậy trước khi bắt đầu build.</span>
+      </li>
     </ul>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Generate plan.md (3 milestones)</span>
-            <button class="copy-btn" data-target="p-plan">Copy</button>
-          </div>
-          <pre id="p-plan">Put on the Tech Lead hat. Create plan.md — a build plan with EXACTLY 3 milestones (not more).
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate plan.md (3 milestones)</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo plan.md (3 milestones)</span>
+        <button class="copy-btn" data-target="p-plan">Copy</button>
+      </div>
+      <pre id="p-plan">Put on the Tech Lead hat. Create plan.md — a build plan with EXACTLY 3 milestones (not more).
 
 Important: the 3 milestones must be split MEANINGFULLY around THIS game&#x27;s own mechanic — not a generic template. Read gdd.md and tdd.md, then divide the work into 3 functional layers that each build on the previous one and each end in something I can actually play or test. As a rough guide (adapt to the game):
 - Milestone 1 is usually the static foundation: scaffold, centralized config, the scene/board/world laid out correctly, HUD placeholders, clean module boundaries. It runs and looks right; the core interaction isn&#x27;t live yet.
@@ -424,129 +634,270 @@ Each milestone must include:
 (c) a single copy-paste prompt for the local AI coding agent — and that prompt must explicitly remind the user to run the test checklist.
 
 Follow tdd.md for all conventions. Write plan.md now.</pre>
-        </div>
+    </div>
   </section>
 
   <!-- PHASE 5 -->
   <section id="p5">
-    <h2><span class="num">5</span>Build, milestone by milestone</h2>
-    <p class="lead">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly. <b>One milestone per chat session</b> to keep context clean. Start with the mid-level model; only escalate if you get stuck.</p>
+    <h2>
+      <span class="num">5</span>
+      <!-- ═══ EN ═══ --><span class="en">Build, milestone by milestone</span>
+      <!-- ═══ VI ═══ --><span class="vi">Build, từng milestone một</span>
+    </h2>
+    <div class="callout">
+      <!-- ═══ EN ═══ --><span class="tag en">Git discipline — run this once, early</span>
+      <!-- ═══ VI ═══ --><span class="tag vi">Kỷ luật Git — chạy một lần, từ sớm</span>
+      <!-- ═══ EN ═══ --><p class="en">Before the agent writes much code, set up version tracking and the commit habit:</p>
+      <!-- ═══ VI ═══ --><p class="vi">Trước khi agent viết nhiều code, thiết lập version tracking và thói quen commit:</p>
+    </div>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Initialize git + commit habit</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Khởi tạo git + thói quen commit</span>
+        <button class="copy-btn" data-target="p-git">Copy</button>
+      </div>
+      <pre id="p-git">Initialize a git repo and commit all current files in this folder.
+
+From now on, in ALL of our conversations: after each turn, run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:), and push to this repo: [PASTE YOUR GITHUB REPO LINK]
+
+If the build fails, fix it before committing.</pre>
+    </div>
+
+    <!-- ═══ EN ═══ --><p class="lead en">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly. <b>One milestone per chat session</b> to keep context clean. Start with the mid-level model; only escalate if you get stuck.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Chuyển sang AI coding <b>agent</b> (không phải chat) — nó đọc, viết, và chạy file trực tiếp. <b>Một milestone mỗi chat session</b> để giữ context gọn. Bắt đầu với model tầm trung; chỉ escalate khi bị bí.</p>
     <ul class="check">
-      <li><b>New session per milestone.</b> <span class="why">Avoids context overflow and hallucination; easier to search later.</span></li>
-      <li><b>Run the milestone prompt</b> (below), then <b>do the test checklist</b> from plan.md yourself.</li>
-      <li><b>Check the config decoupling:</b> open <code>config.js</code> in VS Code and confirm values actually live there, not hardcoded.</li>
-      <li><b>Review the git commits</b> after each milestone — you should be able to follow the story.</li>
-      <li><b>After a milestone, refresh the docs</b> (gdd/tdd/plan), then open a fresh session for the next.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">New session per milestone.</b><b class="vi">Session mới cho mỗi milestone.</b>
+        <!-- ═══ EN ═══ --><span class="why en">Avoids context overflow and hallucination; easier to search later.</span>
+        <!-- ═══ VI ═══ --><span class="why vi">Tránh tràn context và hallucination; dễ tìm lại sau này hơn.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Run the milestone prompt</b><b class="vi">Chạy milestone prompt</b>
+        <!-- ═══ EN ═══ --><span class="en"> (below), then <b>do the test checklist</b> from plan.md yourself.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> (bên dưới), sau đó <b>tự thực hiện test checklist</b> từ plan.md.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Converse back and forth with the AI:</b><b class="vi">Nói chuyện qua lại với AI:</b>
+        <!-- ═══ EN ═══ --><span class="en"> Talk as if you are talking to a dev: says what you need to change, and let the dev do it.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> Trao đổi như bạn đang nói chuyện với dev — nói những gì bạn cần thay đổi, và để dev làm.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Make your own manual edits:</b><b class="vi">Tự tay chỉnh sửa:</b>
+        <!-- ═══ EN ═══ --><span class="en"> open the folder in VS Code and tweak config file as needed. Perform text search across all files (Ctrl+Shift+F) and make text adjustments. Do any other code editing that you are confident to do faster/cheaper/more accurate than AI.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> mở folder trong VS Code và tinh chỉnh config file khi cần. Dùng text search toàn bộ file (Ctrl+Shift+F) để chỉnh sửa text. Làm bất kỳ việc chỉnh code nào mà bạn tự tin làm nhanh hơn/rẻ hơn/chính xác hơn AI.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">After a milestone, refresh the docs</b><b class="vi">Sau mỗi milestone, cập nhật lại docs</b>
+        <!-- ═══ EN ═══ --><span class="en"> (gdd/tdd/plan), then open a fresh session for the next.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> (gdd/tdd/plan), rồi mở session mới cho milestone tiếp theo.</span>
+      </li>
     </ul>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Run a milestone</span>
-            <button class="copy-btn" data-target="p-run">Copy</button>
-          </div>
-          <pre id="p-run">We are building [GAME NAME]. Read gdd.md, tdd.md, and plan.md first.
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Run a milestone</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Chạy một milestone</span>
+        <button class="copy-btn" data-target="p-run">Copy</button>
+      </div>
+      <pre id="p-run">We are building [GAME NAME]. Read gdd.md, tdd.md, and plan.md first.
 
 Execute Milestone [1 / 2 / 3] from plan.md, following every convention in tdd.md (centralized config, zero magic numbers, separation of concerns, incremental edits, logging, comments, tests, commit-after-turn).
 
-Work in small testable steps. When done, run the milestone&#x27;s end-user test checklist from plan.md and report the results.
+Work in small testable steps. When done, verify that the game is runnable and accessible via an URL, create and run tests on the logic parts, report the results.
 
-Reminder: do NOT introduce magic numbers, do NOT make sweeping rewrites, and verify the build compiles before reporting success.</pre>
-        </div>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Refresh docs after a milestone</span>
-            <button class="copy-btn" data-target="p-refresh">Copy</button>
-          </div>
-          <pre id="p-refresh">Milestone [N] is complete and tested. Update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed. Commit the doc updates. Then summarize what&#x27;s left so I can start the next milestone in a fresh session.</pre>
-        </div>
+After everything is done, show user both the URL to test the game AND the list of things to verify on their end, for this milestone.
+</pre>
+    </div>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Refresh docs after a milestone</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Cập nhật docs sau milestone</span>
+        <button class="copy-btn" data-target="p-refresh">Copy</button>
+      </div>
+      <pre id="p-refresh">Milestone [N] is complete and tested. Update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed. Commit the doc updates. Then summarize what&#x27;s left so I can start the next milestone in a fresh session.</pre>
+    </div>
   </section>
 
   <!-- PHASE 6 -->
   <section id="p6">
-    <h2><span class="num">6</span>Fix bugs the smart way</h2>
-    <p class="lead">Iteration is normal — even human devs never get it right in one shot. Give the AI the right evidence and it fixes fast.</p>
+    <h2>
+      <span class="num">6</span>
+      <!-- ═══ EN ═══ --><span class="en">Fix bugs the smart way</span>
+      <!-- ═══ VI ═══ --><span class="vi">Sửa lỗi theo cách thông minh</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">Iteration is normal — even human devs never get it right in one shot. Give the AI the right evidence and it fixes fast.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Iteration là bình thường — ngay cả dev người thật cũng không bao giờ làm đúng ngay lần đầu. Cung cấp đúng bằng chứng cho AI và nó sẽ sửa nhanh thôi.</p>
     <ul class="check">
-      <li><b>Visual bug → attach a screenshot.</b> Words alone rarely convey a layout problem.</li>
-      <li><b>Logic bug → open DevTools (F12) → Console → paste the full log.</b></li>
-      <li><b>Watch the AI "think"</b> — if it's heading the wrong way, stop it early to save time and tokens.</li>
-      <li><b>Stuck for a while? Start a fresh session</b> and ask it to explain the feature's flow before fixing.</li>
-      <li><b>Tell it to add debug logs</b> when a bug is hard to pin down.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Visual bug → attach a screenshot.</b><b class="vi">Lỗi giao diện → đính kèm screenshot.</b>
+        <!-- ═══ EN ═══ --><span class="en"> Words alone rarely convey a layout problem.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> Chỉ dùng từ ngữ hiếm khi truyền đạt được vấn đề layout.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Logic bug → open DevTools (F12) → Console → paste the full log.</b>
+        <!-- ═══ VI ═══ --><b class="vi">Lỗi logic → mở DevTools (F12) → Console → paste toàn bộ log.</b>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Watch the AI "think"</b><b class="vi">Quan sát AI "suy nghĩ"</b>
+        <!-- ═══ EN ═══ --><span class="en"> — if it's heading the wrong way, stop it early to save time and tokens.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> — nếu nó đang đi sai hướng, dừng sớm để tiết kiệm thời gian và token.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Stuck for a while? Start a fresh session</b><b class="vi">Bí một lúc rồi? Mở session mới</b>
+        <!-- ═══ EN ═══ --><span class="en"> and ask it to explain the feature's flow before fixing.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> và bảo nó giải thích flow của feature trước khi sửa.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Tell it to add debug logs</b><b class="vi">Bảo nó thêm debug logs</b>
+        <!-- ═══ EN ═══ --><span class="en"> when a bug is hard to pin down.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> khi lỗi khó xác định nguồn gốc.</span>
+      </li>
     </ul>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Visual / UI bug</span>
-            <button class="copy-btn" data-target="p-visual">Copy</button>
-          </div>
-          <pre id="p-visual">Here&#x27;s a visual/UI bug. [ATTACH SCREENSHOT]
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Visual / UI bug</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Lỗi giao diện / UI</span>
+        <button class="copy-btn" data-target="p-visual">Copy</button>
+      </div>
+      <pre id="p-visual">Here&#x27;s a visual/UI bug. [ATTACH SCREENSHOT]
 
 What&#x27;s wrong: [DESCRIBE what you see vs. what you expect]
 
 Find the cause, fix it via the centralized config or the render layer (not by hardcoding), keep the fix incremental, then tell me exactly what you changed and which config value I can tweak to adjust it further.</pre>
-        </div>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Logic bug</span>
-            <button class="copy-btn" data-target="p-logic">Copy</button>
-          </div>
-          <pre id="p-logic">Here&#x27;s a logic bug. Console output below. [PASTE the full console log from F12 → Console]
+    </div>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Logic bug</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Lỗi logic</span>
+        <button class="copy-btn" data-target="p-logic">Copy</button>
+      </div>
+      <pre id="p-logic">Here&#x27;s a logic bug. Console output below. [PASTE the full console log from F12 → Console]
 
 What happened: [DESCRIBE the wrong behavior]
 What I expected: [DESCRIBE correct behavior]
 
 Diagnose the root cause, add temporary debug logs if helpful, fix it incrementally, update the relevant test, and explain the fix in plain language.</pre>
-        </div>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Stuck — diagnose before fixing</span>
-            <button class="copy-btn" data-target="p-stuck">Copy</button>
-          </div>
-          <pre id="p-stuck">We&#x27;ve been stuck on this bug for a while. Don&#x27;t patch blindly.
+    </div>
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Stuck — diagnose before fixing</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Bí — chẩn đoán trước khi sửa</span>
+        <button class="copy-btn" data-target="p-stuck">Copy</button>
+      </div>
+      <pre id="p-stuck">We&#x27;ve been stuck on this bug for a while. Don&#x27;t patch blindly.
 
 First, review the relevant code end-to-end and explain to me, in plain language, the full flow of how [FEATURE] is supposed to work. Then point to where the flow breaks. Wait for my confirmation before changing anything.</pre>
-        </div>
+    </div>
   </section>
 
   <!-- PHASE 7 -->
   <section id="p7">
-    <h2><span class="num">7</span>Ship it — share a live link</h2>
-    <p class="lead">For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in GitHub.</p>
+    <h2>
+      <span class="num">7</span>
+      <!-- ═══ EN ═══ --><span class="en">Ship it — share a live link</span>
+      <!-- ═══ VI ═══ --><span class="vi">Ship — chia sẻ link chạy thật</span>
+    </h2>
+    <!-- ═══ EN ═══ --><p class="lead en">For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in GitHub.</p>
+    <!-- ═══ VI ═══ --><p class="lead vi">Với HTML game thì cực kỳ dễ. Agent viết deploy workflow; bạn chỉ cần bật một cài đặt trong GitHub.</p>
     <ul class="check">
-      <li><b>Have the AI prepare the GitHub Pages workflow</b> and push it.</li>
-      <li><b>In GitHub → Settings → Pages</b>, set Source to <b>"GitHub Actions"</b>.</li>
-      <li><b>Confirm the live URL works</b> on both desktop and a real phone.</li>
-      <li><b>Send the link to playtesters</b> and collect feedback — the whole point of a prototype.</li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Have the AI prepare the GitHub Pages workflow</b><b class="vi">Để AI chuẩn bị GitHub Pages workflow</b>
+        <!-- ═══ EN ═══ --><span class="en"> and push it.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> và push lên.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">In GitHub → Settings → Pages</b><b class="vi">Trong GitHub → Settings → Pages</b>
+        <!-- ═══ EN ═══ --><span class="en">, set Source to <b>"GitHub Actions"</b>.</span>
+        <!-- ═══ VI ═══ --><span class="vi">, đặt Source thành <b>"GitHub Actions"</b>.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Confirm the live URL works</b><b class="vi">Xác nhận URL live hoạt động</b>
+        <!-- ═══ EN ═══ --><span class="en"> on both desktop and a real phone.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> trên cả desktop và điện thoại thật.</span>
+      </li>
+      <li>
+        <!-- ═══ EN ═══ --><b class="en">Send the link to playtesters</b><b class="vi">Gửi link cho playtesters</b>
+        <!-- ═══ EN ═══ --><span class="en"> and collect feedback — the whole point of a prototype.</span>
+        <!-- ═══ VI ═══ --><span class="vi"> và thu thập feedback — đó chính là mục đích của prototype.</span>
+      </li>
     </ul>
-    
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Set up auto-deploy to GitHub Pages</span>
-            <button class="copy-btn" data-target="p-deploy">Copy</button>
-          </div>
-          <pre id="p-deploy">Prepare this project for a GitHub Pages workflow that auto-publishes after every push to the main branch.
+
+    <div class="prompt">
+      <div class="prompt-head">
+        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Set up auto-deploy to GitHub Pages</span>
+        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Cài đặt auto-deploy lên GitHub Pages</span>
+        <button class="copy-btn" data-target="p-deploy">Copy</button>
+      </div>
+      <pre id="p-deploy">Prepare this project for a GitHub Pages workflow that auto-publishes after every push to the main branch.
 
 Do everything you can yourself (create the workflow file, set the correct build/base settings, commit, push). Then tell me exactly what I need to do on my side in the GitHub web UI, step by step.</pre>
-        </div>
+    </div>
+
     <div class="callout">
-      <span class="tag">Time budget</span>
-      <p>A small prototype is realistically <b>2–3 hours</b> across <b>2–3 sessions</b> (token limits reset on a rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
+      <!-- ═══ EN ═══ --><span class="tag en">Time budget</span>
+      <!-- ═══ VI ═══ --><span class="tag vi">Ngân sách thời gian</span>
+      <!-- ═══ EN ═══ --><p class="en">A small prototype is realistically <b>2–3 hours</b> across <b>2–3 sessions</b> (token limits reset on a 5-hour rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
+      <!-- ═══ VI ═══ --><p class="vi">Một prototype nhỏ thực tế mất <b>2–3 tiếng</b> trải qua <b>2–3 sessions</b> (do giới hạn token reset theo cửa sổ thời gian mỗi 5 tiếng). Nếu bạn đã chứng minh được mechanic có fun, bạn xong rồi — dừng tại đó. Đó chính-xác là mục tiêu.</p>
     </div>
   </section>
 
   <section id="recap">
-    <h2>One-glance recap</h2>
+    <!-- ═══ EN ═══ --><h2 class="en">One-glance recap</h2>
+    <!-- ═══ VI ═══ --><h2 class="vi">Tóm tắt</h2>
     <table class="tbl">
-      <tr><th>Phase</th><th>Output</th><th>Model</th><th>Tool</th></tr>
-      <tr><td>1 · Idea</td><td>Comparison table → 1 chosen idea</td><td>Creative / mid</td><td>Chat AI</td></tr>
-      <tr><td>2 · Game Design</td><td>Concept Card (+ mockup) → <code>gdd.md</code> (≤2 pages, design only)</td><td>Creative / mid</td><td>Chat AI</td></tr>
-      <tr><td>3 · Tech Design</td><td><code>tdd.md</code> (all rules baked in)</td><td>Highest</td><td>Agent</td></tr>
-      <tr><td>4 · Project Plan</td><td><code>plan.md</code> (3 functional milestones)</td><td>Highest</td><td>Agent</td></tr>
-      <tr><td>5 · Build</td><td>Playable prototype, 1 session/milestone</td><td>Mid first, escalate if stuck</td><td>Agent + VS Code</td></tr>
-      <tr><td>6 · Bugs</td><td>Screenshots + console logs → fixes</td><td>Mid first, escalate if stuck</td><td>Agent</td></tr>
-      <tr><td>7 · Ship</td><td>Live GitHub Pages link</td><td>Mid first, escalate if stuck</td><td>Agent + GitHub</td></tr>
+      <tr>
+        <th><span class="en">Phase</span><span class="vi">Phase</span></th>
+        <th><span class="en">Output</span><span class="vi">Đầu ra</span></th>
+        <th><span class="en">Model</span><span class="vi">Model</span></th>
+        <th><span class="en">Tool</span><span class="vi">Công cụ</span></th>
+      </tr>
+      <tr>
+        <td><span class="en">1 · Idea</span><span class="vi">1 · Ý tưởng</span></td>
+        <td><span class="en">Comparison table → 1 chosen idea</span><span class="vi">Bảng so sánh → 1 ý tưởng chọn</span></td>
+        <td><span class="en">Creative / mid</span><span class="vi">Sáng tạo / tầm trung</span></td>
+        <td>Chat AI</td>
+      </tr>
+      <tr>
+        <td><span class="en">2 · Game Design</span><span class="vi">2 · Thiết kế Game</span></td>
+        <td><span class="en"><code>gdd.md</code> (≤2 pages, design only, with wireframe)</span><span class="vi"><code>gdd.md</code> (≤2 trang, chỉ design, kèm wireframe)</span></td>
+        <td><span class="en">Creative / mid</span><span class="vi">Sáng tạo / tầm trung</span></td>
+        <td>Chat AI</td>
+      </tr>
+      <tr>
+        <td><span class="en">3 · Tech Design</span><span class="vi">3 · Thiết kế KT</span></td>
+        <td><span class="en"><code>tdd.md</code> (all rules baked in)</span><span class="vi"><code>tdd.md</code> (tất cả quy tắc được nhúng vào)</span></td>
+        <td><span class="en">Highest</span><span class="vi">Mạnh nhất</span></td>
+        <td>Agent</td>
+      </tr>
+      <tr>
+        <td><span class="en">4 · Project Plan</span><span class="vi">4 · Kế hoạch</span></td>
+        <td><span class="en"><code>plan.md</code> (3 functional milestones)</span><span class="vi"><code>plan.md</code> (3 milestones thực chức năng)</span></td>
+        <td><span class="en">Highest</span><span class="vi">Mạnh nhất</span></td>
+        <td>Agent</td>
+      </tr>
+      <tr>
+        <td><span class="en">5 · Build</span><span class="vi">5 · Build</span></td>
+        <td><span class="en">Playable prototype, 1 session/milestone</span><span class="vi">Prototype chơi được, 1 session/milestone</span></td>
+        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
+        <td><span class="en">Agent + VS Code</span><span class="vi">Agent + VS Code</span></td>
+      </tr>
+      <tr>
+        <td><span class="en">6 · Bugs</span><span class="vi">6 · Lỗi</span></td>
+        <td><span class="en">Screenshots + console logs → fixes</span><span class="vi">Screenshots + console logs → sửa</span></td>
+        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
+        <td>Agent</td>
+      </tr>
+      <tr>
+        <td><span class="en">7 · Ship</span><span class="vi">7 · Ship</span></td>
+        <td><span class="en">Live GitHub Pages link</span><span class="vi">Link GitHub Pages live</span></td>
+        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
+        <td><span class="en">Agent + GitHub</span><span class="vi">Agent + GitHub</span></td>
+      </tr>
     </table>
   </section>
 
@@ -554,17 +905,43 @@ Do everything you can yourself (create the workflow file, set the correct build/
 </main>
 
 <footer>
-  <p class="big">Now go prove your idea is fun.</p>
-  <p>The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it's worth pursuing.</p>
+  <!-- ═══ EN ═══ --><p class="big en">Now go prove your idea is fun.</p>
+  <!-- ═══ VI ═══ --><p class="big vi">Đi chứng minh ý tưởng của bạn có fun nào.</p>
+  <!-- ═══ EN ═══ --><p class="en">The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it's worth pursuing.</p>
+  <!-- ═══ VI ═══ --><p class="vi">AI lo phần kỹ thuật nặng nhọc. Bạn lo phần quan trọng hơn — ý tưởng, gu thẩm mỹ, và quyết định nó có đáng theo đuổi không.</p>
   <p>Workshop companion · Huy Dũng (DaveHD) · huydung.com</p>
   <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
 </footer>
 
 <script>
 (function(){
-  var STORAGE_KEY = 'hd-game-proto-checklist-v1';
+  var STORAGE_KEY = 'hd-game-proto-bi-checklist-v1';
+  var LANG_KEY    = 'hd-lang-v1';
 
-  // Safe storage wrapper — works on hosted file, degrades silently in sandboxed preview
+  /* ---- Language toggle ---- */
+  function setLang(lang) {
+    var html = document.documentElement;
+    html.classList.remove('lang-en', 'lang-vi');
+    html.classList.add('lang-' + lang);
+    document.querySelectorAll('.lang-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
+  }
+
+  document.querySelectorAll('.lang-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      setLang(btn.dataset.lang);
+    });
+  });
+
+  // Restore saved language preference
+  var savedLang = 'en';
+  try { savedLang = localStorage.getItem(LANG_KEY) || 'en'; } catch(e) {}
+  setLang(savedLang);
+
+  /* ---- Checklist ---- */
   var store = {
     load: function(){
       try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
@@ -596,14 +973,14 @@ Do everything you can yourself (create the workflow file, set the correct build/
   });
 
   var fill = document.getElementById('sh-progress');
-  var pct = document.getElementById('pb-pct');
+  var pct  = document.getElementById('pb-pct');
 
   function updateProgress(){
     var total = items.length;
-    var done = document.querySelectorAll('.check li.checked').length;
+    var done  = document.querySelectorAll('.check li.checked').length;
     var p = total ? Math.round(done/total*100) : 0;
     fill.style.width = p + '%';
-    pct.textContent = p + '%';
+    pct.textContent  = p + '%';
     if (p === 100) fill.classList.add('done'); else fill.classList.remove('done');
   }
   updateProgress();
@@ -618,9 +995,9 @@ Do everything you can yourself (create the workflow file, set the correct build/
     updateProgress();
   });
 
-  // Sticky collapsed header — appears once the cover scrolls out of view
+  /* ---- Sticky header ---- */
   var cover = document.querySelector('.cover');
-  var head = document.getElementById('stickyhead');
+  var head  = document.getElementById('stickyhead');
   function onScroll(){
     if (window.scrollY > cover.offsetHeight - 10) head.classList.add('show');
     else head.classList.remove('show');
@@ -628,7 +1005,7 @@ Do everything you can yourself (create the workflow file, set the correct build/
   window.addEventListener('scroll', onScroll, {passive:true});
   onScroll();
 
-  // Copy buttons
+  /* ---- Copy buttons ---- */
   document.querySelectorAll('.copy-btn').forEach(function(btn){
     btn.addEventListener('click', function(e){
       e.stopPropagation();
@@ -638,6 +1015,54 @@ Do everything you can yourself (create the workflow file, set the correct build/
         btn.textContent = 'Copied ✓'; btn.classList.add('done');
         setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1600);
       });
+    });
+  });
+
+  /* ---- Collapsible prompts ----
+     - Wraps copy-btn + chevron in .prompt-head-right
+     - Injects .prompt-expand-bar below the pre (visible only when collapsed)
+     - Pre click also expands (cursor:pointer set via CSS when collapsed)
+     - All prompts start collapsed */
+  document.querySelectorAll('.prompt').forEach(function(prompt){
+    var head = prompt.querySelector('.prompt-head');
+    var pre  = prompt.querySelector('pre');
+    var copyBtn = head.querySelector('.copy-btn');
+
+    // Build right-side group: [copy btn] [chevron]
+    var rightGroup = document.createElement('span');
+    rightGroup.className = 'prompt-head-right';
+    var chevron = document.createElement('span');
+    chevron.className = 'prompt-chevron';
+    chevron.textContent = '▾';
+    rightGroup.appendChild(copyBtn);   // move existing copy btn into group
+    rightGroup.appendChild(chevron);
+    head.appendChild(rightGroup);
+
+    // Inject expand bar below the pre
+    var expandBar = document.createElement('div');
+    expandBar.className = 'prompt-expand-bar';
+    expandBar.innerHTML = '▾&nbsp;&nbsp;Show full prompt';
+    prompt.appendChild(expandBar);
+
+    // Start collapsed
+    prompt.classList.add('collapsed');
+
+    // Toggle on header click (copy btn already stops propagation)
+    head.addEventListener('click', function(){
+      prompt.classList.toggle('collapsed');
+    });
+
+    // Clicking the preview text expands (never collapses — use header for that)
+    pre.addEventListener('click', function(){
+      if (prompt.classList.contains('collapsed')) {
+        prompt.classList.remove('collapsed');
+      }
+    });
+
+    // Clicking the expand bar also expands
+    expandBar.addEventListener('click', function(e){
+      e.stopPropagation();
+      prompt.classList.remove('collapsed');
     });
   });
 })();
