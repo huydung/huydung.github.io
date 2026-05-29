@@ -505,6 +505,7 @@ Then recommend your top 3 with one line each on why they&#x27;re a strong, fun p
 
 Rules:
 - This is a PROTOTYPE design doc, not a commercial GDD. Keep it lean — aim for under ~2 pages.
+- Put clear instruction on the based screen ratio and orientation. 
 - Pure design only. NO technical content (no file names, no code, no formulas, no configs) — that goes in the TDD.
 - Structure: Pitch · Design Pillars (2–4) · Core Mechanic · Core Loop · Rules · Controls (mobile + desktop) · UI layout/elements · UX flow · Win/Lose · In-Scope (vertical slice) · Non-Goals.
 - Every rule must be unambiguous enough that a coder who never spoke to me could implement it.
@@ -520,8 +521,8 @@ Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
   <section id="p3">
     <h2>
       <span class="num">3</span>
-      <!-- ═══ EN ═══ --><span class="en">Write the TDD — with all the rules baked in</span>
-      <!-- ═══ VI ═══ --><span class="vi">Viết TDD — với tất cả quy tắc được nhúng vào trong</span>
+      <!-- ═══ EN ═══ --><span class="en">Write the TDD — tell AI <em>how</em> to work</span>
+      <!-- ═══ VI ═══ --><span class="vi">Viết TDD — hướng dẫn AI <em>cách</em> triển khai</span>
     </h2>
     <!-- ═══ EN ═══ --><p class="lead en">Don't ask for a "technical design document" generically — the AI will give you something bland. Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result as <code>tdd.md</code>.</p>
     <!-- ═══ VI ═══ --><p class="lead vi">Đừng hỏi AI "viết technical design document" một cách chung chung — nó sẽ cho bạn thứ gì đó nhạt nhẽo. Hãy đưa cho nó <b>các ràng-buộc kỹ thuật cụ thể của bạn</b>. Prompt này đã chứa tất cả rồi. Lưu kết quả với tên <code>tdd.md</code>.</p>
@@ -574,6 +575,7 @@ The TDD MUST explicitly encode these requirements:
 9. Logging. Add log messages with essential info at all key interactions for easy debugging.
 10. Comments for non-coders. Add enough code comments to guide a non-coder on how to modify important behavior.
 11. Tests. Write a test suite for all logic-based code and run it every turn. Update tests for each new feature or design change.
+12. Define an appropriate dimendtions following the based game-world ratio and orientation in the GDD. Ensure to calculate all game world physics on that fixed dimensions, while applying letterbox scaling for responsiveness to different screen size.
 
 IMPORTANT: The TDD should be concise, clear, but not too details. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game&#x27;s specific layers/mechanic if you need to before finalizing.</pre>
     </div>
