@@ -1,409 +1,1268 @@
 <!DOCTYPE html>
-<html lang="en" class="lang-en">
+<html lang="en">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prototyping Games with AI — The Checklist</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;0,900;1,400&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --hd-red-deep:#8E011F; --hd-red-bright:#BD0129; --hd-red-dark:#51000C; --hd-ink:#1D1D1D;
-  --hd-white:#FFFFFF; --hd-off-white:#FFFBF6; --hd-gray-page:#F7F7F7; --hd-gray-border:#EAEAEA; --hd-gray-mid:#DEDEDE;
-  --hd-cream:#F8F7D0; --hd-green:#69A257; --hd-orange:#FF9200;
-  --serif:'Merriweather',Georgia,serif; --sans:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;
-}
-* { box-sizing:border-box; }
-html { scroll-behavior:smooth; }
-body { margin:0; font-family:var(--sans); color:var(--hd-ink); line-height:1.6; background:var(--hd-gray-page); }
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prototyping Games with AI — The Checklist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,700;0,900;1,400&family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --hd-red-deep: #8E011F;
+      --hd-red-bright: #BD0129;
+      --hd-red-dark: #51000C;
+      --hd-ink: #1D1D1D;
+      --hd-white: #FFFFFF;
+      --hd-off-white: #FFFBF6;
+      --hd-gray-page: #F7F7F7;
+      --hd-gray-border: #EAEAEA;
+      --hd-gray-mid: #DEDEDE;
+      --hd-cream: #F8F7D0;
+      --hd-green: #69A257;
+      --hd-orange: #FF9200;
+      --serif: 'Merriweather', Georgia, serif;
+      --sans: 'Be Vietnam Pro', 'Segoe UI', system-ui, sans-serif;
+    }
 
-/* ---- Language switch ---- */
-/* !important needed: later rules like .check li .why and .callout .tag have higher/equal specificity */
-.lang-en .vi { display:none !important; }
-.lang-vi .en { display:none !important; }
+    * {
+      box-sizing: border-box;
+    }
 
-/* ---- Language toggle button ---- */
-.lang-toggle { display:flex; align-items:center; gap:2px; background:rgba(255,255,255,.13); border-radius:20px; padding:3px 4px; flex-shrink:0; }
-.lang-btn { font-size:12px; font-weight:700; color:rgba(255,255,255,.55); padding:4px 11px; border-radius:16px; transition:.15s; cursor:pointer; border:none; background:none; letter-spacing:.06em; font-family:var(--sans); }
-.lang-btn.active { background:var(--hd-cream); color:var(--hd-red-deep); }
-.lang-btn:hover:not(.active) { color:rgba(255,255,255,.9); }
+    html {
+      scroll-behavior: smooth;
+    }
 
-/* ---- Cover ---- */
-.cover { background:var(--hd-red-deep); color:#fff; padding:80px 8vw 70px; position:relative; }
-.cover .kicker { font-family:var(--sans); color:var(--hd-cream); letter-spacing:.08em; text-transform:uppercase; font-size:13px; font-weight:500; margin:0 0 18px; }
-.cover h1 { font-family:var(--serif); font-weight:400; font-size:clamp(32px,4.6vw,58px); line-height:1.16; margin:0 0 22px; max-width:24ch; }
-.cover h1 b { font-weight:700; }
-.cover .sub { font-family:var(--serif); font-style:italic; color:var(--hd-cream); font-size:clamp(17px,2vw,24px); max-width:48ch; margin:0 0 8px; }
-.cover .byline { color:var(--hd-cream); font-size:15px; margin-top:26px; }
-.cover .byline b { font-weight:700; }
-.hdi-logo { position:absolute; bottom:24px; right:32px; height:35px; width:auto; }
-.cover-lang-toggle { margin-top:28px; display:inline-flex; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--hd-ink);
+      line-height: 1.6;
+      background: var(--hd-gray-page);
+    }
 
-/* ---- Layout ---- */
-.wrap { max-width:980px; margin:0 auto; padding:0 24px; }
-main { background:var(--hd-white); }
-section { padding:54px 0 8px; border-bottom:1px solid var(--hd-gray-border); }
-section:last-of-type { border-bottom:none; }
 
-h2 { font-family:var(--serif); font-weight:700; color:var(--hd-red-bright); font-size:clamp(24px,3vw,32px); line-height:1.2; margin:0 0 6px; }
-h2 .num { font-family:var(--serif); font-weight:900; color:var(--hd-red-deep); margin-right:14px; }
-h3 { font-family:var(--serif); font-weight:700; color:var(--hd-red-deep); font-size:19px; margin:30px 0 10px; }
-.lead { font-size:16px; color:var(--hd-ink); max-width:70ch; margin:0 0 18px; }
-p { max-width:72ch; }
-a { color:var(--hd-red-bright); }
-code { font-family:Consolas,Menlo,monospace; font-size:.92em; background:var(--hd-gray-page); padding:1px 5px; border-radius:3px; }
 
-/* ---- Intro band ---- */
-.intro { padding:44px 0 30px; }
-.principles { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; margin:24px 0 6px; }
-.principle { background:var(--hd-gray-page); border-left:4px solid var(--hd-red-dark); padding:16px 18px; border-radius:2px; }
-.principle b { color:var(--hd-red-bright); font-weight:700; display:block; font-family:var(--serif); margin-bottom:4px; }
+    /* ---- Cover ---- */
+    .cover {
+      background: var(--hd-red-deep);
+      color: #fff;
+      padding: 80px 0 70px;
+      position: relative;
+    }
 
-/* ---- Phase header chip ---- */
-.phasebar { display:flex; flex-wrap:wrap; gap:8px; margin:30px 0 4px; }
-.phasebar a { text-decoration:none; font-size:13px; font-weight:500; color:var(--hd-ink); background:var(--hd-gray-page); border:1px solid var(--hd-gray-border); padding:7px 13px; border-radius:20px; }
-.phasebar a:hover { background:var(--hd-cream); border-color:var(--hd-red-dark); }
+    .cover-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
 
-/* ---- Checklist (tickable) ---- */
-.check { list-style:none; padding:0; margin:14px 0; }
-.check li { position:relative; padding:9px 0 9px 38px; border-bottom:1px solid var(--hd-gray-border); max-width:78ch; cursor:pointer; transition:opacity .2s; }
-.check li:last-child { border-bottom:none; }
-.check li .box { position:absolute; left:0; top:11px; width:19px; height:19px; border:2px solid var(--hd-red-bright); border-radius:4px; background:#fff; transition:.15s; display:flex; align-items:center; justify-content:center; }
-.check li .box::after { content:"✓"; color:#fff; font-size:13px; font-weight:bold; opacity:0; transform:scale(.5); transition:.15s; }
-.check li.checked .box { background:var(--hd-green); border-color:var(--hd-green); }
-.check li.checked .box::after { opacity:1; transform:scale(1); }
-.check li.checked > b, .check li.checked { color:#999; }
-.check li.checked b { color:#999; }
-.check li.checked .why { color:#aaa; }
-.check li b { color:var(--hd-red-deep); }
-.check li .why { display:block; font-size:13.5px; color:#555; margin-top:2px; }
+    .cover .kicker {
+      font-family: var(--sans);
+      color: var(--hd-cream);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 500;
+      margin: 0 0 18px;
+    }
 
-/* ---- Callout ---- */
-.callout { background:var(--hd-cream); border-left:4px solid var(--hd-red-dark); padding:16px 20px; margin:22px 0; border-radius:2px; }
-.callout .tag { font-family:var(--serif); font-weight:700; color:var(--hd-red-bright); display:block; margin-bottom:4px; font-size:15px; }
-.callout p { margin:4px 0; }
+    .cover h1 {
+      font-family: var(--serif);
+      font-weight: 400;
+      font-size: clamp(32px, 4.6vw, 58px);
+      line-height: 1.16;
+      margin: 0 0 22px;
+      max-width: 24ch;
+    }
 
-/* ---- Prompt block ---- */
-.prompt { margin:18px 0 26px; border:1px solid var(--hd-gray-border); border-radius:6px; overflow:hidden; }
-.prompt-head { display:flex; justify-content:space-between; align-items:center; background:var(--hd-red-deep); padding:9px 14px; cursor:pointer; user-select:none; gap:10px; }
-.prompt-label { color:#fff; font-family:var(--serif); font-weight:700; font-size:14px; flex:1; min-width:0; }
-.prompt-head-right { display:flex; align-items:center; gap:8px; flex-shrink:0; }
-.copy-btn { font-family:var(--sans); font-size:12.5px; font-weight:600; color:var(--hd-red-deep); background:var(--hd-cream); border:none; padding:6px 14px; border-radius:14px; cursor:pointer; transition:.15s; }
-.copy-btn:hover { background:#fff; }
-.copy-btn.done { background:var(--hd-green); color:#fff; }
-/* chevron injected by JS */
-.prompt-chevron { color:rgba(255,255,255,.7); font-size:13px; display:inline-block; transition:transform .2s ease; line-height:1; flex-shrink:0; }
-.prompt.collapsed .prompt-chevron { transform:rotate(-90deg); }
-/* header glow on hover when collapsed — hints at interactivity */
-.prompt.collapsed .prompt-head:hover { background:var(--hd-red-bright); }
-pre { margin:0; padding:16px 18px; background:#fdfdfb; font-family:Consolas,Menlo,monospace; font-size:13px; line-height:1.55; color:var(--hd-ink); white-space:pre-wrap; word-wrap:break-word; }
+    .cover h1 b {
+      font-weight: 700;
+    }
 
-/* ---- Collapsible prompt body ----
+    .cover .sub {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--hd-cream);
+      font-size: clamp(17px, 2vw, 24px);
+      margin: 0 0 8px;
+    }
+
+    .cover .byline {
+      color: var(--hd-cream);
+      font-size: 15px;
+      margin-top: 26px;
+    }
+
+    .cover .byline b {
+      font-weight: 700;
+    }
+
+    .hdi-logo {
+      position: absolute;
+      bottom: 24px;
+      right: 32px;
+      height: 35px;
+      width: auto;
+    }
+
+    /* ---- Layout ---- */
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    main {
+      background: var(--hd-white);
+    }
+
+    section {
+      padding: 54px 0 8px;
+      border-bottom: 1px solid var(--hd-gray-border);
+    }
+
+    section:last-of-type {
+      border-bottom: none;
+    }
+
+    h2 {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--hd-red-bright);
+      font-size: clamp(24px, 3vw, 32px);
+      line-height: 1.2;
+      margin: 0 0 6px;
+    }
+
+    h2 .num {
+      font-family: var(--serif);
+      font-weight: 900;
+      color: var(--hd-red-deep);
+      margin-right: 14px;
+    }
+
+    h3 {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--hd-red-deep);
+      font-size: 19px;
+      margin: 30px 0 10px;
+    }
+
+    .lead {
+      font-size: 16px;
+      color: var(--hd-ink);
+      margin: 0 0 18px;
+    }
+
+    /* p { max-width:72ch; } */
+    a {
+      color: var(--hd-red-bright);
+    }
+
+    code {
+      font-family: Consolas, Menlo, monospace;
+      font-size: .92em;
+      background: var(--hd-gray-page);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* ---- Intro band ---- */
+    .intro {
+      padding: 44px 0 30px;
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin: 24px 0 6px;
+    }
+
+    .principle {
+      background: var(--hd-gray-page);
+      border-left: 4px solid var(--hd-red-dark);
+      padding: 16px 18px;
+      border-radius: 2px;
+    }
+
+    .principle b {
+      color: var(--hd-red-bright);
+      font-weight: 700;
+      display: block;
+      font-family: var(--serif);
+      margin-bottom: 4px;
+    }
+
+    /* ---- Phase header chip ---- */
+    .phasebar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 30px 0 4px;
+    }
+
+    .phasebar a {
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--hd-ink);
+      background: var(--hd-gray-page);
+      border: 1px solid var(--hd-gray-border);
+      padding: 7px 13px;
+      border-radius: 20px;
+    }
+
+    .phasebar a:hover {
+      background: var(--hd-cream);
+      border-color: var(--hd-red-dark);
+    }
+
+    /* ---- Checklist (tickable) ---- */
+    .check {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0;
+    }
+
+    .check li {
+      position: relative;
+      padding: 9px 0 9px 38px;
+      border-bottom: 1px solid var(--hd-gray-border);
+      max-width: 78ch;
+      cursor: pointer;
+      transition: opacity .2s;
+    }
+
+    .check li:last-child {
+      border-bottom: none;
+    }
+
+    .check li .box {
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 19px;
+      height: 19px;
+      border: 2px solid var(--hd-red-bright);
+      border-radius: 4px;
+      background: #fff;
+      transition: .15s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .check li .box::after {
+      content: "✓";
+      color: #fff;
+      font-size: 13px;
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(.5);
+      transition: .15s;
+    }
+
+    .check li.checked .box {
+      background: var(--hd-green);
+      border-color: var(--hd-green);
+    }
+
+    .check li.checked .box::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .check li.checked>b,
+    .check li.checked {
+      color: #999;
+    }
+
+    .check li.checked b {
+      color: #999;
+    }
+
+    .check li.checked .why {
+      color: #aaa;
+    }
+
+    .check li b {
+      color: var(--hd-red-deep);
+    }
+
+    .check li .why {
+      display: block;
+      font-size: 13.5px;
+      color: #555;
+      margin-top: 2px;
+    }
+
+    /* ---- Callout ---- */
+    .callout {
+      background: var(--hd-cream);
+      border-left: 4px solid var(--hd-red-dark);
+      padding: 16px 20px;
+      margin: 22px 0;
+      border-radius: 2px;
+    }
+
+    .callout .tag {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--hd-red-bright);
+      display: block;
+      margin-bottom: 4px;
+      font-size: 15px;
+    }
+
+    .callout p {
+      margin: 4px 0;
+    }
+
+    /* ---- Prompt block ---- */
+    .prompt {
+      margin: 18px 0 26px;
+      border: 1px solid var(--hd-gray-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .prompt-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--hd-red-deep);
+      padding: 9px 14px;
+      cursor: pointer;
+      user-select: none;
+      gap: 10px;
+    }
+
+    .prompt-label {
+      color: #fff;
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 14px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .prompt-head-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .copy-btn {
+      font-family: var(--sans);
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--hd-red-deep);
+      background: var(--hd-cream);
+      border: none;
+      padding: 6px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: .15s;
+    }
+
+    .copy-btn:hover {
+      background: #fff;
+    }
+
+    .copy-btn.done {
+      background: var(--hd-green);
+      color: #fff;
+    }
+
+    /* chevron injected by JS */
+    .prompt-chevron {
+      color: rgba(255, 255, 255, .7);
+      font-size: 13px;
+      display: inline-block;
+      transition: transform .2s ease;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .prompt.collapsed .prompt-chevron {
+      transform: rotate(-90deg);
+    }
+
+    /* header glow on hover when collapsed */
+    .prompt.collapsed .prompt-head:hover {
+      background: var(--hd-red-bright);
+    }
+
+    pre {
+      margin: 0;
+      padding: 16px 18px;
+      background: #fdfdfb;
+      font-family: Consolas, Menlo, monospace;
+      font-size: 13px;
+      line-height: 1.55;
+      color: var(--hd-ink);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* ---- Collapsible prompt body ----
    pre font-size=13px, line-height=1.55 → 1 line ≈ 20.2px; padding-top=16px
    2 lines + top-pad = 16 + 40.4 = ~57px; we use 58px so text isn't cut mid-pixel */
-.prompt.collapsed pre {
-  max-height: 58px;
-  overflow: hidden;
-  cursor: pointer;
-  -webkit-mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
-  mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
-}
+    .prompt.collapsed pre {
+      max-height: 58px;
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
+      mask-image: linear-gradient(to bottom, black 20px, transparent 58px);
+    }
 
-/* ---- Expand bar (injected by JS, shown only when collapsed) ---- */
-.prompt-expand-bar {
-  display: none;
-  background: linear-gradient(to bottom, #fdfdfb, var(--hd-gray-page));
-  border-top: 1px solid var(--hd-gray-border);
-  text-align: center;
-  padding: 8px 14px;
-  font-size: 12px;
-  font-weight: 400;
-  font-family: var(--sans);
-  color: var(--hd-red-bright);
-  letter-spacing: .06em;
-  cursor: pointer;
-  user-select: none;
-  transition: background .15s, color .15s;
-}
-.prompt.collapsed .prompt-expand-bar { display: block; }
-.prompt-expand-bar:hover { background: var(--hd-cream); color: var(--hd-red-deep); }
-.fill { color:var(--hd-red-bright); font-weight:700; }
+    /* ---- Expand bar (injected by JS, shown only when collapsed) ---- */
+    .prompt-expand-bar {
+      display: none;
+      background: linear-gradient(to bottom, #fdfdfb, var(--hd-gray-page));
+      border-top: 1px solid var(--hd-gray-border);
+      text-align: center;
+      padding: 8px 14px;
+      font-size: 12px;
+      font-weight: 400;
+      font-family: var(--sans);
+      color: var(--hd-red-bright);
+      letter-spacing: .06em;
+      cursor: pointer;
+      user-select: none;
+      transition: background .15s, color .15s;
+    }
 
-/* ---- Tool table ---- */
-.tbl { width:100%; border-collapse:collapse; margin:18px 0 0; font-size:14px; table-layout:fixed; }
-.tbl th { background:var(--hd-red-deep); color:#fff; font-family:var(--sans); font-weight:600; text-align:left; padding:10px 12px; }
-.tbl td { padding:9px 12px; border-bottom:1px solid var(--hd-gray-border); vertical-align:top; word-wrap:break-word; }
-.tbl col.aspect { width:22%; }
-.tbl col.model { width:26%; }
-.tbl tr:nth-child(even) td { background:var(--hd-gray-page); }
-.tbl .yes { color:var(--hd-green); font-weight:600; }
-.tbl .warn { color:var(--hd-orange); font-weight:600; }
-.tbl-note { width:100%; max-width:none; font-size:14.5px; margin:0 0 6px; padding:14px 16px; background:var(--hd-gray-page); border:1px solid var(--hd-gray-border); border-top:none; border-radius:0 0 4px 4px; line-height:1.55; }
+    .prompt.collapsed .prompt-expand-bar {
+      display: block;
+    }
 
-/* ---- footer ---- */
-footer { background:var(--hd-red-deep); color:#fff; padding:40px 8vw; position:relative; }
-footer p { color:var(--hd-cream); max-width:60ch; margin:6px 0; font-size:14px; }
-footer .big { font-family:var(--serif); color:#fff; font-size:22px; font-weight:700; margin-bottom:10px; }
-footer .hdi-logo { bottom:24px; }
+    .prompt-expand-bar:hover {
+      background: var(--hd-cream);
+      color: var(--hd-red-deep);
+    }
 
-@media print {
-  .copy-btn { display:none; }
-  body { background:#fff; }
-  .phasebar { display:none; }
-  #stickyhead { display:none !important; }
-  .check li { cursor:default; }
-}
+    .fill {
+      color: var(--hd-red-bright);
+      font-weight: 700;
+    }
 
-/* ---- Sticky collapsed header (with merged progress border) ---- */
-#stickyhead {
-  position:fixed; top:0; left:0; right:0; z-index:90;
-  background:var(--hd-red-deep); color:#fff;
-  transform:translateY(-100%); transition:transform .25s ease;
-  box-shadow:0 2px 10px rgba(0,0,0,.15);
-}
-#stickyhead.show { transform:translateY(0); }
-#stickyhead .sh-wrap { max-width:980px; margin:0 auto; padding:11px 24px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
-#stickyhead .sh-title { font-family:var(--serif); font-weight:700; font-size:15px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-#stickyhead .sh-title span { color:var(--hd-cream); font-weight:400; }
-#stickyhead .sh-right { display:flex; align-items:center; gap:14px; flex-shrink:0; }
-#stickyhead .sh-pct { font-size:12.5px; font-weight:600; color:var(--hd-cream); white-space:nowrap; }
-/* the progress bar IS the bottom border of the header */
-#sh-progress { height:4px; width:0%; background:var(--hd-cream); transition:width .35s ease; }
-#sh-progress.done { background:var(--hd-green); }
-</style>
+    /* ---- Tool table ---- */
+    .tbl {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0 0;
+      font-size: 14px;
+      table-layout: fixed;
+    }
+
+    .tbl th {
+      background: var(--hd-red-deep);
+      color: #fff;
+      font-family: var(--sans);
+      font-weight: 600;
+      text-align: left;
+      padding: 10px 12px;
+    }
+
+    .tbl td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--hd-gray-border);
+      vertical-align: top;
+      word-wrap: break-word;
+    }
+
+    .tbl col.aspect {
+      width: 22%;
+    }
+
+    .tbl col.model {
+      width: 26%;
+    }
+
+    .tbl tr:nth-child(even) td {
+      background: var(--hd-gray-page);
+    }
+
+    .tbl td.yes {
+      color: var(--hd-green);
+      font-weight: 600;
+      background: rgba(105, 162, 87, .11) !important;
+    }
+
+    .tbl td.warn {
+      color: var(--hd-orange);
+      font-weight: 600;
+      background: rgba(255, 146, 0, .09) !important;
+    }
+
+    .tbl td.no {
+      color: var(--hd-red-bright);
+      font-weight: 600;
+      background: rgba(189, 1, 41, .07) !important;
+    }
+
+    .task-sub {
+      display: block;
+      font-size: 11.5px;
+      color: #999;
+      margin-top: 2px;
+      font-weight: 400;
+    }
+
+    .tbl-note {
+      width: 100%;
+      max-width: none;
+      font-size: 14.5px;
+      margin: 0 0 6px;
+      padding: 14px 16px;
+      background: var(--hd-gray-page);
+      border: 1px solid var(--hd-gray-border);
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      line-height: 1.55;
+    }
+
+    /* ---- footer ---- */
+    footer {
+      background: var(--hd-red-deep);
+      color: #fff;
+      padding: 40px 0;
+      position: relative;
+    }
+
+    footer .footer-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    footer p {
+      color: var(--hd-cream);
+      margin: 6px 0;
+      font-size: 14px;
+    }
+
+    footer .big {
+      font-family: var(--serif);
+      color: #fff;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    footer .hdi-logo {
+      bottom: 24px;
+    }
+
+    /* ---- Opening statement ---- */
+    .opening {
+      padding: 52px 0 12px;
+      border-bottom: 1px solid var(--hd-gray-border);
+    }
+
+    .opening-lead {
+      font-size: 17px;
+      line-height: 1.75;
+      max-width: none;
+      color: var(--hd-ink);
+      margin: 0 0 40px;
+    }
+
+    /* ---- Era comparison grid ---- */
+    .era-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 4px 0 8px;
+    }
+
+    .era {
+      border: 1px solid var(--hd-gray-border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .era-head {
+      padding: 14px 16px 12px;
+      background: var(--hd-gray-page);
+      border-bottom: 1px solid var(--hd-gray-border);
+    }
+
+    .era-epoch {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: #999;
+      margin: 0 0 5px;
+    }
+
+    .era-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--hd-red-deep);
+      margin: 0;
+      line-height: 1.25;
+    }
+
+    .era-body {
+      padding: 14px 16px;
+      flex: 1;
+    }
+
+    .era-time-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #aaa;
+      margin: 0 0 3px;
+    }
+
+    .era-time-val {
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 24px;
+      color: var(--hd-ink);
+      margin: 0 0 16px;
+      line-height: 1;
+    }
+
+    .era-rows {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .era-rows li {
+      font-size: 13.5px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--hd-gray-border);
+      line-height: 1.45;
+    }
+
+    .era-rows li:last-child {
+      border-bottom: none;
+    }
+
+    .era-rows li b {
+      color: #888;
+      font-weight: 600;
+      display: block;
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 2px;
+    }
+
+    /* Now column */
+    .era--now {
+      border-color: var(--hd-red-deep);
+      border-width: 2px;
+    }
+
+    .era--now .era-head {
+      background: var(--hd-red-deep);
+      border-bottom-color: var(--hd-red-dark);
+    }
+
+    .era--now .era-epoch {
+      color: var(--hd-cream);
+      opacity: .8;
+    }
+
+    .era--now .era-title {
+      color: #fff;
+    }
+
+    .era--now .era-time-val {
+      color: var(--hd-red-bright);
+    }
+
+    .era--now .era-rows li {
+      border-bottom-color: var(--hd-gray-border);
+    }
+
+    .era--now .era-rows li b {
+      color: var(--hd-red-bright);
+    }
+
+    @media (max-width:680px) {
+      .era-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ---- Hint panel ---- */
+    .hint {
+      background: var(--hd-cream);
+      border-left: 4px solid var(--hd-red-dark);
+      border-radius: 0 4px 4px 0;
+      padding: 16px 20px 14px;
+      margin: 22px 0 26px;
+    }
+
+    .hint-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--hd-red-dark);
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .hint p {
+      margin: 0 0 12px;
+      font-size: 14.5px;
+      line-height: 1.55;
+      max-width: none;
+    }
+
+    .hint p:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .hint-imgs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .hint-img {
+      position: relative;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1.5px dashed var(--hd-gray-mid);
+      background: #fff;
+      flex: 1;
+      min-width: 180px;
+      height: 440px; /* single image */
+      /* fixed height — image fills it regardless of aspect ratio */
+    }
+
+    .hint-img img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top left;
+      cursor: zoom-in;
+      transition: opacity .15s;
+    }
+
+    .hint-img:not(:only-child) {
+      height: 240px; /* paired images */
+    }
+
+    .hint-img img:hover {
+      opacity: .88;
+    }
+
+    .hint-img .ph {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      height: 100%;
+      padding: 14px;
+      color: #ccc;
+      font-size: 12.5px;
+      text-align: center;
+    }
+
+    .hint-img .ph-icon {
+      font-size: 26px;
+      opacity: .35;
+      line-height: 1;
+    }
+
+    /* ---- Lightbox ---- */
+    #lb {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .9);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+      cursor: zoom-out;
+    }
+
+    #lb.open {
+      display: flex;
+    }
+
+    #lb img {
+      max-width: 92vw;
+      max-height: 92vh;
+      border-radius: 4px;
+      box-shadow: 0 8px 48px rgba(0, 0, 0, .6);
+      object-fit: contain;
+    }
+
+    #lb-close {
+      position: absolute;
+      top: 18px;
+      right: 26px;
+      color: #fff;
+      font-size: 32px;
+      cursor: pointer;
+      opacity: .6;
+      line-height: 1;
+      background: none;
+      border: none;
+      font-weight: 300;
+      padding: 4px 10px;
+    }
+
+    #lb-close:hover {
+      opacity: 1;
+    }
+
+    @media print {
+      .copy-btn {
+        display: none;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .phasebar {
+        display: none;
+      }
+
+      #stickyhead {
+        display: none !important;
+      }
+
+      .check li {
+        cursor: default;
+      }
+    }
+
+    /* ---- Sticky collapsed header ---- */
+    #stickyhead {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+      background: var(--hd-red-deep);
+      color: #fff;
+      transform: translateY(-100%);
+      transition: transform .25s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+    }
+
+    #stickyhead.show {
+      transform: translateY(0);
+    }
+
+    #stickyhead .sh-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 11px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    #stickyhead .sh-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #stickyhead .sh-title span {
+      color: var(--hd-cream);
+      font-weight: 400;
+    }
+
+    #stickyhead .sh-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    #stickyhead .sh-pct {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--hd-cream);
+      white-space: nowrap;
+    }
+
+    #sh-progress {
+      height: 4px;
+      width: 0%;
+      background: var(--hd-cream);
+      transition: width .35s ease;
+    }
+
+    #sh-progress.done {
+      background: var(--hd-green);
+    }
+
+    /* ---- Translate button ---- */
+    .translate-btn {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hd-red-deep);
+      background: var(--hd-cream);
+      border: none;
+      padding: 7px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: .15s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 26px;
+    }
+
+    .translate-btn:hover {
+      background: #fff;
+    }
+
+    .translate-btn--sm {
+      font-size: 13px;
+      padding: 5px 10px;
+      margin-top: 0;
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="stickyhead">
-  <div class="sh-wrap">
-    <!-- ═══ EN ═══ --><div class="sh-title en">Prototyping Games with AI <span>· The Checklist</span></div>
-    <!-- ═══ VI ═══ --><div class="sh-title vi">Prototype Game với AI <span>· Checklist</span></div>
-    <div class="sh-right">
-      <div class="lang-toggle" id="lang-toggle-head">
-        <button class="lang-btn" data-lang="en">EN</button>
-        <button class="lang-btn" data-lang="vi">VI</button>
+  <div id="stickyhead">
+    <div class="sh-wrap">
+      <div class="sh-title">Prototyping Games with AI <span>· The Checklist</span></div>
+
+      <div class="sh-right">
+        <button class="translate-btn translate-btn--sm"
+          onclick="window.open('https://translate.google.com/translate?sl=en&tl=vi&u='+encodeURIComponent(window.location.href),'_blank')">🌐</button>
+        <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
       </div>
-      <div class="sh-pct"><span id="pb-pct">0%</span> <span class="en">complete</span><span class="vi">hoàn thành</span></div>
     </div>
+    <div id="sh-progress"></div>
   </div>
-  <div id="sh-progress"></div>
-</div>
 
-<header class="cover">
-  <p class="kicker">Gameloft Hanoi · AI Workshop · 2026</p>
-  <!-- ═══ EN ═══ --><h1 class="en">Prototyping Games with AI — <b>The Step-by-Step Checklist</b></h1>
-  <!-- ═══ VI ═══ --><h1 class="vi">Prototype Game với AI — <b>Checklist Từng Bước</b></h1>
-  <!-- ═══ EN ═══ --><p class="sub en">From a raw idea to a playable, shareable web prototype — with copy-paste prompts for every step.</p>
-  <!-- ═══ VI ═══ --><p class="sub vi">Từ ý tưởng thô đến prototype chạy được trên web — kèm prompt copy-paste cho từng bước.</p>
-  <!-- ═══ EN ═══ --><p class="byline en">A practical companion to the walkthrough · by <b>Huy Dũng (DaveHD)</b></p>
-  <!-- ═══ VI ═══ --><p class="byline vi">Tài liệu đồng hành cho workshop · Huy Dũng (DaveHD)</p>
-  <div class="cover-lang-toggle">
-    <div class="lang-toggle" id="lang-toggle-cover">
-      <button class="lang-btn" data-lang="en">EN</button>
-      <button class="lang-btn" data-lang="vi">VI</button>
+  <header class="cover">
+    <div class="cover-inner">
+      <h1><strong>Prototyping Games with AI</strong></h1>
+      <p class="sub">Turn your wild idea into a playable prototype in 1 day. Even if you can't code.</p>
+      <p class="byline">By <b>Huy Dũng (DaveHD)</b></p>
+      <button class="translate-btn"
+        onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🌐
+        Vietnamese</button>
     </div>
-  </div>
-  <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
-</header>
+    <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
+  </header>
 
-<main>
-<div class="wrap">
+  <div id="lb"><button id="lb-close">×</button><img src="" alt="Screenshot"></div>
+  <main>
+    <div class="wrap">
 
-  <section class="intro" id="how">
-    <!-- ═══ EN ═══ --><h2 class="en">How to use this guide</h2>
-    <!-- ═══ VI ═══ --><h2 class="vi">Dùng tài liệu này như thế nào</h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Work top to bottom. Each phase has a <b>checklist</b> (tick as you go) and one or more <b>ready-to-use prompts</b> — copy the prompt, paste it into your AI, and replace anything marked <span class="fill">[LIKE THIS]</span> with your own game's details. You stay the designer and director; the AI executes.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Làm theo thứ tự từ trên xuống dưới. Mỗi phase có một <b>checklist</b> (tick khi xong từng bước) và một hoặc nhiều <b>prompt dùng được ngay</b> — copy prompt, paste vào AI, rồi thay những phần <span class="fill">[LIKE THIS]</span> bằng thông tin game của bạn. Bạn là designer và director; AI là người thực thi.</p>
+      <section class="opening" id="opening">
+        <p class="opening-lead">Not long ago, making even a rough game prototype meant mastering a full stack of
+          disciplines most people don't have: coding, game engine, graphic asset creation, audio editing, writing and
+          balancing rules, etc. You either have to be an excellent all-rounder technical person, or having the budget to
+          hire several people. And in any case, <span class="fill">it takes time</span>. Days, or even Weeks.</p>
+        <p>The consequences went beyond inconvenience. When prototyping is expensive: </p>
+        <ul>
+          <li>Ideas stay stuck in notebooks</li>
+          <li>Investment flows toward "safe" bets — sequels, proven genres, low-risk variants</li>
+          <li>Innovation gets filtered out before it ever gets a fair try.</li>
+        </ul>
+        <p><span class="fill">That constraint has now collapsed</span>. AI handles the full technical execution — code,
+          graphics, docs, and more — so you can take any idea from concept to playable prototype in a few hours. Test
+          it. Feel whether it's actually fun. Decide if it's worth pursuing before committing real resources. And if
+          it's not — discard it and try the next one, at a cost that makes that affordable.</p>
 
-    <div class="principles">
-      <div class="principle">
-        <!-- ═══ EN ═══ --><b class="en">You direct, AI executes</b><b class="vi">Bạn chỉ đạo, AI thực thi</b>
-        <!-- ═══ EN ═══ --><span class="en">The idea and the judgment are yours. The AI is a thinking partner and a coder.</span>
-        <!-- ═══ VI ═══ --><span class="vi">Ý tưởng và phán xét là của bạn. AI là đối tác tư duy và là coder — không hơn, không kém.</span>
-      </div>
-      <div class="principle">
-        <!-- ═══ EN ═══ --><b class="en">Plan first, then build small</b><b class="vi">Plan trước, build từng bước nhỏ</b>
-        <!-- ═══ EN ═══ --><span class="en">Lock the design before any code. Build in small, testable steps — never one giant request.</span>
-        <!-- ═══ VI ═══ --><span class="vi">Chốt design trước khi viết dòng code nào. Build theo từng bước nhỏ, kiểm tra được — đừng bao giờ ném một request khổng lồ một lần.</span>
-      </div>
-      <div class="principle">
-        <!-- ═══ EN ═══ --><b class="en">Prototype scope only</b><b class="vi">Chỉ scope prototype thôi</b>
-        <!-- ═══ EN ═══ --><span class="en">You are proving the core mechanic is fun. Resist polishing, feature-creep, and chasing tiny bugs.</span>
-        <!-- ═══ VI ═══ --><span class="vi">Mục tiêu là chứng minh core mechanic có fun không. Kháng cự việc polish, thêm feature, và đuổi theo từng bug nhỏ.</span>
-      </div>
-      <div class="principle">
-        <!-- ═══ EN ═══ --><b class="en">Keep docs lean</b><b class="vi">Giữ docs gọn gàng</b>
-        <!-- ═══ EN ═══ --><span class="en">Keep things clear, and simple, and focused. That helps both for human reader and AI coder.</span>
-        <!-- ═══ VI ═══ --><span class="vi">Rõ ràng, đơn giản, tập trung. Tốt cho cả người đọc lẫn AI coder.</span>
-      </div>
-    </div>
+        <table class="tbl task-tbl">
+          <colgroup>
+            <col style="width:22%">
+            <col style="width:26%">
+            <col style="width:26%">
+            <col style="width:26%">
+          </colgroup>
+          <tr>
+            <th>Task</th>
+            <th>Non-tech person — alone</th>
+            <th>+ AI Chat<br><small style="font-weight:400;opacity:.65">GPT / Claude / Gemini</small></th>
+            <th>+ AI Agent<br><small style="font-weight:400;opacity:.65">Codex / Claude Desktop</small></th>
+          </tr>
+          <tr>
+            <td><b>Game design, story &amp; wireframing</b><span class="task-sub">concept, rules, narrative, design
+                docs</span></td>
+            <td class="yes">✅ Can do</td>
+            <td class="yes">✅ AI as thinking partner; structures &amp; writes GDD, rules, narrative, draw wireframe</td>
+            <td class="yes">✅ Agent writes &amp; saves all docs/visuals directly to your project</td>
+          </tr>
 
-    <div class="phasebar">
-      <a href="#p0"><span class="en">0 · Setup</span><span class="vi">0 · Cài đặt</span></a>
-      <a href="#p1"><span class="en">1 · Idea</span><span class="vi">1 · Ý tưởng</span></a>
-      <a href="#p2"><span class="en">2 · Game Design</span><span class="vi">2 · Thiết kế</span></a>
-      <a href="#p3"><span class="en">3 · Tech Design</span><span class="vi">3 · Thiết kế Kỹ thuật</span></a>
-      <a href="#p4"><span class="en">4 · Project Plan</span><span class="vi">4 · Kế hoạch</span></a>
-      <a href="#p5"><span class="en">5 · Build</span><span class="vi">5 · Xây dựng</span></a>
-      <a href="#p6"><span class="en">6 · Fix bugs</span><span class="vi">6 · Sửa lỗi</span></a>
-      <a href="#p7"><span class="en">7 · Ship</span><span class="vi">7 · Ship</span></a>
-    </div>
-  </section>
+          <tr>
+            <td><b>Game programming</b><span class="task-sub">architecture, logic, physics, input, UI code</span></td>
+            <td class="no">❌ Requires coding skills — must learn or hire</td>
+            <td class="warn">⚠️ AI writes snippets; you still assemble, integrate &amp; debug manually</td>
+            <td class="yes">✅ Agent architects, writes, runs, and fixes end-to-end</td>
+          </tr>
+          <tr>
+            <td><b>2D art &amp; visual assets</b><span class="task-sub">sprites, backgrounds, UI graphics</span></td>
+            <td class="no">❌ Requires art skills — must learn or hire</td>
+            <td class="warn">⚠️ AI generates images in chat; you place them in the game manually</td>
+            <td class="yes">✅ Generate + integrate into project automatically</td>
+          </tr>
+          <tr>
+            <td><b>Animation</b><span class="task-sub">sprite sheets, UI transitions, motion</span></td>
+            <td class="no">❌ Requires animation skills — must learn or hire</td>
+            <td class="no">❌ Chat AI cannot produce animation files</td>
+            <td class="warn">⚠️ Basic CSS / spritesheet animation only</td>
+          </tr>
+          <tr>
+            <td><b>Sound &amp; music</b><span class="task-sub">sound effects, background music</span></td>
+            <td class="no">❌ Requires audio skills — must learn or hire</td>
+            <td class="warn">⚠️ AI suggests free sources; cannot create or integrate</td>
+            <td class="warn">⚠️ Can source from free libraries &amp; wire into project</td>
+          </tr>
+          <tr>
+            <td><b>Version control &amp; deployment</b><span class="task-sub">git setup, commits, live URL</span></td>
+            <td class="no">❌ Requires technical skills — must learn</td>
+            <td class="warn">⚠️ AI explains each step; you execute manually</td>
+            <td class="yes">✅ Agent sets up, commits automatically, deploys to live URL</td>
+          </tr>
+          <tr>
+            <td><b>Debug, Playtest &amp; Iterate</b><span class="task-sub">playing, observing, giving feedback</span>
+            </td>
+            <td class="warn">⚠️ Come up with improvement ideas. Hard to self-implement.</td>
+            <td class="warn">⚠️ AI can only suggest fixes on very specific snippets, from your description</td>
+            <td class="yes">✅ Agents read files, think, make changes, test, report. The full loop.</td>
+          </tr>
+        </table>
 
-  <!-- PHASE 0 -->
-  <section id="p0">
-    <h2>
-      <span class="num">0</span>
-      <!-- ═══ EN ═══ --><span class="en">Set up your tools</span>
-      <!-- ═══ VI ═══ --><span class="vi">Cài đặt công cụ</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">One-time setup. You need a place to store code, a way to read it, and an AI coding agent.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Setup một lần, dùng mãi. Bạn cần: nơi lưu code, cách đọc code đó, và một AI coding agent.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Create a GitHub account</b><b class="vi">Tạo tài khoản GitHub</b>
-        <span class="en"> and a new <b>public</b> repository.</span><span class="vi"> và một repository <b>public</b> mới.</span>
-        <!-- ═══ EN ═══ --><span class="why en">This stores every step so you can compare, roll back, and host the game for free later.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Lưu từng bước đi, cho phép bạn so sánh, rollback, và host game miễn phí sau này.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Install GitHub Desktop</b><b class="vi">Cài GitHub Desktop</b>
-        <span class="en"> and clone the repo to your machine.</span><span class="vi"> và clone repo về máy.</span>
-        <!-- ═══ EN ═══ --><span class="why en">A friendly UI for commits — you won't need the command line.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Giao diện thân thiện cho việc commit — không cần đụng command line.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Install Visual Studio Code</b><b class="vi">Cài Visual Studio Code</b>
-        <span class="en"> with a Markdown preview extension.</span><span class="vi"> kèm extension preview Markdown.</span>
-        <!-- ═══ EN ═══ --><span class="why en">To read the code the AI writes and make tiny tweaks yourself — faster than asking the AI.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Để đọc code AI viết và tự chỉnh sửa những thứ nhỏ — nhanh hơn nhiều so với nhờ AI làm.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Pick and install ONE AI coding agent</b><b class="vi">Chọn và cài MỘT AI coding agent</b>
-        <span class="en"> (desktop app). See the comparison below.</span><span class="vi"> (desktop app). Xem bảng so sánh bên dưới.</span>
-        <!-- ═══ EN ═══ --><span class="why en">The workflow is nearly identical across all three.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Workflow gần như giống hệt nhau với cả ba lựa chọn.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Pick ONE chat AI</b><b class="vi">Chọn MỘT chat AI</b>
-        <span class="en"> for design discussion (can be the same provider).</span><span class="vi"> để thảo luận thiết kế (có thể cùng provider).</span>
-        <!-- ═══ EN ═══ --><span class="why en">Used for brainstorming and writing the design docs before any code.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Dùng cho việc brainstorm và viết design docs trước khi code bất cứ thứ gì.</span>
-      </li>
-    </ul>
 
-    <table class="tbl">
-      <colgroup><col class="aspect"><col class="model"><col class="model"><col class="model"></colgroup>
-      <tr>
-        <th><span class="en">Aspect</span><span class="vi">Tiêu chí</span></th>
-        <th>Claude (Claude Desktop)</th>
-        <th>ChatGPT (Codex)</th>
-        <th>Gemini (Antigravity)</th>
-      </tr>
-      <tr>
-        <td><span class="en">Creating an account</span><span class="vi">Tạo tài khoản</span></td>
-        <td class="warn"><span class="en">⚠️ Harder — appears to block new Vietnam phone numbers</span><span class="vi">⚠️ Khó hơn — có vẻ chặn số điện thoại Việt Nam mới</span></td>
-        <td class="yes"><span class="en">☑️ Easy</span><span class="vi">☑️ Dễ</span></td>
-        <td class="yes"><span class="en">✅ Most people already have a Google account</span><span class="vi">✅ Hầu hết mọi người đã có sẵn tài khoản Google</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">Code &amp; reasoning power</span><span class="vi">Sức mạnh code &amp; reasoning</span></td>
-        <td class="yes"><span class="en">✅ Strongest</span><span class="vi">✅ Mạnh nhất</span></td>
-        <td class="yes"><span class="en">✅ Strong</span><span class="vi">✅ Mạnh</span></td>
-        <td><span class="en">☑️ Solid, usable</span><span class="vi">☑️ Ổn, dùng được</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">Image generation</span><span class="vi">Tạo ảnh</span></td>
-        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
-        <td><span class="en">☑️ Yes</span><span class="vi">☑️ Có</span></td>
-        <td class="yes"><span class="en">✅ Top-tier</span><span class="vi">✅ Hàng đầu</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">Video / music generation</span><span class="vi">Tạo video / nhạc</span></td>
-        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
-        <td class="warn"><span class="en">⚠️ None</span><span class="vi">⚠️ Không có</span></td>
-        <td class="yes"><span class="en">✅ Yes</span><span class="vi">✅ Có</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">Connecting to other apps &amp; services</span><span class="vi">Kết nối ứng dụng &amp; dịch vụ</span></td>
-        <td class="yes"><span class="en">✅ Plugins, MCP, Office extensions</span><span class="vi">✅ Plugins, MCP, Office extensions</span></td>
-        <td><span class="en">☑️ Plugins, MCP…</span><span class="vi">☑️ Plugins, MCP…</span></td>
-        <td class="yes"><span class="en">✅ Native connections to Google apps/services</span><span class="vi">✅ Kết nối trực tiếp với apps/services Google</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">Bundled perks</span><span class="vi">Quyền lợi đi kèm</span></td>
-        <td><span class="en">None</span><span class="vi">Không có</span></td>
-        <td><span class="en">None</span><span class="vi">Không có</span></td>
-        <td class="yes"><span class="en">✅ YouTube Premium · 5TB Google Drive</span><span class="vi">✅ YouTube Premium · 5TB Google Drive</span></td>
-      </tr>
-    </table>
-    <!-- ═══ EN ═══ --><p class="tbl-note en">Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them; a team can share a single account for a month. <b>Quick take for mid-2026:</b> Gemini gives the best value for most people. Pick Claude if your use case is purely code/writing/agent work that demands the highest accuracy. ChatGPT is worth grabbing especially when there's a free Plus month. For this prototype workflow, the choice barely matters — the steps below are nearly identical across all three.</p>
-    <!-- ═══ VI ═══ --><p class="tbl-note vi">Khoảng $20/tháng (~500K VND) cho gói Plus/Pro của bất kỳ công cụ nào; một nhóm có thể dùng chung một tài khoản cả tháng. <b>Nhận xét nhanh giữa 2026:</b> Gemini có giá trị tốt nhất cho hầu hết mọi người. Chọn Claude nếu use case của bạn thiên về code/writing/agent và đòi hỏi độ chính xác cao nhất. ChatGPT đáng thử — đặc biệt khi có tháng Plus miễn phí. Với workflow prototype này, lựa chọn gần như không quan trọng — các bước bên dưới gần như giống nhau với cả ba.</p>
 
-    <div class="callout">
-      <!-- ═══ EN ═══ --><span class="tag en">Model selection — important</span>
-      <!-- ═══ VI ═══ --><span class="tag vi">Chọn model — quan trọng</span>
-      <!-- ═══ EN ═══ --><p class="en">For <b>brainstorming &amp; design</b> (Phases 1–2), use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</p>
-      <!-- ═══ VI ═══ --><p class="vi">Cho <b>brainstorming &amp; design</b> (Phase 1–2), dùng <b>model tầm trung / sáng tạo</b> (Claude Sonnet, Gemini Flash, ChatGPT reasoning "medium") — model đỉnh thường over-optimize cho logic và kém sáng tạo hơn.</p>
-      <!-- ═══ EN ═══ --><p class="en">For <b>technical &amp; design and planning</b> (Phases 1–2), use the <b>highest</b> (e.model and thinking effort.</p>
-      <!-- ═══ VI ═══ --><p class="vi">Cho <b>thiết kế kỹ thuật và lập kế hoạch</b>, dùng <b>model mạnh nhất</b> với effort tư duy cao nhất.</p>
-      <!-- ═══ EN ═══ --><p class="en">For <b>the coding</b>, <b>start with the mid-level model too</b> — for a game prototype it works fine about 90% of the time. Only switch up to the strongest model (Opus, Gemini Pro, ChatGPT high reasoning) when you genuinely can't get the result you want.</p>
-      <!-- ═══ VI ═══ --><p class="vi">Cho <b>phần code</b>, <b>bắt đầu với model tầm trung</b> — với prototype game, 90% trường hợp là đủ dùng. Chỉ escalate lên model mạnh nhất (Opus, Gemini Pro, ChatGPT high reasoning) khi bạn thực-sự bí.</p>
-    </div>
-  </section>
 
-  <!-- PHASE 1 -->
-  <section id="p1">
-    <h2>
-      <span class="num">1</span>
-      <!-- ═══ EN ═══ --><span class="en">Find the idea</span>
-      <!-- ═══ VI ═══ --><span class="vi">Tìm ý tưởng</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Use the chat AI as a thinking partner. Make it ask <i>you</i> questions — the best idea still comes from you. Pick whichever prompt matches your situation: an open brainstorm, or one anchored to a specific theme.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Dùng chat AI như một đối tác tư duy. Bắt nó hỏi-ngược lại bạn — ý tưởng hay nhất vẫn phải xuất phát từ bạn. Chọn prompt phù hợp với tình huống: brainstorm mở hoàn toàn, hoặc gắn với một theme cụ thể.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Use a creative (mid-tier) model</b><b class="vi">Dùng model sáng tạo (mid-tier)</b>
-        <span class="en">, in English if you can.</span><span class="vi">, bằng tiếng Anh nếu có thể.</span>
-        <!-- ═══ EN ═══ --><span class="why en">Saves tokens and improves quality.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Tiết kiệm token và cải thiện chất lượng đầu ra.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">State who the players are</b><b class="vi">Xác định rõ người chơi là ai</b>
-        <!-- ═══ EN ═══ --><span class="en"> — both prompts ask for it, because a game for kids and a game for puzzle fans lead to very different ideas.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — cả hai prompt đều hỏi điều này, vì game cho trẻ em và game cho puzzle fan sẽ ra ý tưởng rất khác nhau.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Make the AI ask you clarifying questions</b><b class="vi">Bắt AI hỏi-ngược bạn những câu làm rõ</b>
-        <!-- ═══ EN ═══ --><span class="en"> before it proposes anything.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> trước khi nó đề xuất bất cứ thứ gì.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Demand a comparison table</b><b class="vi">Yêu cầu một bảng so sánh</b>
-        <!-- ═══ EN ═══ --><span class="en"> of 10+ ideas scored on clear criteria, so you can choose objectively.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> 10+ ý tưởng được chấm điểm theo tiêu chí rõ ràng, để bạn chọn lựa một cách khách quan.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><span class="en">Pick a few ideas you like. Or ask for more. Discuss back and forth with AI until <b>you have a clear favorite.</b></span>
-        <!-- ═══ VI ═══ --><span class="vi">Chọn vài ý tưởng bạn thích. Hoặc yêu cầu thêm. Thảo luận qua lại với AI đến khi <b>bạn có một lựa chọn rõ ràng.</b></span>
-      </li>
-    </ul>
+      </section>
 
-    <!-- ═══ EN ═══ --><h3 class="en">Version A — open brainstorm (no fixed theme)</h3>
-    <!-- ═══ VI ═══ --><h3 class="vi">Phiên bản A — brainstorm mở (không có theme cố định)</h3>
+      <section class="intro" id="how">
+        <h2>How to use this guide</h2>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Brainstorm — open</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Brainstorm — mở</span>
-        <button class="copy-btn" data-target="p-brain-open">Copy</button>
-      </div>
-      <pre id="p-brain-open">I want to prototype a game. Help me find ONE creative, fun game idea worth building.
+        <p class="lead">Work top to bottom. Each phase has a <b>checklist</b> (tick as you go) and one or more
+          <b>ready-to-use prompts</b> — copy the prompt, paste it into your AI, and replace anything marked <span
+            class="fill">[LIKE THIS]</span> with your own game's details. You stay the designer and director; the AI is
+          your all-around technical executor.
+        </p>
 
-The game is for this audience (the people who&#x27;ll play it): [DESCRIBE PLAYERS — e.g. &quot;casual mobile players&quot;, &quot;kids 8–12&quot;, &quot;puzzle fans&quot;].
 
-Let&#x27;s brainstorm together — ask me clarifying questions first if anything is vague, don&#x27;t jump straight to answers.
+        <div class="phasebar">
+          <a href="#p0">0 · Setup</a>
+          <a href="#p1">1 · Idea</a>
+          <a href="#p2">2 · Game Design</a>
+          <a href="#p3">3 · Tech Design</a>
+          <a href="#p4">4 · Project Plan</a>
+          <a href="#p5">5 · Build</a>
+          <a href="#p6">6 · Fix bugs</a>
+          <a href="#p6b">7 · Iterate</a>
+          <a href="#p7">8 · Ship</a>
+        </div>
+      </section>
+
+      <!-- PHASE 0 -->
+      <section id="p0">
+        <h2><span class="num">0</span>Set up your tools</h2>
+        <p class="lead">One-time setup. These tools do far more than write code — they scrape websites, edit images,
+          generate game sprites, and help draft design docs. Get them configured once.</p>
+
+        <ul class="check">
+          <li>
+            <b>Create a <a href="https://github.com/signup" target="_blank">GitHub</a> account</b>
+            and a new <b>public</b> repository.
+            <span class="why">This stores every step so you can compare, roll back, and host the game for free
+              later.</span>
+
+          </li>
+          <li>
+            <b>Install <a href="https://desktop.github.com" target="_blank">GitHub Desktop</a></b>
+            and clone the repo to your machine.
+            <span class="why">A friendly UI for commits — you won't need the command line.</span>
+
+          </li>
+          <li>
+            <b>Install <a href="https://code.visualstudio.com" target="_blank">Visual Studio Code</a></b>
+            to read and edit source code.
+            <span class="why">To read the code the AI writes and make tiny tweaks yourself — faster than asking the
+              AI.</span>
+
+          </li>
+          <li>
+            <b>Pick and install ONE AI coding agent</b>
+            (desktop app). See the comparison below.
+            <span class="why">The workflow is nearly identical across all three.</span>
+
+          </li>
+        </ul>
+
+
+
+        <table class="tbl">
+          <colgroup>
+            <col class="aspect">
+            <col class="model">
+            <col class="model">
+            <col class="model">
+          </colgroup>
+          <tr>
+            <th>Aspect</th>
+            <th><a href="https://claude.ai/download" target="_blank" style="color:#fff">Claude</a> (Claude Desktop)</th>
+            <th><a href="https://chatgpt.com/codex/" target="_blank" style="color:#fff">ChatGPT</a> (Codex)</th>
+            <th><a href="https://antigravity.google/" target="_blank" style="color:#fff">Gemini</a> (Antigravity)</th>
+          </tr>
+          <tr>
+            <td>Creating an account</td>
+            <td class="warn">⚠️ Harder — appears to block new Vietnam phone numbers</td>
+            <td class="yes">☑️ Easy</td>
+            <td class="yes">✅ Most people already have a Google account</td>
+          </tr>
+          <tr>
+            <td>Code &amp; reasoning power</td>
+            <td class="yes">✅ Strongest</td>
+            <td class="yes">✅ Strong — Codex excels at game prototype code</td>
+            <td>☑️ Solid, usable</td>
+          </tr>
+          <tr>
+            <td>Image &amp; sprite generation</td>
+            <td class="warn">⚠️ None built-in </td>
+            <td class="yes">✅ Yes</td>
+            <td class="yes">✅ Yes</td>
+          </tr>
+          <tr>
+            <td>Video / music generation</td>
+            <td class="warn">⚠️ None</td>
+            <td class="warn">⚠️ None</td>
+            <td class="yes">✅ Yes (Veo, Lyria)</td>
+          </tr>
+          <tr>
+            <td>Connecting to apps &amp; services</td>
+            <td class="yes">✅ Plugins, MCP, Office </td>
+            <td>☑️ Plugins, MCP</td>
+            <td class="yes">✅ Native connections to Google apps/services</td>
+          </tr>
+          <tr>
+            <td>Bundled perks</td>
+            <td>None</td>
+            <td class="yes">✅ Free Plus month for everyone (mid-2026)</td>
+            <td class="yes">✅ YouTube Premium · 5TB Google Drive</td>
+          </tr>
+        </table>
+        <br />
+        <p class="tbl-note">Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them. <b>Quick take for
+            mid-2026:</b></p>
+        <ul>
+          <li><a href="https://antigravity.google/" target="_blank"><b>Gemini</b></a> shines during planning (use Canvas
+            to draft GDD/TDD/plan live, export to .md when done) and has the best bundled value-for-money overall.</li>
+          <li><a href="https://chatgpt.com/codex/" target="_blank"><b>Codex</b></a> is the standout for executing the
+            technical tasks of game prototyping right now — capable coder, game-studio plugin for sprites, and a free
+            Plus month to try.</li>
+          <li><a href="https://claude.ai/download" target="_blank"><b>Claude</b></a> is strongest for pure reasoning and
+            writing, and Cowork adds practical non-coding tasks (image editing, web scraping).</li>
+        </ul>
+        <p>For this workflow, start with whichever you already have — the prompts work across all three.</p>
+
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The
+            key things are: giving it access to a local folder, pick the right permissions level, and the right model.
+            Below is a screenshot of Codex.</p>
+
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent interface screenshot</div>
+            </div>
+          </div>
+          <br />
+          <p>For <b>brainstorming &amp; design</b>, use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash,
+            ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</p>
+
+          <p>For <b>technical design and planning</b>, use the <b>highest</b> model and thinking effort.</p>
+
+          <p>For <b>the coding</b>, <b>start with the mid-level model</b> — it should works fine for simple game
+            prototype. Only switch up to the strongest model when you genuinely can't get the result you want.</p>
+        </div>
+      </section>
+
+      <!-- PHASE 1 -->
+      <section id="p1">
+        <h2><span class="num">1</span>Find the idea</h2>
+        <p class="lead">Use the chat AI as a thinking partner. Make it ask <i>you</i> questions — the best idea still
+          comes from you. Pick whichever prompt matches your situation: an open brainstorm, or one anchored to a
+          specific theme.</p>
+
+        <ul class="check">
+          <li>
+            <b>Use a creative (mid-tier) model</b>
+            , in English if you can.
+            <span class="why">Saves tokens and improves quality.</span>
+
+          </li>
+          <li>
+            <b>State who the players are</b>
+            — both prompts ask for it, because a game for kids and a game for puzzle fans lead to very different ideas.
+
+          </li>
+          <li>
+            <b>Make the AI ask you clarifying questions</b>
+            before it proposes anything.
+
+          </li>
+          <li>
+            <b>Get 10+ ideas, each with a clear gameplay description and annotated ratings</b>
+            — concrete "what the player does" language, not inspirational copy. Ratings let you compare objectively.
+
+          </li>
+          <li>
+            <b>Discuss back and forth with AI untilyou have a clear
+              favorite.</b> Or ask for more. 
+
+          </li>
+        </ul>
+
+
+
+        <h3>Version A — open brainstorm (no fixed theme)</h3>
+
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Brainstorm — open</span>
+
+            <button class="copy-btn" data-target="p-brain-open">Copy</button>
+          </div>
+          <pre id="p-brain-open">I want to prototype a game. Help me find ONE creative, fun game idea worth building.
+
+The game is for this audience (the people who'll play it): [DESCRIBE PLAYERS — e.g. "casual mobile players", "kids 8–12", "puzzle fans"].
+
+Let's brainstorm together — ask me clarifying questions first if anything is vague, don't jump straight to answers.
 
 Constraints for the idea:
 - Must play well on BOTH desktop and mobile (fun with touch / tap / swipe)
@@ -412,100 +1271,111 @@ Constraints for the idea:
 
 My hobbies / interests to draw from (optional): [FILL IN — e.g. Poker, Pool, Piano, Origami — or delete this line]
 
-When I say &quot;ready&quot;, present at least 10 ideas in a TABLE, in an artifact, comparing them on:
-Innovativeness | Mobile-first fit | Core mechanic clarity | Prototype feasibility (hours) | Appeal to my players.
-Then recommend your top 3 with one line on why each is a strong, fun prototype for this audience.</pre>
-    </div>
+When I say "ready", present at least 10 ideas as a numbered list. For each idea:
+- One short paragraph describing the gameplay clearly and concretely (what the player does, what the game responds with, what makes it fun — no inspirational fluff, just how it actually plays).
+- Annotated ratings: Innovativeness · Mobile fit · Mechanic clarity · Feasibility (hrs) · Player appeal — each rated Low/Med/High with one phrase of reasoning.
 
-    <!-- ═══ EN ═══ --><h3 class="en">Version B — themed brainstorm (AI researches the theme first)</h3>
-    <!-- ═══ VI ═══ --><h3 class="vi">Phiên bản B — brainstorm theo theme (AI nghiên cứu theme trước)</h3>
+Then call out your top 3 picks with one sentence on why each is a strong prototype for this audience.</pre>
+        </div>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Brainstorm — with a theme</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Brainstorm — theo theme</span>
-        <button class="copy-btn" data-target="p-brain-theme">Copy</button>
-      </div>
-      <pre id="p-brain-theme">I want to prototype a game built around a specific theme. Help me find ONE creative, fun idea worth building.
+        <h3>Version B — themed brainstorm (AI researches the theme first)</h3>
 
-The game is for this audience (the people who&#x27;ll play it): [DESCRIBE PLAYERS — e.g. &quot;casual mobile players&quot;, &quot;fans of the theme&quot;, &quot;kids 8–12&quot;].
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Brainstorm — with a theme</span>
 
-Theme: [STATE YOUR THEME — e.g. &quot;Dragon Mania Legends&quot;, &quot;Vietnamese folk tales&quot;, &quot;outer space&quot;].
+            <button class="copy-btn" data-target="p-brain-theme">Copy</button>
+          </div>
+          <pre
+            id="p-brain-theme">I want to prototype a game built around a specific theme. Help me find ONE creative, fun idea worth building.
+
+The game is for this audience (the people who'll play it): [DESCRIBE PLAYERS — e.g. "casual mobile players", "fans of the theme", "kids 8–12"].
+
+Theme: [STATE YOUR THEME — e.g. "Dragon Mania Legends", "Vietnamese folk tales", "outer space"].
 
 First, RESEARCH the theme so the ideas feel authentic:
-- Look up the theme&#x27;s signature elements, characters, mechanics, tone, and visual identity.
+- Look up the theme's signature elements, characters, mechanics, tone, and visual identity.
 - Summarize back to me, in a short list, the 5–8 most distinctive things about it that a game could build on.
 
 Then brainstorm with me. Ask clarifying questions if needed. Each idea must:
-- Stay true to the theme&#x27;s identity
+- Stay true to the theme's identity
 - Play well on BOTH desktop and mobile (fun with touch / tap / swipe)
 - Have ONE interesting, reasonably innovative core mechanic — not a clone
 - Be small enough to prototype in a few hours (a vertical slice)
 
-When I say &quot;ready&quot;, present at least 10 theme-based ideas in a TABLE, in an artifact, comparing them on:
-Innovativeness | Mobile-first fit | Core mechanic clarity | Prototype feasibility (hours) | Theme authenticity | Appeal to my players.
-Then recommend your top 3 with one line each on why they&#x27;re a strong, fun prototype that fits the theme and this audience.</pre>
-    </div>
-  </section>
+When I say "ready", present at least 10 theme-based ideas as a numbered list. For each idea:
+- One short paragraph describing the gameplay clearly and concretely (what the player does, what the game responds with, what makes it fun — no inspirational fluff, just how it actually plays).
+- Annotated ratings: Innovativeness · Mobile fit · Mechanic clarity · Feasibility (hrs) · Theme authenticity · Player appeal — each rated Low/Med/High with one phrase of reasoning.
 
-  <!-- PHASE 2 -->
-  <section id="p2">
-    <h2>
-      <span class="num">2</span>
-      <!-- ═══ EN ═══ --><span class="en">Lock the design — write the GDD</span>
-      <!-- ═══ VI ═══ --><span class="vi">Chốt thiết kế — viết GDD</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Discuss the idea in chat until the core loop feels fun on paper, then write a lean <b>Prototype GDD</b>. This is the biggest scope-saver — nail the mechanic in plain words before any code exists.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Thảo luận ý tưởng trong chat đến khi core loop cảm giác fun trên giấy, rồi viết <b>Prototype GDD</b> gọn nhẹ. Đây là bước tiết kiệm scope nhiều nhất — nail mechanic bằng ngôn ngữ thông thường trước khi code tồn tại.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">The core mechanic is one sentence</b><b class="vi">Core mechanic là một câu</b>
-        <!-- ═══ EN ═══ --><span class="en"> you can say out loud. Keep refining until you can.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> bạn có thể nói to được. Tiếp tục tinh chỉnh cho đến khi làm được.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Ask the AI for a labelled wireframe</b><b class="vi">Bảo AI phác một wireframe có chú thích</b>
-        <!-- ═══ EN ═══ --><span class="en"> of the main screen — shows layout problems before any code exists.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> của màn hình chính — sẽ lộ ra vấn đề layout trước khi code tồn tại.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Define the vertical slice</b><b class="vi">Xác định vertical slice</b>
-        <!-- ═══ EN ═══ --><span class="en"> — the smallest thing that proves the mechanic is fun.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — thứ nhỏ nhất chứng minh được mechanic có fun hay không.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Write the non-goals.</b><b class="vi">Viết ra non-goals.</b>
-        <!-- ═══ EN ═══ --><span class="en"> What you <i>won't</i> build matters as much as what you will.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> Những thứ bạn <i>sẽ KHÔNG</i> xây dựng quan trọng không kém những thứ bạn sẽ xây dựng.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">GDD is design only, under ~2 pages</b><b class="vi">GDD chỉ là design, dưới ~2 trang</b>
-        <!-- ═══ EN ═══ --><span class="en"> — no file names, code, formulas, or configs (that's the TDD's job).</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — không có tên file, code, công thức, hay config (đó là việc của TDD).</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Every rule is implementable by a stranger</b><b class="vi">Mọi rule phải đủ rõ ràng để người lạ implement được</b>
-        <!-- ═══ EN ═══ --><span class="en"> — no "you know what I mean".</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — không có kiểu "bạn hiểu ý mình muốn nói chứ".</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Review the GDD in VS Code</b><b class="vi">Xem lại GDD trong VS Code</b>
-        <!-- ═══ EN ═══ --><span class="en"> and fix small things yourself before moving on.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> và tự sửa những thứ nhỏ trước khi chuyển sang bước tiếp theo.</span>
-      </li>
-    </ul>
+Then call out your top 3 picks with one sentence on why each is a strong prototype that fits the theme and this audience.</pre>
+        </div>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Below is an example of output given by Claude, in normal Chat mode. It's a bit of an Overkill, yeah 😆</p>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate gdd.md</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo gdd.md</span>
-        <button class="copy-btn" data-target="p-gdd">Copy</button>
-      </div>
-      <pre id="p-gdd">Let&#x27;s lock the design for [GAME NAME / chosen idea]. Write a PROTOTYPE GDD as a Markdown file: gdd.md
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/brainstorm-output.png" alt="Example brainstorm output"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Example brainstorm output</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 2 -->
+      <section id="p2">
+        <h2><span class="num">2</span>Lock the design — write the GDD</h2>
+        <p class="lead">Discuss the idea in chat until the core loop feels fun on paper, then write a lean <b>Prototype
+            GDD</b>. This is the biggest time-saver — nail the mechanic in plain words before any code exists.</p>
+
+        <ul class="check">
+          <li>
+            <b>The core mechanic is one sentence</b>
+            you can say out loud. Keep refining until you can.
+
+          </li>
+          <li>
+            <b>Ask the AI for a labelled wireframe</b>
+            of the main screen — shows layout problems before any code exists.
+
+          </li>
+          <li>
+            <b>Define the vertical slice</b>
+            — the smallest thing that proves the mechanic is fun.
+
+          </li>
+          <li>
+            <b>Write the non-goals.</b>
+            What you <i>won't</i> build matters as much as what you will.
+
+          </li>
+          <li>
+            <b>GDD is design only, under ~2 pages</b>
+            — no file names, code, formulas, or configs (that's the TDD's job).
+
+          </li>
+          <li>
+            <b>Every rule is implementable by a stranger</b>
+            — no "you know what I mean".
+
+          </li>
+          <li>
+            <b>Review the GDD in VS Code</b>
+            and fix small things yourself before moving on.
+
+          </li>
+        </ul>
+
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Generate gdd.md</span>
+
+            <button class="copy-btn" data-target="p-gdd">Copy</button>
+          </div>
+          <pre id="p-gdd">Let's lock the design for [GAME NAME / chosen idea]. Write a PROTOTYPE GDD as a Markdown file: gdd.md
 
 Rules:
 - This is a PROTOTYPE design doc, not a commercial GDD. Keep it lean — aim for under ~2 pages.
-- Put clear instruction on the based screen ratio and orientation. 
 - Pure design only. NO technical content (no file names, no code, no formulas, no configs) — that goes in the TDD.
 - Structure: Pitch · Design Pillars (2–4) · Core Mechanic · Core Loop · Rules · Controls (mobile + desktop) · UI layout/elements · UX flow · Win/Lose · In-Scope (vertical slice) · Non-Goals.
 - Every rule must be unambiguous enough that a coder who never spoke to me could implement it.
@@ -514,53 +1384,69 @@ Rules:
 Also produce a VISUAL MOCKUP of the main gameplay screen: a clean labelled wireframe (inline SVG or simple HTML/CSS in an artifact) showing where the play area, controls, HUD/score, and key UI elements sit. Keep it schematic, not polished art.
 
 Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
-    </div>
-  </section>
+        </div>
 
-  <!-- PHASE 3 -->
-  <section id="p3">
-    <h2>
-      <span class="num">3</span>
-      <!-- ═══ EN ═══ --><span class="en">Write the TDD — tell AI <em>how</em> to work</span>
-      <!-- ═══ VI ═══ --><span class="vi">Viết TDD — hướng dẫn AI <em>cách</em> triển khai</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Don't ask for a "technical design document" generically — the AI will give you something bland. Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result as <code>tdd.md</code>.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Đừng hỏi AI "viết technical design document" một cách chung chung — nó sẽ cho bạn thứ gì đó nhạt nhẽo. Hãy đưa cho nó <b>các ràng-buộc kỹ thuật cụ thể của bạn</b>. Prompt này đã chứa tất cả rồi. Lưu kết quả với tên <code>tdd.md</code>.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Centralized config + zero magic numbers</b><b class="vi">Centralized config + không magic numbers</b>
-        <!-- ═══ EN ═══ --><span class="en"> so non-coders can tweak and playtest.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> để người không biết code vẫn có thể tinh chỉnh và playtest.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Strict separation of concerns</b><b class="vi">Tách biệt rõ ràng các concerns</b>
-        <!-- ═══ EN ═══ --><span class="en"> (physics / render / rules) — keeps the AI from breaking everything on a refactor.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> (physics / render / rules) — giúp AI không phá vỡ mọi thứ khi refactor.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Incremental edits + commit after every turn</b><b class="vi">Chỉnh sửa từng bước nhỏ + commit sau mỗi lượt</b>
-        <!-- ═══ EN ═══ --><span class="en"> with conventional messages.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> với commit message chuẩn.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Logging, non-coder comments, and a test suite</b><b class="vi">Logging, comment cho người không code, và test suite</b>
-        <!-- ═══ EN ═══ --><span class="en"> run every turn.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> chạy mỗi lượt.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Workspace &amp; build health checks</b><b class="vi">Kiểm tra workspace &amp; build</b>
-        <!-- ═══ EN ═══ --><span class="en"> before the AI reports success.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> trước khi AI báo xong.</span>
-      </li>
-    </ul>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate tdd.md (rules baked in)</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo tdd.md (quy tắc được nhúng vào)</span>
-        <button class="copy-btn" data-target="p-tdd">Copy</button>
-      </div>
-      <pre id="p-tdd">Put on the Game Architect hat. Create tdd.md (Technical Design Document) for this prototype, based on gdd.md.
+
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Use Gemini to draft the GDD (and later the TDD and plan) directly in <b>Canvas</b> — it lets you edit the
+            document live as you chat, which is ideal for iterating on design decisions. When you're happy with it, copy
+            the text and save it as <code>gdd.md</code> manually.</p>
+          <p>The GDD and wireframe work as a pair — the wireframe makes abstract layout decisions visible before any
+            code exists. If something looks wrong in the wireframe, fix it in the GDD now. Changing layout after it's
+            coded costs 10× more effort.</p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/gdd-example.png" alt="GDD example"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>GDD example</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 3 -->
+      <section id="p3">
+        <h2><span class="num">3</span>Write the TDD — with all the rules baked in</h2>
+        <p class="lead">Don't ask for a "technical design document" generically — the AI will give you something bland.
+          Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result
+          as <code>tdd.md</code>.</p>
+
+        <ul class="check">
+          <li>
+            <b>Centralized config + zero magic numbers</b>
+            so non-coders can tweak and playtest.
+
+          </li>
+          <li>
+            <b>Strict separation of concerns</b>
+            (physics / render / rules) — keeps the AI from breaking everything on a refactor.
+
+          </li>
+          <li>
+            <b>Incremental edits + commit after every turn</b>
+            with conventional messages.
+
+          </li>
+          <li>
+            <b>Logging, non-coder comments, and a test suite</b>
+            run every turn.
+
+          </li>
+          <li>
+            <b>Workspace &amp; build health checks</b>
+            before the AI reports success.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Generate tdd.md (rules baked in)</span>
+
+            <button class="copy-btn" data-target="p-tdd">Copy</button>
+          </div>
+          <pre
+            id="p-tdd">Put on the Game Architect hat. Create tdd.md (Technical Design Document) for this prototype, based on gdd.md.
 
 Move ALL technical content here: architecture, code conventions, math/formulas, and the full list of tunable configs.
 
@@ -568,506 +1454,659 @@ The TDD MUST explicitly encode these requirements:
 1. Single centralized configuration file. ALL mechanical, physical, and rules-based constants live in one dedicated config file (e.g. src/config.js) so non-coders can tweak and playtest.
 2. Zero Magic Numbers. No pixel dimensions, speeds, friction, colors, or turn limits hardcoded in game loop, physics, or render files.
 3. Self-documenting config. Every config key has a natural-language comment explaining what it changes and its recommended range.
-4. Maximum separation of concerns — decoupled source files between game states, physics, ui, etc..
+4. Maximum separation of concerns — decoupled source files between game states, physics, ui, etc.
 6. Commit after every turn. On completing a request: run a local compile/build check, and if it passes, do a Git commit with a clear conventional message (feat:/fix:/chore:/test:). If the build fails, fix it first.
 7. Automated workspace diagnostics. Before reporting done, verify the local dev server is running; if not, start it. Note any sandbox limitation that blocks running the server/tests locally and tell me to run it on my machine instead.
 8. Health &amp; compilation check. Confirm the build compiles cleanly with no errors before reporting success.
 9. Logging. Add log messages with essential info at all key interactions for easy debugging.
 10. Comments for non-coders. Add enough code comments to guide a non-coder on how to modify important behavior.
 11. Tests. Write a test suite for all logic-based code and run it every turn. Update tests for each new feature or design change.
-12. Define an appropriate dimendtions following the based game-world ratio and orientation in the GDD. Ensure to calculate all game world physics on that fixed dimensions, while applying letterbox scaling for responsiveness to different screen size.
 
-IMPORTANT: The TDD should be concise, clear, but not too details. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game&#x27;s specific layers/mechanic if you need to before finalizing.</pre>
-    </div>
-  </section>
+IMPORTANT: The TDD should be concise, clear, but not too detailed. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game's specific layers/mechanic if you need to before finalizing.</pre>
+        </div>
 
-  <!-- PHASE 4 -->
-  <section id="p4">
-    <h2>
-      <span class="num">4</span>
-      <!-- ═══ EN ═══ --><span class="en">Build plan — 3 milestones</span>
-      <!-- ═══ VI ═══ --><span class="vi">Kế hoạch build — 3 milestones</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Three milestones, not five — but split them <b>around your game's own mechanic</b>, not a fixed template. The AI proposes the division and explains its reasoning; you sanity-check it. Each milestone ends in something you can actually play or test.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Ba milestones, không phải năm — nhưng chia dựa trên <b>mechanic của chính game bạn</b>, không theo template cố định. AI đề xuất cách chia và giải thích lý do; bạn kiểm tra lại. Mỗi milestone kết thúc bằng thứ gì đó bạn thực sự có thể chơi hoặc test.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Exactly 3 functional milestones</b><b class="vi">Đúng 3 milestones thực chức năng</b>
-        <!-- ═══ EN ═══ --><span class="en">, each building on the last.</span>
-        <!-- ═══ VI ═══ --><span class="vi">, mỗi cái build trên cái trước.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Divided by what THIS game needs</b><b class="vi">Chia dựa trên những gì game NÀY cần</b>
-        <!-- ═══ EN ═══ --><span class="en"> — the mechanic drives the split, not a generic "setup / build / polish" template.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — mechanic dẫn dắt cách chia, không phải template "setup / build / polish" chung chung.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Every milestone delivers real functionality progression</b>
-        <!-- ═══ VI ═══ --><b class="vi">Mỗi milestone mang lại tiến triển chức năng thực sự</b>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Each milestone has a user-facing test checklist and a copy-paste agent prompt.</b>
-        <!-- ═══ VI ═══ --><b class="vi">Mỗi milestone có checklist test từ góc độ người dùng và prompt copy-paste cho agent.</b>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Sanity-check the plan</b><b class="vi">Kiểm tra lại kế hoạch</b>
-        <!-- ═══ EN ═══ --><span class="en"> — have the AI summarize the 3 milestones and its reasoning back to you before building.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — bảo AI tóm tắt lại 3 milestones và lý do chia như vậy trước khi bắt đầu build.</span>
-      </li>
-    </ul>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Using Codex, you can preview the .md in the app itself. Of course, VS Code will be way more useful for
+            editing the file.</p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/tdd.png" alt="Config file example"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Config file example</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Generate plan.md (3 milestones)</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Tạo plan.md (3 milestones)</span>
-        <button class="copy-btn" data-target="p-plan">Copy</button>
-      </div>
-      <pre id="p-plan">Put on the Tech Lead hat. Create plan.md — a build plan with EXACTLY 3 milestones (not more).
+      <!-- PHASE 4 -->
+      <section id="p4">
+        <h2><span class="num">4</span>Build plan — 2 or 3 milestones</h2>
+        <p class="lead">Split the work into 2–4 milestones depending on your game's complexity. Highly recommend. If you
+          ask AI to code everythign at once, there's a very high chance that you'll have to redo/rewrite a lot
+          afterward, and it's easy for AI to make mistake both in the first implementation and in the edits. With clear
+          milestones, you ensure solid foundation before adding complexity.</p>
 
-Important: the 3 milestones must be split MEANINGFULLY around THIS game&#x27;s own mechanic — not a generic template. Read gdd.md and tdd.md, then divide the work into 3 functional layers that each build on the previous one and each end in something I can actually play or test. As a rough guide (adapt to the game):
-- Milestone 1 is usually the static foundation: scaffold, centralized config, the scene/board/world laid out correctly, HUD placeholders, clean module boundaries. It runs and looks right; the core interaction isn&#x27;t live yet.
+        <ul class="check">
+          <li>
+            <b>2–4 functional milestones</b>
+            , each building on the last.
+
+          </li>
+          <li>
+            <b>Divided by what THIS game needs</b>
+            — the mechanic drives the split, not a generic template.
+
+          </li>
+          <li>
+            <b>Every milestone delivers real functionality progression</b>
+
+          </li>
+          <li>
+            <b>Each milestone has a user-facing test checklist and a copy-paste agent prompt.</b>
+
+          </li>
+          <li>
+            <b>Sanity-check the plan</b>
+            — have the AI summarize the milestones and its reasoning back to you before building.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Generate plan.md (2–3 milestones)</span>
+
+            <button class="copy-btn" data-target="p-plan">Copy</button>
+          </div>
+          <pre
+            id="p-plan">Put on the Tech Lead hat. Create plan.md — a build plan with 2 to 4 milestones.
+
+Important: the milestones must be split MEANINGFULLY around THIS game's own mechanic — not a generic template. Read gdd.md and tdd.md, then divide the work into functional layers that each build on the previous one and each end in something I can actually play or test. As a rough guide (adapt to the game):
+- Milestone 1 is usually the static foundation: scaffold, centralized config, the scene/board/world laid out correctly, HUD placeholders, clean module boundaries. It runs and looks right; the core interaction isn't live yet.
 - Milestone 2 is usually the core mechanic itself — the ONE thing that makes the game fun, working end-to-end (input → simulation/logic → feedback). This is the milestone that proves the idea.
-- Milestone 3 is usually the rules, win/lose, and full game loop wrapped around that mechanic, plus a GitHub Pages deploy so it&#x27;s shareable.
-But you decide the actual split based on what this specific game needs — tell me your reasoning for the division before listing the details. Do NOT make milestone 3 a generic &quot;polish&quot; pass; this is a prototype, so every milestone must deliver real functionality.
+- Milestone 3 (if needed) is usually the rules, win/lose, and full game loop wrapped around that mechanic, plus a GitHub Pages deploy so it's shareable. Skip this if the game is simple enough that it can be included in Milestone 2.
+Tell me your reasoning for the split before listing the details. Do NOT make the last milestone a generic "polish" pass; every milestone must deliver real functionality.
 
 Each milestone must include:
 (a) a short scope paragraph,
-(b) a checklist of things to test FROM THE END-USER&#x27;s perspective,
+(b) a checklist of things to test FROM THE END-USER's perspective,
 (c) a single copy-paste prompt for the local AI coding agent — and that prompt must explicitly remind the user to run the test checklist.
 
-Follow tdd.md for all conventions. Write plan.md now.</pre>
-    </div>
-  </section>
+Follow tdd.md for all conventions. Write plan.md now. Then summarize back in chat the list of milestones, its main scope, and your reasoning.</pre>
+        </div>
 
-  <!-- PHASE 5 -->
-  <section id="p5">
-    <h2>
-      <span class="num">5</span>
-      <!-- ═══ EN ═══ --><span class="en">Build, milestone by milestone</span>
-      <!-- ═══ VI ═══ --><span class="vi">Build, từng milestone một</span>
-    </h2>
-    <div class="callout">
-      <!-- ═══ EN ═══ --><span class="tag en">Git discipline — run this once, early</span>
-      <!-- ═══ VI ═══ --><span class="tag vi">Kỷ luật Git — chạy một lần, từ sớm</span>
-      <!-- ═══ EN ═══ --><p class="en">Before the agent writes much code, set up version tracking and the commit habit:</p>
-      <!-- ═══ VI ═══ --><p class="vi">Trước khi agent viết nhiều code, thiết lập version tracking và thói quen commit:</p>
-    </div>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Each milestone ends with a test checklist written from a player's point of view — not a developer's. "The
+            ball bounces off walls correctly" is a player test. "The physics engine is initialized" is not. If you can't
+            describe what to test in plain terms, the milestone scope is probably too vague.</p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/build-plan.png" alt="plan.md example"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>plan.md example</div>
+            </div>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Initialize git + commit habit</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Khởi tạo git + thói quen commit</span>
-        <button class="copy-btn" data-target="p-git">Copy</button>
-      </div>
-      <pre id="p-git">Initialize a git repo and commit all current files in this folder.
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 5 -->
+      <section id="p5">
+        <h2><span class="num">5</span>Build, milestone by milestone</h2>
+        <div class="callout">
+          <span class="tag">Git discipline — run this once, early</span>
+
+          <p>Before the agent writes much code, set up version tracking and the commit habit:</p>
+
+        </div>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Initialize git + commit habit</span>
+
+            <button class="copy-btn" data-target="p-git">Copy</button>
+          </div>
+          <pre id="p-git">Initialize a git repo and commit all current files in this folder.
 
 From now on, in ALL of our conversations: after each turn, run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:), and push to this repo: [PASTE YOUR GITHUB REPO LINK]
 
 If the build fails, fix it before committing.</pre>
-    </div>
+        </div>
 
-    <!-- ═══ EN ═══ --><p class="lead en">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly. <b>One milestone per chat session</b> to keep context clean. Start with the mid-level model; only escalate if you get stuck.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Chuyển sang AI coding <b>agent</b> (không phải chat) — nó đọc, viết, và chạy file trực tiếp. <b>Một milestone mỗi chat session</b> để giữ context gọn. Bắt đầu với model tầm trung; chỉ escalate khi bị bí.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">New session per milestone.</b><b class="vi">Session mới cho mỗi milestone.</b>
-        <!-- ═══ EN ═══ --><span class="why en">Avoids context overflow and hallucination; easier to search later.</span>
-        <!-- ═══ VI ═══ --><span class="why vi">Tránh tràn context và hallucination; dễ tìm lại sau này hơn.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Run the milestone prompt</b><b class="vi">Chạy milestone prompt</b>
-        <!-- ═══ EN ═══ --><span class="en"> (below), then <b>do the test checklist</b> from plan.md yourself.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> (bên dưới), sau đó <b>tự thực hiện test checklist</b> từ plan.md.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Converse back and forth with the AI:</b><b class="vi">Nói chuyện qua lại với AI:</b>
-        <!-- ═══ EN ═══ --><span class="en"> Talk as if you are talking to a dev: says what you need to change, and let the dev do it.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> Trao đổi như bạn đang nói chuyện với dev — nói những gì bạn cần thay đổi, và để dev làm.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Make your own manual edits:</b><b class="vi">Tự tay chỉnh sửa:</b>
-        <!-- ═══ EN ═══ --><span class="en"> open the folder in VS Code and tweak config file as needed. Perform text search across all files (Ctrl+Shift+F) and make text adjustments. Do any other code editing that you are confident to do faster/cheaper/more accurate than AI.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> mở folder trong VS Code và tinh chỉnh config file khi cần. Dùng text search toàn bộ file (Ctrl+Shift+F) để chỉnh sửa text. Làm bất kỳ việc chỉnh code nào mà bạn tự tin làm nhanh hơn/rẻ hơn/chính xác hơn AI.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">After a milestone, refresh the docs</b><b class="vi">Sau mỗi milestone, cập nhật lại docs</b>
-        <!-- ═══ EN ═══ --><span class="en"> (gdd/tdd/plan), then open a fresh session for the next.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> (gdd/tdd/plan), rồi mở session mới cho milestone tiếp theo.</span>
-      </li>
-    </ul>
+        <p class="lead">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly.
+          Context windows are large and auto-compress, so <b>stay in the same session while you're in flow</b>. Start a
+          fresh session when the AI gets confused, loops on a fix, or you're shifting to something unrelated. Always
+          paste the current docs at the start of any new session. Start with the mid-level model; only escalate if you
+          get stuck.</p>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Run a milestone</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Chạy một milestone</span>
-        <button class="copy-btn" data-target="p-run">Copy</button>
-      </div>
-      <pre id="p-run">We are building [GAME NAME]. Read gdd.md, tdd.md, and plan.md first.
+        <ul class="check">
+          <li>
+            <b>The docs are the memory, not just the session.</b>
+            <span class="why">Keep gdd/tdd/plan current and you can start a fresh session any time — the AI re-orients
+              instantly. Start fresh when it gets confused or loops; otherwise stay in the same session.</span>
+
+          </li>
+          <li>
+            <b>Run the milestone prompt</b>
+            (below), then <b>do the test checklist</b> from plan.md yourself.
+
+          </li>
+          <li>
+            <b>Converse back and forth with the AI:</b>
+            Talk as if you are talking to a dev — say what you need to change, and let the dev do it.
+
+          </li>
+          
+          <li>
+            <b>Make your own manual edits:</b>
+            open the folder in VS Code and tweak config file as needed. Perform text search across all files
+            (Ctrl+Shift+F) and make text adjustments.
+
+          </li>
+          <li>
+            <b>After a milestone, refresh the docs</b>
+            (gdd/tdd/plan). Then continue in the same session or start fresh — current docs make either option equally
+            easy.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Run a milestone</span>
+
+            <button class="copy-btn" data-target="p-run">Copy</button>
+          </div>
+          <pre
+            id="p-run">We are building [GAME NAME]. Read gdd.md, tdd.md, and plan.md first.
 
 Execute Milestone [1 / 2 / 3] from plan.md, following every convention in tdd.md (centralized config, zero magic numbers, separation of concerns, incremental edits, logging, comments, tests, commit-after-turn).
 
 Work in small testable steps. When done, verify that the game is runnable and accessible via an URL, create and run tests on the logic parts, report the results.
 
-After everything is done, show user both the URL to test the game AND the list of things to verify on their end, for this milestone.
-</pre>
-    </div>
+After everything is done, show user both the URL to test the game AND the list of things to verify on their end, for this milestone.</pre>
+        </div>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Refresh docs after a milestone</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Cập nhật docs sau milestone</span>
-        <button class="copy-btn" data-target="p-refresh">Copy</button>
-      </div>
-      <pre id="p-refresh">Milestone [N] is complete and tested. Update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed. Commit the doc updates. Then summarize what&#x27;s left so I can start the next milestone in a fresh session.</pre>
-    </div>
-  </section>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Here you can see the agent worked autonomously for 12 minutes and create dozens of files, to finish the
+            first 2 milestones. It even write automated test scripts and run the game in a browser to verify its work.
+          </p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/milestone1.png" alt="Agent mid-session"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/milestone2.png" alt="Agent mid-session"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <!-- PHASE 6 -->
-  <section id="p6">
-    <h2>
-      <span class="num">6</span>
-      <!-- ═══ EN ═══ --><span class="en">Fix bugs the smart way</span>
-      <!-- ═══ VI ═══ --><span class="vi">Sửa lỗi theo cách thông minh</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">Iteration is normal — even human devs never get it right in one shot. Give the AI the right evidence and it fixes fast.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Iteration là bình thường — ngay cả dev người thật cũng không bao giờ làm đúng ngay lần đầu. Cung cấp đúng bằng chứng cho AI và nó sẽ sửa nhanh thôi.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Visual bug → attach a screenshot.</b><b class="vi">Lỗi giao diện → đính kèm screenshot.</b>
-        <!-- ═══ EN ═══ --><span class="en"> Words alone rarely convey a layout problem.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> Chỉ dùng từ ngữ hiếm khi truyền đạt được vấn đề layout.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Logic bug → open DevTools (F12) → Console → paste the full log.</b>
-        <!-- ═══ VI ═══ --><b class="vi">Lỗi logic → mở DevTools (F12) → Console → paste toàn bộ log.</b>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Watch the AI "think"</b><b class="vi">Quan sát AI "suy nghĩ"</b>
-        <!-- ═══ EN ═══ --><span class="en"> — if it's heading the wrong way, stop it early to save time and tokens.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> — nếu nó đang đi sai hướng, dừng sớm để tiết kiệm thời gian và token.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Stuck for a while? Start a fresh session</b><b class="vi">Bí một lúc rồi? Mở session mới</b>
-        <!-- ═══ EN ═══ --><span class="en"> and ask it to explain the feature's flow before fixing.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> và bảo nó giải thích flow của feature trước khi sửa.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Tell it to add debug logs</b><b class="vi">Bảo nó thêm debug logs</b>
-        <!-- ═══ EN ═══ --><span class="en"> when a bug is hard to pin down.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> khi lỗi khó xác định nguồn gốc.</span>
-      </li>
-    </ul>
+      <!-- PHASE 6 -->
+      <section id="p6">
+        <h2><span class="num">6</span>Fix bugs the smart way</h2>
+        <p class="lead">Iteration is normal — even human devs never get it right in one shot. Give the AI the right
+          evidence and it fixes fast.</p>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Visual / UI bug</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Lỗi giao diện / UI</span>
-        <button class="copy-btn" data-target="p-visual">Copy</button>
-      </div>
-      <pre id="p-visual">Here&#x27;s a visual/UI bug. [ATTACH SCREENSHOT]
+        <ul class="check">
+          <li>
+            <b>Visual bug → attach a screenshot.</b>
+            Words alone rarely convey a layout problem.
 
-What&#x27;s wrong: [DESCRIBE what you see vs. what you expect]
+          </li>
+          <li>
+            <b>Logic bug → open DevTools (F12) → Console → paste the full log.</b>
+
+          </li>
+          <li>
+            <b>Watch the AI "think"</b>
+            — if it's heading the wrong way, stop it early to save time and tokens.
+
+          </li>
+          <li>
+            <b>Stuck for a while? Start a fresh session</b>
+            and ask it to explain the feature's flow before fixing.
+
+          </li>
+          <li>
+            <b>Tell it to add debug logs</b>
+            when a bug is hard to pin down.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Visual / UI bug</span>
+
+            <button class="copy-btn" data-target="p-visual">Copy</button>
+          </div>
+          <pre
+            id="p-visual">Here's a visual/UI bug. [ATTACH SCREENSHOT]
+
+What's wrong: [DESCRIBE what you see vs. what you expect]
 
 Find the cause, fix it via the centralized config or the render layer (not by hardcoding), keep the fix incremental, then tell me exactly what you changed and which config value I can tweak to adjust it further.</pre>
-    </div>
+        </div>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Logic bug</span>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Logic bug</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Lỗi logic</span>
-        <button class="copy-btn" data-target="p-logic">Copy</button>
-      </div>
-      <pre id="p-logic">Here&#x27;s a logic bug. Console output below. [PASTE the full console log from F12 → Console]
+            <button class="copy-btn" data-target="p-logic">Copy</button>
+          </div>
+          <pre
+            id="p-logic">Here's a logic bug. Console output below. [PASTE the full console log from F12 → Console]
 
 What happened: [DESCRIBE the wrong behavior]
 What I expected: [DESCRIBE correct behavior]
 
 Diagnose the root cause, add temporary debug logs if helpful, fix it incrementally, update the relevant test, and explain the fix in plain language.</pre>
-    </div>
+        </div>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Stuck — diagnose before fixing</span>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Stuck — diagnose before fixing</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Bí — chẩn đoán trước khi sửa</span>
-        <button class="copy-btn" data-target="p-stuck">Copy</button>
-      </div>
-      <pre id="p-stuck">We&#x27;ve been stuck on this bug for a while. Don&#x27;t patch blindly.
+            <button class="copy-btn" data-target="p-stuck">Copy</button>
+          </div>
+          <pre
+            id="p-stuck">We've been stuck on this bug for a while. Don't patch blindly.
 
 First, review the relevant code end-to-end and explain to me, in plain language, the full flow of how [FEATURE] is supposed to work. Then point to where the flow breaks. Wait for my confirmation before changing anything.</pre>
-    </div>
-  </section>
+        </div>
 
-  <!-- PHASE 7 -->
-  <section id="p7">
-    <h2>
-      <span class="num">7</span>
-      <!-- ═══ EN ═══ --><span class="en">Ship it — share a live link</span>
-      <!-- ═══ VI ═══ --><span class="vi">Ship — chia sẻ link chạy thật</span>
-    </h2>
-    <!-- ═══ EN ═══ --><p class="lead en">For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in GitHub.</p>
-    <!-- ═══ VI ═══ --><p class="lead vi">Với HTML game thì cực kỳ dễ. Agent viết deploy workflow; bạn chỉ cần bật một cài đặt trong GitHub.</p>
-    <ul class="check">
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Have the AI prepare the GitHub Pages workflow</b><b class="vi">Để AI chuẩn bị GitHub Pages workflow</b>
-        <!-- ═══ EN ═══ --><span class="en"> and push it.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> và push lên.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">In GitHub → Settings → Pages</b><b class="vi">Trong GitHub → Settings → Pages</b>
-        <!-- ═══ EN ═══ --><span class="en">, set Source to <b>"GitHub Actions"</b>.</span>
-        <!-- ═══ VI ═══ --><span class="vi">, đặt Source thành <b>"GitHub Actions"</b>.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Confirm the live URL works</b><b class="vi">Xác nhận URL live hoạt động</b>
-        <!-- ═══ EN ═══ --><span class="en"> on both desktop and a real phone.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> trên cả desktop và điện thoại thật.</span>
-      </li>
-      <li>
-        <!-- ═══ EN ═══ --><b class="en">Send the link to playtesters</b><b class="vi">Gửi link cho playtesters</b>
-        <!-- ═══ EN ═══ --><span class="en"> and collect feedback — the whole point of a prototype.</span>
-        <!-- ═══ VI ═══ --><span class="vi"> và thu thập feedback — đó chính là mục đích của prototype.</span>
-      </li>
-    </ul>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>Two things are extremely useful: screenshots, and console log. Still, sometime, the best thing that helps
+            unblock a tricky situation is a sharp human-observation!</p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/debug.png" alt="DevTools Console"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/debug2.png" alt="DevTools Console"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <div class="prompt">
-      <div class="prompt-head">
-        <!-- ═══ EN ═══ --><span class="prompt-label en">PROMPT · Set up auto-deploy to GitHub Pages</span>
-        <!-- ═══ VI ═══ --><span class="prompt-label vi">PROMPT · Cài đặt auto-deploy lên GitHub Pages</span>
-        <button class="copy-btn" data-target="p-deploy">Copy</button>
-      </div>
-      <pre id="p-deploy">Prepare this project for a GitHub Pages workflow that auto-publishes after every push to the main branch.
+      <!-- PHASE 6b -->
+      <section id="p6b">
+        <h2><span class="num">7</span>Iterate — add features &amp; keep docs current</h2>
+        <p class="lead">A prototype is never truly done in one pass. Once the core loop works, you iterate: add a
+          feature, tweak a mechanic, try something new. Keep the docs in sync after each meaningful change — they're the
+          AI's memory.</p>
+
+        <ul class="check">
+          <li>
+            <b>One feature at a time.</b>
+            Describe it clearly, let the AI propose the implementation approach before coding.
+
+          </li>
+          <li>
+            <b>Request multiple agents to perform tasks in parallel</b> to save time, if the tasks are fairly independent and contained (for example 1 agent on images, 1 agent on sprites, 1 agent on UI bug...)
+
+          </li>
+          <li>
+            <b>Keep the docs updated</b>
+            whenever you make a decision that changes how the game works or how it's built.
+
+          </li>
+          <li>
+            <b>Start a fresh session when the AI gets confused or loops</b>
+            — not on a fixed schedule. If you're in flow, keep going. Always paste the current docs at the start of any
+            new session.
+
+          </li>
+          <li>
+            <b>Use the AI for non-code tasks too:</b>
+            scrape reference sites, generate sprite sheets (Codex game-studio plugin), remove image backgrounds, resize
+            &amp; flip assets — the agent can handle all of this.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Add a new feature</span>
+
+            <button class="copy-btn" data-target="p-feature">Copy</button>
+          </div>
+          <pre
+            id="p-feature">Read the current docs (gdd.md, tdd.md, plan.md).
+
+I want to add this feature: [DESCRIBE the feature clearly — what the player does, what the game responds with]
+
+Before coding: propose how you'd implement it, what files you'd touch, and flag any risks. Wait for my go-ahead before writing any code.</pre>
+        </div>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Keep docs up to date</span>
+
+            <button class="copy-btn" data-target="p-refresh">Copy</button>
+          </div>
+          <pre
+            id="p-refresh">Review the current state of the code and update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed along the way. Keep each doc concise — remove anything that's no longer accurate, add anything that's now true. Commit the updated docs.</pre>
+        </div>
+
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package
+            of thousand files, and even build a full-features game editor</p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/generate-images.png"
+                alt="Game before / after a new feature"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
+              </div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/scrape-dragons.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/explore-assets.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/editor.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 7 -->
+      <section id="p7">
+        <h2><span class="num">8</span>Ship it — share a live link</h2>
+        <p class="lead">For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in
+          GitHub.</p>
+
+        <ul class="check">
+          <li>
+            <b>Have the AI prepare the GitHub Pages workflow</b>
+            and push it.
+
+          </li>
+          <li>
+            <b>In <a href="https://github.com" target="_blank">GitHub</a> → Settings → Pages</b>, set Source to <b>"GitHub Actions"</b>.
+
+          </li>
+          <li>
+            <b>Confirm the live URL works</b>
+            on both desktop and a real phone.
+
+          </li>
+          <li>
+            <b>Send the link to playtesters</b>
+            and collect feedback — the whole point of a prototype.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Set up auto-deploy to GitHub Pages</span>
+
+            <button class="copy-btn" data-target="p-deploy">Copy</button>
+          </div>
+          <pre
+            id="p-deploy">Prepare this project for a GitHub Pages workflow that auto-publishes after every push to the main branch.
 
 Do everything you can yourself (create the workflow file, set the correct build/base settings, commit, push). Then tell me exactly what I need to do on my side in the GitHub web UI, step by step.</pre>
+        </div>
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push from the agent
+            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately:
+            getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/game1.png"
+                alt="Game before / after a new feature"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
+              </div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/game2.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/game3.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+            <div class="hint-img"><img src="game-proto-images/game4.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+            </div>
+          </div>
+        </div>
+        <div class="callout">
+          <span class="tag">Time budget</span>
+
+          <p>A small prototype is realistically <b>2–6 hours</b> across <b>2–3 sessions</b> (token limits reset on a
+            5-hour
+            rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
+
+        </div>
+      </section>
+
+      <section id="recap">
+        <h2>One-glance recap</h2>
+
+        <table class="tbl">
+          <tr>
+            <th>Phase</th>
+            <th>Output</th>
+            <th>Model</th>
+            <th>Tool</th>
+          </tr>
+          <tr>
+            <td>1 · Idea</td>
+            <td>Rated idea list → 1 chosen idea</td>
+            <td>Creative / mid</td>
+            <td>Chat AI</td>
+          </tr>
+          <tr>
+            <td>2 · Game Design</td>
+            <td><code>gdd.md</code> (≤2 pages, design only, with wireframe)</td>
+            <td>Creative / mid</td>
+            <td>Chat AI (Gemini Canvas)</td>
+          </tr>
+          <tr>
+            <td>3 · Tech Design</td>
+            <td><code>tdd.md</code> (all rules baked in)</td>
+            <td>Highest</td>
+            <td>Agent</td>
+          </tr>
+          <tr>
+            <td>4 · Project Plan</td>
+            <td><code>plan.md</code> (2–3 functional milestones)</td>
+            <td>Highest</td>
+            <td>Agent</td>
+          </tr>
+          <tr>
+            <td>5 · Build</td>
+            <td>Playable prototype + sprites</td>
+            <td>Mid first, escalate if stuck</td>
+            <td>Agent + VS Code + Codex</td>
+          </tr>
+          <tr>
+            <td>6 · Bugs</td>
+            <td>Screenshots + console logs → fixes</td>
+            <td>Mid first, escalate if stuck</td>
+            <td>Agent</td>
+          </tr>
+          <tr>
+            <td>7 · Iterate</td>
+            <td>Add features, keep docs in sync</td>
+            <td>Mid first, escalate if stuck</td>
+            <td>Agent</td>
+          </tr>
+          <tr>
+            <td>8 · Ship</td>
+            <td>Live GitHub Pages link</td>
+            <td>Mid first, escalate if stuck</td>
+            <td>Agent + GitHub</td>
+          </tr>
+        </table>
+      </section>
+
     </div>
+  </main>
 
-    <div class="callout">
-      <!-- ═══ EN ═══ --><span class="tag en">Time budget</span>
-      <!-- ═══ VI ═══ --><span class="tag vi">Ngân sách thời gian</span>
-      <!-- ═══ EN ═══ --><p class="en">A small prototype is realistically <b>2–3 hours</b> across <b>2–3 sessions</b> (token limits reset on a 5-hour rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
-      <!-- ═══ VI ═══ --><p class="vi">Một prototype nhỏ thực tế mất <b>2–3 tiếng</b> trải qua <b>2–3 sessions</b> (do giới hạn token reset theo cửa sổ thời gian mỗi 5 tiếng). Nếu bạn đã chứng minh được mechanic có fun, bạn xong rồi — dừng tại đó. Đó chính-xác là mục tiêu.</p>
+  <footer>
+    <div class="footer-inner">
+      <h2 class="big">Now go prove your idea is fun!</h2>
+
+      <p>The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on
+        whether it's worth pursuing.</p>
+
+      <p>Huy Dũng (DaveHD) · huydung.com</p>
     </div>
-  </section>
+    <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
+  </footer>
 
-  <section id="recap">
-    <!-- ═══ EN ═══ --><h2 class="en">One-glance recap</h2>
-    <!-- ═══ VI ═══ --><h2 class="vi">Tóm tắt</h2>
-    <table class="tbl">
-      <tr>
-        <th><span class="en">Phase</span><span class="vi">Phase</span></th>
-        <th><span class="en">Output</span><span class="vi">Đầu ra</span></th>
-        <th><span class="en">Model</span><span class="vi">Model</span></th>
-        <th><span class="en">Tool</span><span class="vi">Công cụ</span></th>
-      </tr>
-      <tr>
-        <td><span class="en">1 · Idea</span><span class="vi">1 · Ý tưởng</span></td>
-        <td><span class="en">Comparison table → 1 chosen idea</span><span class="vi">Bảng so sánh → 1 ý tưởng chọn</span></td>
-        <td><span class="en">Creative / mid</span><span class="vi">Sáng tạo / tầm trung</span></td>
-        <td>Chat AI</td>
-      </tr>
-      <tr>
-        <td><span class="en">2 · Game Design</span><span class="vi">2 · Thiết kế Game</span></td>
-        <td><span class="en"><code>gdd.md</code> (≤2 pages, design only, with wireframe)</span><span class="vi"><code>gdd.md</code> (≤2 trang, chỉ design, kèm wireframe)</span></td>
-        <td><span class="en">Creative / mid</span><span class="vi">Sáng tạo / tầm trung</span></td>
-        <td>Chat AI</td>
-      </tr>
-      <tr>
-        <td><span class="en">3 · Tech Design</span><span class="vi">3 · Thiết kế KT</span></td>
-        <td><span class="en"><code>tdd.md</code> (all rules baked in)</span><span class="vi"><code>tdd.md</code> (tất cả quy tắc được nhúng vào)</span></td>
-        <td><span class="en">Highest</span><span class="vi">Mạnh nhất</span></td>
-        <td>Agent</td>
-      </tr>
-      <tr>
-        <td><span class="en">4 · Project Plan</span><span class="vi">4 · Kế hoạch</span></td>
-        <td><span class="en"><code>plan.md</code> (3 functional milestones)</span><span class="vi"><code>plan.md</code> (3 milestones thực chức năng)</span></td>
-        <td><span class="en">Highest</span><span class="vi">Mạnh nhất</span></td>
-        <td>Agent</td>
-      </tr>
-      <tr>
-        <td><span class="en">5 · Build</span><span class="vi">5 · Build</span></td>
-        <td><span class="en">Playable prototype, 1 session/milestone</span><span class="vi">Prototype chơi được, 1 session/milestone</span></td>
-        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
-        <td><span class="en">Agent + VS Code</span><span class="vi">Agent + VS Code</span></td>
-      </tr>
-      <tr>
-        <td><span class="en">6 · Bugs</span><span class="vi">6 · Lỗi</span></td>
-        <td><span class="en">Screenshots + console logs → fixes</span><span class="vi">Screenshots + console logs → sửa</span></td>
-        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
-        <td>Agent</td>
-      </tr>
-      <tr>
-        <td><span class="en">7 · Ship</span><span class="vi">7 · Ship</span></td>
-        <td><span class="en">Live GitHub Pages link</span><span class="vi">Link GitHub Pages live</span></td>
-        <td><span class="en">Mid first, escalate if stuck</span><span class="vi">Tầm trung trước, escalate khi bí</span></td>
-        <td><span class="en">Agent + GitHub</span><span class="vi">Agent + GitHub</span></td>
-      </tr>
-    </table>
-  </section>
+  <script>
+    (function () {
+      var STORAGE_KEY = 'hd-game-proto-bi-checklist-v1';
 
-</div>
-</main>
 
-<footer>
-  <!-- ═══ EN ═══ --><p class="big en">Now go prove your idea is fun.</p>
-  <!-- ═══ VI ═══ --><p class="big vi">Đi chứng minh ý tưởng của bạn có fun nào.</p>
-  <!-- ═══ EN ═══ --><p class="en">The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it's worth pursuing.</p>
-  <!-- ═══ VI ═══ --><p class="vi">AI lo phần kỹ thuật nặng nhọc. Bạn lo phần quan trọng hơn — ý tưởng, gu thẩm mỹ, và quyết định nó có đáng theo đuổi không.</p>
-  <p>Workshop companion · Huy Dũng (DaveHD) · huydung.com</p>
-  <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
-</footer>
+      /* ---- Checklist ---- */
+      var store = {
+        load: function () {
+          try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
+          catch (e) { return {}; }
+        },
+        save: function (obj) {
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
+          catch (e) { }
+        }
+      };
 
-<script>
-(function(){
-  var STORAGE_KEY = 'hd-game-proto-bi-checklist-v1';
-  var LANG_KEY    = 'hd-lang-v1';
-
-  /* ---- Language toggle ---- */
-  function setLang(lang) {
-    var html = document.documentElement;
-    html.classList.remove('lang-en', 'lang-vi');
-    html.classList.add('lang-' + lang);
-    document.querySelectorAll('.lang-btn').forEach(function(btn) {
-      btn.classList.toggle('active', btn.dataset.lang === lang);
-    });
-    try { localStorage.setItem(LANG_KEY, lang); } catch(e) {}
-  }
-
-  document.querySelectorAll('.lang-btn').forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      setLang(btn.dataset.lang);
-    });
-  });
-
-  // Restore saved language preference
-  var savedLang = 'en';
-  try { savedLang = localStorage.getItem(LANG_KEY) || 'en'; } catch(e) {}
-  setLang(savedLang);
-
-  /* ---- Checklist ---- */
-  var store = {
-    load: function(){
-      try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); }
-      catch(e){ return {}; }
-    },
-    save: function(obj){
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(obj)); }
-      catch(e){ /* storage blocked — progress lives for this session only */ }
-    }
-  };
-
-  // Give every checklist item a stable id + a visible checkbox, restore saved state
-  var saved = store.load();
-  var items = Array.prototype.slice.call(document.querySelectorAll('.check li'));
-  items.forEach(function(li, i){
-    var id = 'chk-' + i;
-    li.dataset.id = id;
-    var box = document.createElement('span');
-    box.className = 'box';
-    li.insertBefore(box, li.firstChild);
-    if (saved[id]) li.classList.add('checked');
-    li.addEventListener('click', function(){
-      li.classList.toggle('checked');
-      var s = store.load();
-      if (li.classList.contains('checked')) s[id] = 1; else delete s[id];
-      store.save(s);
-      updateProgress();
-    });
-  });
-
-  var fill = document.getElementById('sh-progress');
-  var pct  = document.getElementById('pb-pct');
-
-  function updateProgress(){
-    var total = items.length;
-    var done  = document.querySelectorAll('.check li.checked').length;
-    var p = total ? Math.round(done/total*100) : 0;
-    fill.style.width = p + '%';
-    pct.textContent  = p + '%';
-    if (p === 100) fill.classList.add('done'); else fill.classList.remove('done');
-  }
-  updateProgress();
-
-  // Double-click the "% complete" label to reset all progress
-  pct.parentNode.title = 'Double-click to reset progress';
-  pct.parentNode.style.cursor = 'pointer';
-  pct.parentNode.addEventListener('dblclick', function(){
-    if (!confirm('Clear all ticked steps?')) return;
-    items.forEach(function(li){ li.classList.remove('checked'); });
-    store.save({});
-    updateProgress();
-  });
-
-  /* ---- Sticky header ---- */
-  var cover = document.querySelector('.cover');
-  var head  = document.getElementById('stickyhead');
-  function onScroll(){
-    if (window.scrollY > cover.offsetHeight - 10) head.classList.add('show');
-    else head.classList.remove('show');
-  }
-  window.addEventListener('scroll', onScroll, {passive:true});
-  onScroll();
-
-  /* ---- Copy buttons ---- */
-  document.querySelectorAll('.copy-btn').forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      var el = document.getElementById(btn.dataset.target);
-      navigator.clipboard.writeText(el.innerText).then(function(){
-        var old = btn.textContent;
-        btn.textContent = 'Copied ✓'; btn.classList.add('done');
-        setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1600);
+      var saved = store.load();
+      var items = Array.prototype.slice.call(document.querySelectorAll('.check li'));
+      items.forEach(function (li, i) {
+        var id = 'chk-' + i;
+        li.dataset.id = id;
+        var box = document.createElement('span');
+        box.className = 'box';
+        li.insertBefore(box, li.firstChild);
+        if (saved[id]) li.classList.add('checked');
+        li.addEventListener('click', function () {
+          li.classList.toggle('checked');
+          var s = store.load();
+          if (li.classList.contains('checked')) s[id] = 1; else delete s[id];
+          store.save(s);
+          updateProgress();
+        });
       });
-    });
-  });
 
-  /* ---- Collapsible prompts ----
-     - Wraps copy-btn + chevron in .prompt-head-right
-     - Injects .prompt-expand-bar below the pre (visible only when collapsed)
-     - Pre click also expands (cursor:pointer set via CSS when collapsed)
-     - All prompts start collapsed */
-  document.querySelectorAll('.prompt').forEach(function(prompt){
-    var head = prompt.querySelector('.prompt-head');
-    var pre  = prompt.querySelector('pre');
-    var copyBtn = head.querySelector('.copy-btn');
+      var fill = document.getElementById('sh-progress');
+      var pct = document.getElementById('pb-pct');
 
-    // Build right-side group: [copy btn] [chevron]
-    var rightGroup = document.createElement('span');
-    rightGroup.className = 'prompt-head-right';
-    var chevron = document.createElement('span');
-    chevron.className = 'prompt-chevron';
-    chevron.textContent = '▾';
-    rightGroup.appendChild(copyBtn);   // move existing copy btn into group
-    rightGroup.appendChild(chevron);
-    head.appendChild(rightGroup);
-
-    // Inject expand bar below the pre
-    var expandBar = document.createElement('div');
-    expandBar.className = 'prompt-expand-bar';
-    expandBar.innerHTML = '▾&nbsp;&nbsp;Show full prompt';
-    prompt.appendChild(expandBar);
-
-    // Start collapsed
-    prompt.classList.add('collapsed');
-
-    // Toggle on header click (copy btn already stops propagation)
-    head.addEventListener('click', function(){
-      prompt.classList.toggle('collapsed');
-    });
-
-    // Clicking the preview text expands (never collapses — use header for that)
-    pre.addEventListener('click', function(){
-      if (prompt.classList.contains('collapsed')) {
-        prompt.classList.remove('collapsed');
+      function updateProgress() {
+        var total = items.length;
+        var done = document.querySelectorAll('.check li.checked').length;
+        var p = total ? Math.round(done / total * 100) : 0;
+        fill.style.width = p + '%';
+        pct.textContent = p + '%';
+        if (p === 100) fill.classList.add('done'); else fill.classList.remove('done');
       }
-    });
+      updateProgress();
 
-    // Clicking the expand bar also expands
-    expandBar.addEventListener('click', function(e){
-      e.stopPropagation();
-      prompt.classList.remove('collapsed');
-    });
-  });
-})();
-</script>
+      pct.parentNode.title = 'Double-click to reset progress';
+      pct.parentNode.style.cursor = 'pointer';
+      pct.parentNode.addEventListener('dblclick', function () {
+        if (!confirm('Clear all ticked steps?')) return;
+        items.forEach(function (li) { li.classList.remove('checked'); });
+        store.save({});
+        updateProgress();
+      });
+
+      /* ---- Sticky header ---- */
+      var cover = document.querySelector('.cover');
+      var head = document.getElementById('stickyhead');
+      function onScroll() {
+        if (window.scrollY > cover.offsetHeight - 10) head.classList.add('show');
+        else head.classList.remove('show');
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* ---- Copy buttons ---- */
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          var el = document.getElementById(btn.dataset.target);
+          navigator.clipboard.writeText(el.innerText).then(function () {
+            var old = btn.textContent;
+            btn.textContent = 'Copied ✓'; btn.classList.add('done');
+            setTimeout(function () { btn.textContent = old; btn.classList.remove('done'); }, 1600);
+          });
+        });
+      });
+
+      /* ---- Collapsible prompts ---- */
+      document.querySelectorAll('.prompt').forEach(function (prompt) {
+        var head = prompt.querySelector('.prompt-head');
+        var pre = prompt.querySelector('pre');
+        var copyBtn = head.querySelector('.copy-btn');
+
+        var rightGroup = document.createElement('span');
+        rightGroup.className = 'prompt-head-right';
+        var chevron = document.createElement('span');
+        chevron.className = 'prompt-chevron';
+        chevron.textContent = '▾';
+        rightGroup.appendChild(copyBtn);
+        rightGroup.appendChild(chevron);
+        head.appendChild(rightGroup);
+
+        var expandBar = document.createElement('div');
+        expandBar.className = 'prompt-expand-bar';
+        expandBar.innerHTML = '▾  Show full prompt';
+        prompt.appendChild(expandBar);
+
+        prompt.classList.add('collapsed');
+
+        head.addEventListener('click', function () {
+          prompt.classList.toggle('collapsed');
+        });
+
+        pre.addEventListener('click', function () {
+          if (prompt.classList.contains('collapsed')) {
+            prompt.classList.remove('collapsed');
+          }
+        });
+
+        expandBar.addEventListener('click', function (e) {
+          e.stopPropagation();
+          prompt.classList.remove('collapsed');
+        });
+      });
+      /* ---- Lightbox ---- */
+      var lb = document.getElementById('lb');
+      var lbImg = lb.querySelector('img');
+      document.querySelectorAll('.hint-img img').forEach(function (img) {
+        img.addEventListener('click', function (e) {
+          e.stopPropagation();
+          lbImg.src = img.src;
+          lbImg.alt = img.alt || '';
+          lb.classList.add('open');
+        });
+      });
+      lb.addEventListener('click', function () { lb.classList.remove('open'); });
+      document.getElementById('lb-close').addEventListener('click', function (e) {
+        e.stopPropagation(); lb.classList.remove('open');
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') lb.classList.remove('open'); });
+
+    })();
+  </script>
 </body>
+
 </html>
