@@ -445,8 +445,8 @@
     }
 
     .prompt-expand-bar:hover {
-      background: var(--hd-cream);
-      color: var(--hd-red-deep);
+      background: var(--hd-red-deep);
+      color: #fff;
     }
 
     .fill {
@@ -922,6 +922,68 @@
     #sh-progress.done {
       background: var(--hd-green);
     }
+    .opening .opening-lead {
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--hd-ink);
+      margin: 0 0 28px;
+      max-width: 72ch;
+    }
+    .opening > p, .opening > ul { color: var(--hd-ink); max-width: 72ch; }
+    .opening > ul li { margin-bottom: 4px; }
+    .opening .fill { color: var(--hd-red-deep); font-weight: 600; }
+    /* table on white card */
+    .opening .tbl-card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 36px 0 32px;
+      border: 1px solid var(--hd-gray-border);
+    }
+    /* ask-AI callout — full content width */
+    .opening-callout {
+      background: rgba(142,1,31,.07);
+      border-left: 4px solid var(--hd-red-deep);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 20px;
+      margin: 0;
+      max-width: 100%;
+    }
+    .opening-callout .tag { color: var(--hd-red-deep); }
+    .opening-callout p { color: var(--hd-ink); margin: 4px 0 0; max-width: none; }
+    .opening-callout a { color: var(--hd-red-deep); }
+
+    /* ── Sticky header phase nav ── */
+    #sh-nav {
+      padding: 0 0 8px;
+    }
+    #sh-nav-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-width: 980px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 24px;
+    }
+    #sh-nav a {
+      font-family: var(--sans);
+      font-size: 11.5px;
+      font-weight: 400;
+      color: rgba(255,255,255,.6);
+      white-space: nowrap;
+      padding: 4px 11px;
+      border-radius: 12px;
+      text-decoration: none;
+      transition: color .15s, background .15s;
+      border: 1px solid rgba(255,255,255,.18);
+    }
+    #sh-nav a:hover { color: rgba(255,255,255,.95); background: rgba(255,255,255,.1); }
+    #sh-nav a.active { color: var(--hd-red-deep); background: var(--hd-cream); border-color: transparent; font-weight: 600; }
+    @media (max-width: 600px) {
+      #stickyhead .sh-title span { display: none; }
+      #sh-nav a { font-size: 11px; padding: 3px 9px; }
+    }
 
     /* ---- Translate button ---- */
     .translate-btn {
@@ -950,6 +1012,88 @@
       padding: 5px 10px;
       margin-top: 0;
     }
+    /* Recap text styles */
+
+  
+    /* ── Full-bleed cream bands ── */
+    .band-cream {
+      background: var(--hd-cream);
+      width: 100%;
+    }
+    .band-cream-bottom {
+      border-bottom: 2px solid rgba(142,1,31,.15);
+    }
+    .band-cream-top {
+      border-top: 2px solid rgba(142,1,31,.15);
+    }
+    /* Opening section inside band: just padding, no background */
+    section.opening {
+      padding: 52px 0 40px;
+      border-bottom: none;
+    }
+    .opening .opening-lead {
+      font-size: 17px;
+      line-height: 1.8;
+      color: var(--hd-ink);
+      margin: 0 0 28px;
+      max-width: 72ch;
+    }
+    .opening > p, .opening > ul { color: var(--hd-ink); max-width: 72ch; }
+    .opening > ul li { margin-bottom: 4px; }
+    .opening .fill { color: var(--hd-red-deep); font-weight: 600; }
+    /* Table card on white (sits outside .band-cream) */
+    .opening-tbl-wrap {
+      padding: 36px 0 0;
+    }
+    .opening .tbl-card,
+    .opening-tbl-wrap .tbl-card {
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 0 0 28px;
+      border: 1px solid var(--hd-gray-border);
+    }
+    /* Ask-AI callout */
+    .opening-callout {
+      background: rgba(142,1,31,.06);
+      border-left: 4px solid var(--hd-red-deep);
+      border-radius: 0 6px 6px 0;
+      padding: 14px 20px;
+      margin: 0 0 48px;
+      max-width: 100%;
+    }
+    .opening-callout .tag { color: var(--hd-red-deep); }
+    .opening-callout p { color: var(--hd-ink); margin: 4px 0 0; max-width: none; }
+    .opening-callout a { color: var(--hd-red-deep); }
+    /* Recap inside band */
+    section#recap {
+      padding: 52px 0 48px;
+      border-bottom: none;
+      border-top: none;
+    }
+    /* Recap table: darker header so it contrasts with cream background */
+    section#recap .tbl th {
+      background: var(--hd-red-dark);
+      color: #fff;
+    }
+    section#recap .tbl tr:nth-child(even) td {
+      background: rgba(0,0,0,.04);
+    }
+    section#recap .tbl td {
+      background: rgba(255,255,255,.55);
+    }
+    section#recap .tbl td.yes { background: rgba(105,162,87,.14) !important; }
+    section#recap .tbl td.warn { background: rgba(255,146,0,.10) !important; }
+    section#recap .tbl td.no { background: rgba(189,1,41,.07) !important; }
+
+    /* Intro: consistent 17px for all paragraphs and list */
+    section.opening p,
+    section.opening ul,
+    section.opening li {
+      font-size: 17px;
+      line-height: 1.75;
+    }
+
   </style>
 </head>
 
@@ -965,6 +1109,19 @@
         <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
       </div>
     </div>
+  <div id="sh-nav">
+    <div id="sh-nav-inner">
+      <a href="#p0">0 · Setup</a>
+      <a href="#p1">1 · Idea</a>
+      <a href="#p2">2 · Game Design</a>
+      <a href="#p3">3 · Tech Design</a>
+      <a href="#p4">4 · Project Plan</a>
+      <a href="#p5">5 · Build</a>
+      <a href="#p6">6 · Fix bugs</a>
+      <a href="#p6b">7 · Iterate</a>
+      <a href="#p7">8 · Ship</a>
+    </div>
+  </div>
     <div id="sh-progress"></div>
   </div>
 
@@ -982,8 +1139,8 @@
 
   <div id="lb"><button id="lb-close">×</button><img src="" alt="Screenshot"></div>
   <main>
+      <div class="band-cream band-cream-bottom">
     <div class="wrap">
-
       <section class="opening" id="opening">
         <p class="opening-lead">Not long ago, making even a rough game prototype meant mastering a full stack of
           disciplines most people don't have: coding, game engine, graphic asset creation, audio editing, writing and
@@ -999,7 +1156,14 @@
           graphics, docs, and more — so you can take any idea from concept to playable prototype in a few hours. Test
           it. Feel whether it's actually fun. Decide if it's worth pursuing before committing real resources. And if
           it's not — discard it and try the next one, at a cost that makes that affordable.</p>
+      </section>
+</div><!-- /wrap -->
+  </div><!-- /band-cream -->
 
+  <div class="wrap">
+    <div class="opening-tbl-wrap">
+      <div class="tbl-card">
+        <h2>Making Game Prototypes - with and without AI</h2>
         <table class="tbl task-tbl">
           <colgroup>
             <col style="width:22%">
@@ -1008,7 +1172,7 @@
             <col style="width:26%">
           </colgroup>
           <tr>
-            <th>Task</th>
+            <th></th>
             <th>Non-tech person — alone</th>
             <th>+ AI Chat<br><small style="font-weight:400;opacity:.65">GPT / Claude / Gemini</small></th>
             <th>+ AI Agent<br><small style="font-weight:400;opacity:.65">Codex / Claude Desktop</small></th>
@@ -1059,66 +1223,36 @@
             <td class="yes">✅ Agents read files, think, make changes, test, report. The full loop.</td>
           </tr>
         </table>
-
-
-
-
-      </section>
-
-      <section class="intro" id="how">
-        <h2>How to use this guide</h2>
-
-        <p class="lead">Work top to bottom. Each phase has a <b>checklist</b> (tick as you go) and one or more
-          <b>ready-to-use prompts</b> — copy the prompt, paste it into your AI, and replace anything marked <span
-            class="fill">[LIKE THIS]</span> with your own game's details. You stay the designer and director; the AI is
-          your all-around technical executor.
-        </p>
-
-
-        <div class="phasebar">
-          <a href="#p0">0 · Setup</a>
-          <a href="#p1">1 · Idea</a>
-          <a href="#p2">2 · Game Design</a>
-          <a href="#p3">3 · Tech Design</a>
-          <a href="#p4">4 · Project Plan</a>
-          <a href="#p5">5 · Build</a>
-          <a href="#p6">6 · Fix bugs</a>
-          <a href="#p6b">7 · Iterate</a>
-          <a href="#p7">8 · Ship</a>
         </div>
-      </section>
+        <p>In this guide, we'll walk through the whole process of creating a game prototype with agentic coding AI. There are pre-made prompts in each step that you can copy-paste.</p>
+        <p>Just bring your ideas, curiosity, and passion. We'll make something fun!</p>
+        <div class="callout opening-callout">
+          <span class="tag">🤔 Something unclear?</span>
+          <p><b>Ask your AI first</b> — describe what you don't understand and it will almost certainly explain it clearly. If you're still stuck after that, I'm happy to help: <a href="https://huydung.com" target="_blank">huydung.com</a></p>
+        </div>
+    </div>
 
-      <!-- PHASE 0 -->
+    <!-- PHASE 0 -->
       <section id="p0">
         <h2><span class="num">0</span>Set up your tools</h2>
-        <p class="lead">One-time setup. These tools do far more than write code — they scrape websites, edit images,
-          generate game sprites, and help draft design docs. Get them configured once.</p>
+        <p class="lead">These are just one-time setup. So keep with it</p>
 
         <ul class="check">
           <li>
-            <b>Create a <a href="https://github.com/signup" target="_blank">GitHub</a> account</b>
+            <b>Create a <a href="https://github.com/signup" target="_blank">GitHub</a> account</b> (if you haven't got it yet)
             and a new <b>public</b> repository.
-            <span class="why">This stores every step so you can compare, roll back, and host the game for free
-              later.</span>
-
-          </li>
-          <li>
-            <b>Install <a href="https://desktop.github.com" target="_blank">GitHub Desktop</a></b>
-            and clone the repo to your machine.
-            <span class="why">A friendly UI for commits — you won't need the command line.</span>
+            <span class="why">This helps storing our work somewhere safe, so we can compare, roll back, and host the game for free later.</span>
 
           </li>
           <li>
             <b>Install <a href="https://code.visualstudio.com" target="_blank">Visual Studio Code</a></b>
-            to read and edit source code.
-            <span class="why">To read the code the AI writes and make tiny tweaks yourself — faster than asking the
-              AI.</span>
+            to edit source code + manage git manually.          
 
           </li>
           <li>
-            <b>Pick and install ONE AI coding agent</b>
+            <b>Pick and install at least ONE AI coding agent</b>
             (desktop app). See the comparison below.
-            <span class="why">The workflow is nearly identical across all three.</span>
+            <span class="why">You can install different ones and experiment to find the best fit.</span>
 
           </li>
         </ul>
@@ -1461,6 +1595,7 @@ The TDD MUST explicitly encode these requirements:
 9. Logging. Add log messages with essential info at all key interactions for easy debugging.
 10. Comments for non-coders. Add enough code comments to guide a non-coder on how to modify important behavior.
 11. Tests. Write a test suite for all logic-based code and run it every turn. Update tests for each new feature or design change.
+12. ALL UI elements, game characters, event handlers, etc. must be created inside the Canvas. The html is purely a container. Do not put any logic or visuals in html.
 
 IMPORTANT: The TDD should be concise, clear, but not too detailed. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game's specific layers/mechanic if you need to before finalizing.</pre>
         </div>
@@ -1566,24 +1701,21 @@ Follow tdd.md for all conventions. Write plan.md now. Then summarize back in cha
           </div>
           <pre id="p-git">Initialize a git repo and commit all current files in this folder.
 
-From now on, in ALL of our conversations: after each turn, run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:), and push to this repo: [PASTE YOUR GITHUB REPO LINK]
+From now on, in ALL of our conversations, after each turn:
+- Run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:)
+- If the build fails, fix it before answer back and committing.
+- If you notice a change in game design or technical direction in my instructions compared to the gdd.md or tdd.md - update those files to sync with latest information
 
-If the build fails, fix it before committing.</pre>
+</pre>
         </div>
 
         <p class="lead">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly.
           Context windows are large and auto-compress, so <b>stay in the same session while you're in flow</b>. Start a
           fresh session when the AI gets confused, loops on a fix, or you're shifting to something unrelated. Always
-          paste the current docs at the start of any new session. Start with the mid-level model; only escalate if you
-          get stuck.</p>
+          instruct AI to chech the current docs at the start of any new session. Start with the mid-level model; only escalate if you get stuck.</p>
 
         <ul class="check">
-          <li>
-            <b>The docs are the memory, not just the session.</b>
-            <span class="why">Keep gdd/tdd/plan current and you can start a fresh session any time — the AI re-orients
-              instantly. Start fresh when it gets confused or loops; otherwise stay in the same session.</span>
-
-          </li>
+          
           <li>
             <b>Run the milestone prompt</b>
             (below), then <b>do the test checklist</b> from plan.md yourself.
@@ -1894,7 +2026,10 @@ Do everything you can yourself (create the workflow file, set the correct build/
 
         </div>
       </section>
+  </div><!-- /wrap -->
 
+  <div class="band-cream band-cream-top">
+    <div class="wrap">
       <section id="recap">
         <h2>One-glance recap</h2>
 
@@ -1955,9 +2090,9 @@ Do everything you can yourself (create the workflow file, set the correct build/
           </tr>
         </table>
       </section>
-
     </div>
-  </main>
+  </div>
+</main>
 
   <footer>
     <div class="footer-inner">
@@ -2106,7 +2241,28 @@ Do everything you can yourself (create the workflow file, set the correct build/
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape') lb.classList.remove('open'); });
 
     })();
-  </script>
+  
+  /* ---- Sticky nav active state ---- */
+  (function(){
+    var navLinks = document.querySelectorAll('#sh-nav a');
+    if (!navLinks.length) return;
+    var sections = Array.prototype.slice.call(document.querySelectorAll('section[id]'));
+    var observer = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          navLinks.forEach(function(a){
+            var hit = a.getAttribute('href') === '#' + id;
+            a.classList.toggle('active', hit);
+            if (hit) { a.scrollIntoView({block:'nearest',inline:'nearest'}); }
+          });
+        }
+      });
+    }, { rootMargin: '-10% 0px -75% 0px' });
+    sections.forEach(function(s){ observer.observe(s); });
+  })();
+
+</script>
 </body>
 
 </html>
