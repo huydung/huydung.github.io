@@ -493,20 +493,20 @@
     }
 
     .tbl td.yes {
-      color: var(--hd-green);
-      font-weight: 600;
+      /* color: var(--hd-green); */
+      /* font-weight: 600; */
       background: rgba(105, 162, 87, .11) !important;
     }
 
     .tbl td.warn {
-      color: var(--hd-orange);
-      font-weight: 600;
+      /* color: var(--hd-orange); */
+      /* font-weight: 600; */
       background: rgba(255, 146, 0, .09) !important;
     }
 
     .tbl td.no {
-      color: var(--hd-red-bright);
-      font-weight: 600;
+      /* color: var(--hd-red-bright); */
+      /* font-weight: 600; */
       background: rgba(189, 1, 41, .07) !important;
     }
 
@@ -1324,6 +1324,35 @@
       margin-top: 0;
     }
 
+  
+    /* Image slides: fill the slide, caption below */
+    #preso-slide .hint-img {
+      height: auto !important;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #preso-slide .hint-img img {
+      width: 100%;
+      height: auto;
+      max-height: 82vh;
+      object-fit: contain;
+      object-position: top center;
+      border-radius: 4px;
+    }
+    #preso-slide .hint-img p {
+      font-size: 14px;
+      color: #666;
+      font-style: italic;
+      margin: 0;
+      line-height: 1.4;
+    }
+    /* preso slide container: less padding for image slides */
+    #preso-overlay.img-slide #preso-slide {
+      padding: 24px 40px;
+    }
+
   </style>
 </head>
 
@@ -1454,7 +1483,7 @@
             <td><b>Sound &amp; music</b><span class="task-sub">sound effects, background music</span></td>
             <td class="no">❌ Requires audio skills — must learn or hire</td>
             <td class="warn">⚠️ AI suggests free sources; cannot create or integrate</td>
-            <td class="yes">✅ Can Generate or source from free libraries &amp; wire into project</td>
+            <td class="yes">✅ Can generate or source from free libraries &amp; wire into project</td>
           </tr>
           <tr>
             <td><b>Version control &amp; deployment</b><span class="task-sub">git setup, commits, live URL</span></td>
@@ -1502,9 +1531,7 @@
 
           </li>
           <li>
-            <b>Pick and install at least ONE AI coding agent</b>
-            (desktop app). See the comparison below.
-            <span class="why">You can install different ones and experiment to find the best fit.</span>
+            <b>Pick and install at least ONE AI coding agent</b> (desktop app).
 
           </li>
         </ul>
@@ -1546,55 +1573,50 @@
             <td>Video / music generation</td>
             <td class="warn">⚠️ None</td>
             <td class="warn">⚠️ None</td>
-            <td class="yes">✅ Yes (Veo, Lyria)</td>
+            <td class="yes">☑️ Yes - separately</td>
           </tr>
           <tr>
             <td>Connecting to apps &amp; services</td>
-            <td class="yes">✅ Plugins, MCP, Office </td>
+            <td class="yes">☑️  Plugins, MCP, Office </td>
             <td>☑️ Plugins, MCP</td>
-            <td class="yes">✅ Native connections to Google apps/services</td>
+            <td class="yes">☑️  Native connections to Google apps/services</td>
           </tr>
           <tr>
             <td>Bundled perks</td>
             <td>None</td>
-            <td class="yes">✅ Free Plus month for everyone (mid-2026)</td>
+            <td class="yes">☑️ Free Plus month for everyone (mid-2026)</td>
             <td class="yes">✅ YouTube Premium · 5TB Google Drive</td>
           </tr>
-        </table>
-        <br />
-        <p class="tbl-note" data-preso-merge>Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them. <b>Quick take for
-            mid-2026:</b></p>
-        <ul data-preso-merge>
-          <li><a href="https://antigravity.google/" target="_blank"><b>Gemini</b></a> shines during planning (use Canvas
+        </table> 
+      </section>
+      <section id="p0b">
+        <h3>On choosing the main AI service provider</h3>
+        <ul>
+          <li><a href="https://antigravity.google/" target="_blank"><b>Gemini (Antigravity)</b></a> shines during planning (use Canvas
             to draft GDD/TDD/plan live, export to .md when done) and has the best bundled value-for-money overall.</li>
-          <li><a href="https://chatgpt.com/codex/" target="_blank"><b>Codex</b></a> is the standout for executing the
+          <li><a href="https://chatgpt.com/codex/" target="_blank"><b>ChatGPT (Codex)</b></a> is the standout for executing the
             technical tasks of game prototyping right now — capable coder, game-studio plugin for sprites, and a free
             Plus month to try.</li>
-          <li><a href="https://claude.ai/download" target="_blank"><b>Claude</b></a> is strongest for pure reasoning and
-            writing, and Cowork adds practical non-coding tasks (image editing, web scraping).</li>
+          <li><a href="https://claude.ai/download" target="_blank"><b>Claude (Claude Code)</b></a> is strongest for pure reasoning and writing, and working on a large codebase.</li>
         </ul>
-        <p data-preso-merge>For this workflow, start with whichever you already have — the prompts work across all three.</p>
-
+        <p>For game prototypes, start with whichever you already have — the prompts work across all three.</p>
+        <h3>On choosing models within the app</h3>
+        <ul>
+          <li>During <b>brainstorming &amp; design</b>, use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</li>
+          <li>During <b>technical design and planning</b>, use the <b>highest</b> model and thinking effort.</li>
+          <li>During <b>the coding</b>, <b>start with the mid-level model</b> — it should works fine for simple game
+            prototype. Only switch up to the strongest model when you genuinely can't get the result you want.</li>
+        </ul>
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The
-            key things are: giving it access to a local folder, pick the right permissions level, and the right model.
-            Below is a screenshot of Codex.</p>
+          <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The key things are: giving it access to a local folder, pick the right permissions level, and the right model. Below is a screenshot of Codex.</p>
 
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent interface screenshot</div>
             </div>
-          </div>
-          <br />
-          <p>For <b>brainstorming &amp; design</b>, use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash,
-            ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</p>
-
-          <p>For <b>technical design and planning</b>, use the <b>highest</b> model and thinking effort.</p>
-
-          <p>For <b>the coding</b>, <b>start with the mid-level model</b> — it should works fine for simple game
-            prototype. Only switch up to the strongest model when you genuinely can't get the result you want.</p>
+          </div>         
         </div>
       </section>
 
@@ -1779,11 +1801,12 @@ Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
           <p>Use Gemini to draft the GDD (and later the TDD and plan) directly in <b>Canvas</b> — it lets you edit the
             document live as you chat, which is ideal for iterating on design decisions. When you're happy with it, copy
             the text and save it as <code>gdd.md</code> manually.</p>
-          <p>The GDD and wireframe work as a pair — the wireframe makes abstract layout decisions visible before any
-            code exists. If something looks wrong in the wireframe, fix it in the GDD now. Changing layout after it's
-            coded costs 10× more effort.</p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/gdd-example.png" alt="GDD example"
+            <div class="hint-img">
+              <p>The GDD and wireframe work as a pair — the wireframe makes abstract layout decisions visible before any
+            code exists. If something looks wrong in the wireframe, fix it in the GDD now. Changing layout after it's
+            coded costs 10× more effort.</p><img src="game-proto-images/gdd-example.png" alt="GDD example"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>GDD example</div>
             </div>
@@ -1854,10 +1877,11 @@ IMPORTANT: The TDD should be concise, clear, but not too detailed. It should con
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Using Codex, you can preview the .md in the app itself. Of course, VS Code will be way more useful for
-            editing the file.</p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/tdd.png" alt="Config file example"
+            <div class="hint-img">
+              <p>Using Codex, you can preview the .md in the app itself. Of course, VS Code will be way more useful for
+            editing the file.</p><img src="game-proto-images/tdd.png" alt="Config file example"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Config file example</div>
             </div>
@@ -1923,11 +1947,12 @@ Follow tdd.md for all conventions. Write plan.md now. Then summarize back in cha
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Each milestone ends with a test checklist written from a player's point of view — not a developer's. "The
-            ball bounces off walls correctly" is a player test. "The physics engine is initialized" is not. If you can't
-            describe what to test in plain terms, the milestone scope is probably too vague.</p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/build-plan.png" alt="plan.md example"
+            <div class="hint-img">
+              <p>Each milestone ends with a test checklist written from a player's point of view — not a developer's. "The
+            ball bounces off walls correctly" is a player test. "The physics engine is initialized" is not. If you can't
+            describe what to test in plain terms, the milestone scope is probably too vague.</p><img src="game-proto-images/build-plan.png" alt="plan.md example"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>plan.md example</div>
             </div>
@@ -2015,29 +2040,26 @@ After everything is done, show user both the URL to test the game AND the list o
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Here you can see the agent worked autonomously for 12 minutes and create dozens of files, to finish the
-            first 2 milestones.
-          </p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/milestone1.png" alt="Agent mid-session"
+            <div class="hint-img">
+              <p>Here you can see the agent worked autonomously for 12 minutes and create dozens of files, to finish the
+            first 2 milestones.
+          </p><img src="game-proto-images/milestone1.png" alt="Agent mid-session"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
             </div>            
-          </div>
-          <br/>
-          <p>AI agent even write its own automated testing script, spawn a browser and <strong>draw</strong> on it to verify game logic, and capture screenshot. That's better discipline in smoke-testing than many junior devs!
-          </p>
-          <div class="hint-imgs">            
-            <div class="hint-img"><img src="game-proto-images/milestone2.png" alt="Agent mid-session"
+          </div><div class="hint-imgs">            
+            <div class="hint-img">
+              <p>AI agent even write its own automated testing script, spawn a browser and <strong>draw</strong> on it to verify game logic, and capture screenshot. That's better discipline in smoke-testing than many junior devs!
+          </p><img src="game-proto-images/milestone2.png" alt="Agent mid-session"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
             </div>
-          </div>
-          <br/>
-          <p>This is an example when I stop the AI mid-thinking to correct its direction.
-          </p>
-          <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/stop-ai-mid-thinking-to-steer.png" alt="Agent mid-session"
+          </div><div class="hint-imgs">
+            <div class="hint-img">
+              <p>This is an example when I stop the AI mid-thinking to correct its direction.
+          </p><img src="game-proto-images/stop-ai-mid-thinking-to-steer.png" alt="Agent mid-session"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
             </div>            
@@ -2115,9 +2137,10 @@ First, review the relevant code end-to-end and explain to me, in plain language,
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Two things are extremely useful: screenshots, and console log.</p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/debug.png" alt="DevTools Console"
+            <div class="hint-img">
+              <p>Two things are extremely useful: screenshots, and console log.</p><img src="game-proto-images/debug.png" alt="DevTools Console"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
             </div>
@@ -2196,9 +2219,10 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package of thousand files, generate SFX, and even build a full-features game editor</p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/generate-images.png"
+            <div class="hint-img">
+              <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package of thousand files, generate SFX, and even build a full-features game editor</p><img src="game-proto-images/generate-images.png"
                 alt="Game before / after a new feature"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
@@ -2260,7 +2284,7 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
             Code still slop, performance can be meh, and bugs are expected.
           </li>
         </ul>
-        <div class="prompt">
+        <div class="prompt" data-preso-merge>
           <div class="prompt-head">
             <span class="prompt-label">PROMPT · Set up auto-deploy to GitHub Pages</span>
 
@@ -2273,10 +2297,11 @@ Do everything you can yourself (create the workflow file, set the correct build/
         </div>
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push from the agent
-            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately: getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p>
+          
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/game1.png"
+            <div class="hint-img">
+              <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push from the agent
+            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately: getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p><img src="game-proto-images/game1.png"
                 alt="Game before / after a new feature"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
@@ -2603,19 +2628,20 @@ function presoBuildSlides() {
     var children = Array.from(sec.children);
     var i = 0;
 
-    // ── Slide: h2 + lead + checklist ──
+    // ── Slide: h2 + paragraphs + callout + checklist ──
     var headerEls = [];
     while (i < children.length) {
       var c = children[i];
       var cn = (c.className || '');
       var tn = c.tagName;
-      if (tn === 'H2' || cn.indexOf('lead') !== -1) {
-        headerEls.push(c); i++;
+      // Stop at prompts, hint divs, tables — they get their own slides
+      if (cn.indexOf('prompt') !== -1 || (tn === 'DIV' && (cn === 'hint' || cn.split(' ').indexOf('hint') !== -1)) || tn === 'TABLE') {
+        break;
       } else if (cn.indexOf('check') !== -1) {
         headerEls.push(c); i++;
-        break;
+        break; // checklist ends the header slide
       } else {
-        break;
+        headerEls.push(c); i++; // h2, p, lead, callout, etc.
       }
     }
     if (headerEls.length) {
@@ -2654,16 +2680,25 @@ function presoBuildSlides() {
           var groupLen = promptBuf.reduce(function(s,e){ return s + e.textContent.trim().length; }, 0);
           if (promptBuf.length >= 3 || groupLen > 900) { flushPrompts(); }
         }
-      } else if (cn.indexOf('hint-panel') !== -1) {
-        flushPrompts();
-        addSlide(slide([c], secTitle, 'Screenshots / hint'));
       } else if (tn === 'TABLE' || cn.indexOf('tbl-card') !== -1) {
         flushPrompts();
         addSlide(slide([c], secTitle, 'Table'));
+      } else if (tn === 'DIV' && (cn === 'hint' || cn.split(' ').indexOf('hint') !== -1)) {
+        // Each div.hint-img = 1 full-screen image slide (caption is inside hint-img after restructure)
+        flushPrompts();
+        var hImgs = Array.from(c.querySelectorAll('.hint-img'));
+        hImgs.forEach(function(img) {
+          var alt = img.querySelector('img') ? img.querySelector('img').alt : 'Screenshot';
+          addSlide(slide([img], secTitle, alt));
+        });
       } else if (tn === 'H3') {
         // H3 waits silently — it will be attached to the next prompt group
         flushPrompts();
         promptH3 = c;
+      } else if (c.dataset && c.dataset.presoMerge !== undefined) {
+        // Catch-all: merge data-preso-merge elements into the last slide
+        flushPrompts();
+        if (slides.length) slides[slides.length - 1].els.push(c);
       }
       i++;
     }
@@ -2675,6 +2710,9 @@ function presoBuildSlides() {
   if (recap) {
     addSlide(slide(Array.from(recap.children), 'One-glance recap', 'Summary table'));
   }
+
+  // ── Final footer slide ──
+  slides.push({ els: [], title: '', desc: 'End', footer: true });
 
   return slides;
 }
@@ -2696,11 +2734,22 @@ function presoRender(idx) {
       (sub ? '<p style="font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.4vw,28px);color:rgba(248,247,208,.9);margin:0 0 20px;line-height:1.4;">' + sub.textContent + '</p>' : '') +
       (byline ? '<p style="font-size:16px;color:rgba(255,255,255,.55);">' + byline.textContent + '</p>' : '') +
       '</div>';
+  } else if (s.footer) {
+    wrap.style.background = 'var(--hd-red-deep)';
+    container.innerHTML =
+      '<div style="display:flex;flex-direction:column;justify-content:center;min-height:75vh;padding:60px 0;">' +
+      '<h1 style="font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:700;color:#fff;margin:0 0 28px;line-height:1.08;">Now go prove your idea is fun!</h1>' +
+      '<p style="font-family:var(--serif);font-style:italic;font-size:clamp(16px,2vw,24px);color:var(--hd-cream);margin:0 0 24px;line-height:1.5;max-width:70ch;">The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it’s worth pursuing.</p>' +
+      '<p style="font-size:15px;color:rgba(255,255,255,.45);letter-spacing:.02em;">Huy Dũng (DaveHD) · huydung.com</p>' +
+      '</div>';
   } else {
     s.els.forEach(function(el) {
       container.appendChild(el.cloneNode(true));
     });
     wrap.style.background = '';
+    // Minimal padding for pure image slides
+    var isImgSlide = s.els.length === 1 && s.els[0].classList && s.els[0].classList.contains('hint-img');
+    container.style.padding = isImgSlide ? '16px 32px' : '';
     // Force-expand all prompts: remove collapsed class, hide expand bar
     container.querySelectorAll('.prompt').forEach(function(p) {
       p.classList.remove('collapsed');
