@@ -1122,6 +1122,208 @@
       line-height: 1.75;
     }
 
+  
+    /* ════════════════════════════════════════
+       PRESENTATION MODE
+    ════════════════════════════════════════ */
+    .btn-present {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--hd-red-deep);
+      background: var(--hd-cream);
+      border: none;
+      padding: 7px 18px;
+      border-radius: 20px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 26px;
+      transition: .15s;
+      line-height: 1.4;
+    }
+    .btn-present:hover { background: #fff; }
+    .btn-present--sm {
+      margin-top: 0;
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+    /* Cover: both buttons same height */
+    .cover-btns .translate-btn,
+    .cover-btns .btn-present {
+      margin-top: 0;
+      padding: 8px 20px;
+      font-size: 14px;
+    }
+
+    #preso-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9000;
+      background: #fff;
+      flex-direction: column;
+      font-family: var(--sans);
+    }
+    #preso-overlay.active { display: flex; }
+
+    #preso-topbar {
+      background: var(--hd-red-deep);
+      color: #fff;
+      padding: 9px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      gap: 12px;
+    }
+    #preso-title {
+      font-family: var(--serif);
+      font-weight: 700;
+      font-size: 14px;
+      opacity: .85;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #preso-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    #preso-counter {
+      font-size: 12px;
+      opacity: .6;
+      margin-right: 6px;
+      white-space: nowrap;
+    }
+    #preso-controls button {
+      background: rgba(255,255,255,.15);
+      border: none;
+      color: #fff;
+      padding: 5px 14px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--sans);
+    }
+    #preso-controls button:hover { background: rgba(255,255,255,.28); }
+
+    #preso-slide-wrap {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 0;
+    }
+    #preso-slide {
+      width: 100%;
+      max-width: 960px;
+      padding: 56px 72px;
+      font-size: 1.12em;
+      box-sizing: border-box;
+    }
+    @media (max-width: 700px) {
+      #preso-slide { padding: 28px 20px; font-size: 1em; }
+    }
+
+    /* ── Grid overlay ── */
+    #preso-grid-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9500;
+      background: rgba(20,0,5,.92);
+      padding: 32px 32px 60px;
+      overflow-y: auto;
+    }
+    #preso-grid-overlay.active { display: block; }
+    #preso-grid-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    #preso-grid-header span {
+      color: rgba(255,255,255,.6);
+      font-size: 13px;
+    }
+    .preso-grid-close {
+      background: rgba(255,255,255,.12);
+      border: none;
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: var(--sans);
+    }
+    .preso-grid-close:hover { background: rgba(255,255,255,.22); }
+    .preso-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .preso-thumb {
+      background: #fff;
+      border-radius: 6px;
+      cursor: pointer;
+      padding: 12px 14px 10px;
+      border: 2px solid transparent;
+      transition: border-color .15s;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+    }
+    .preso-thumb:hover { border-color: var(--hd-cream); }
+    .preso-thumb.preso-cur { border-color: var(--hd-red-bright); }
+    .thumb-num {
+      font-size: 10px;
+      color: var(--hd-red-deep);
+      font-weight: 700;
+      margin-bottom: 4px;
+      font-family: var(--sans);
+    }
+    .thumb-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--hd-ink);
+      margin-bottom: 4px;
+      font-family: var(--serif);
+      line-height: 1.3;
+    }
+    .thumb-desc {
+      font-size: 10px;
+      color: #777;
+      line-height: 1.4;
+      overflow: hidden;
+      flex: 1;
+    }
+
+  
+    /* Prompts fully expanded in presentation mode */
+    #preso-slide .prompt-body {
+      max-height: none !important;
+      -webkit-mask-image: none !important;
+      mask-image: none !important;
+      overflow: visible !important;
+    }
+    #preso-slide .prompt-toggle { display: none !important; }
+    /* Cover-inner: buttons on one row */
+    .cover-inner .cover-btns {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 26px;
+    }
+    .cover-inner .cover-btns .translate-btn,
+    .cover-inner .cover-btns .btn-present {
+      margin-top: 0;
+    }
+
   </style>
 </head>
 
@@ -1132,6 +1334,7 @@
       <div class="sh-title">Prototyping Games with AI <span>· The Checklist</span></div>
 
       <div class="sh-right">
+        <button class="btn-present btn-present--sm" onclick="presoEnter()">▶ Present</button>
         <button class="translate-btn translate-btn--sm"
           onclick="window.open('https://translate.google.com/translate?sl=en&tl=vi&u='+encodeURIComponent(window.location.href),'_blank')">🌐</button>
         <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
@@ -1158,9 +1361,11 @@
       <h1><strong>Prototyping Games with AI</strong></h1>
       <p class="sub">Turn your wild idea into a playable prototype in 1 day. Even if you can't code.</p>
       <p class="byline">By <b>Huy Dũng (DaveHD)</b></p>
-      <button class="translate-btn"
-        onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🌐
-        Vietnamese</button>
+      <div class="cover-btns">
+        <button class="translate-btn"
+          onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🌐 Vietnamese</button>
+        <button class="btn-present" onclick="presoEnter()">▶ Present</button>
+      </div>
     </div>
     <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
   </header>
@@ -1267,13 +1472,17 @@
         </table>
         </div>
         
+    </div>
+    <section id="p00">
+      <h2>Making Game Prototypes with agentic AI</h2>
+
         <p>In this guide, we'll walk through the whole process of creating a game prototype with agentic coding AI. There are pre-made prompts in each step that you can copy-paste.</p>
         <p>Just bring your ideas, curiosity, and passion. We'll make something fun!</p>
         <div class="callout opening-callout">
           <span class="tag">🤔 Something unclear?</span>
           <p><b>Ask your AI first</b> — describe what you don't understand and it will almost certainly explain it clearly. If you're still stuck after that, I'm happy to help: <a href="https://huydung.com" target="_blank">huydung.com</a></p>
         </div>
-    </div>
+    </section>
 
     <!-- PHASE 0 -->
       <section id="p0">
@@ -1302,7 +1511,7 @@
 
 
 
-        <table class="tbl">
+        <table class="tbl" data-preso-merge>
           <colgroup>
             <col class="aspect">
             <col class="model">
@@ -1353,9 +1562,9 @@
           </tr>
         </table>
         <br />
-        <p class="tbl-note">Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them. <b>Quick take for
+        <p class="tbl-note" data-preso-merge>Roughly $20/month (~500K VND) for the Plus/Pro tier of any one of them. <b>Quick take for
             mid-2026:</b></p>
-        <ul>
+        <ul data-preso-merge>
           <li><a href="https://antigravity.google/" target="_blank"><b>Gemini</b></a> shines during planning (use Canvas
             to draft GDD/TDD/plan live, export to .md when done) and has the best bundled value-for-money overall.</li>
           <li><a href="https://chatgpt.com/codex/" target="_blank"><b>Codex</b></a> is the standout for executing the
@@ -1364,7 +1573,7 @@
           <li><a href="https://claude.ai/download" target="_blank"><b>Claude</b></a> is strongest for pure reasoning and
             writing, and Cowork adds practical non-coding tasks (image editing, web scraping).</li>
         </ul>
-        <p>For this workflow, start with whichever you already have — the prompts work across all three.</p>
+        <p data-preso-merge>For this workflow, start with whichever you already have — the prompts work across all three.</p>
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
@@ -1730,13 +1939,13 @@ Follow tdd.md for all conventions. Write plan.md now. Then summarize back in cha
       <!-- PHASE 5 -->
       <section id="p5">
         <h2><span class="num">5</span>Build, milestone by milestone</h2>
-        <div class="callout">
+        <div class="callout" data-preso-merge>
           <span class="tag">Git discipline — run this once, early</span>
 
           <p>Before the agent writes much code, set up version tracking and the commit habit:</p>
 
         </div>
-        <div class="prompt">
+        <div class="prompt" data-preso-merge>
           <div class="prompt-head">
             <span class="prompt-label">PROMPT · Initialize git + commit habit</span>
 
@@ -2023,10 +2232,10 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
       <!-- PHASE 7 -->
       <section id="p7">
         <h2><span class="num">8</span>Ship it — share a live link</h2>
-        <p class="lead">For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in
+        <p class="lead" data-preso-merge>For an HTML game this is easy. The agent writes the deploy workflow; you flip one setting in
           GitHub.</p>
 
-        <ul class="check">
+        <ul class="check" data-preso-merge>
           <li>
             <b>Have the AI prepare the GitHub Pages workflow</b>
             and push it.
@@ -2340,7 +2549,266 @@ Do everything you can yourself (create the workflow file, set the correct build/
     sections.forEach(function(s){ observer.observe(s); });
   })();
 
+
+// ════════════════════════════════════════
+// PRESENTATION MODE
+// ════════════════════════════════════════
+var presoSlides = [];
+var presoCur = 0;
+var presoGridOpen = false;
+
+function presoBuildSlides() {
+  var slides = [];
+
+  function slide(els, title, desc) {
+    return { els: els.filter(Boolean), title: title || '', desc: desc || '' };
+  }
+
+  function addSlide(s) {
+    // If first element has data-preso-merge, merge into last slide
+    if (slides.length && s.els.length && s.els[0].dataset && s.els[0].dataset.presoMerge !== undefined) {
+      slides[slides.length - 1].els = slides[slides.length - 1].els.concat(s.els);
+    } else {
+      slides.push(s);
+    }
+  }
+
+  // ── Slide 0: Hero ──
+  slides.push({ els: [], title: 'Prototyping Games with AI', desc: 'Workshop by Huy Dũng', hero: true });
+
+  // ── Slide 1: Intro text ──
+  var opening = document.querySelector('section.opening');
+  if (opening) {
+    addSlide(slide(Array.from(opening.children), 'Introduction', 'Why AI changes prototyping'));
+  }
+
+  // ── Slide 2: YouTube demo ──
+  var yt = document.querySelector('.yt-block');
+  if (yt) addSlide(slide([yt], 'Demo video', 'Game prototype demo'));
+
+  // ── Slide 3: Comparison table (tbl-card only) ──
+  var openTblWrap = document.querySelector('.opening-tbl-wrap');
+  if (openTblWrap) {
+    var openTblCard = openTblWrap.querySelector('.tbl-card');
+    var openCallout = openTblWrap.querySelector('.opening-callout');
+    if (openTblCard) addSlide(slide([openTblCard], 'Why AI changes everything', 'Capability comparison'));
+    if (openCallout) addSlide(slide([openCallout], 'Why AI changes everything', 'Note'));
+  }
+
+  // ── Main content sections (exclude recap — handled separately) ──
+  var secs = Array.from(document.querySelectorAll('main section[id]:not(.opening):not(#recap)'));
+  secs.forEach(function(sec) {
+    var h2 = sec.querySelector(':scope > h2');
+    var secTitle = h2 ? h2.textContent.replace(/\s+/g,' ').trim() : '';
+    var children = Array.from(sec.children);
+    var i = 0;
+
+    // ── Slide: h2 + lead + checklist ──
+    var headerEls = [];
+    while (i < children.length) {
+      var c = children[i];
+      var cn = (c.className || '');
+      var tn = c.tagName;
+      if (tn === 'H2' || cn.indexOf('lead') !== -1) {
+        headerEls.push(c); i++;
+      } else if (cn.indexOf('check') !== -1) {
+        headerEls.push(c); i++;
+        break;
+      } else {
+        break;
+      }
+    }
+    if (headerEls.length) {
+      var desc = headerEls.map(function(e){ return e.textContent.trim(); }).join(' ').slice(0,80);
+      addSlide(slide(headerEls, secTitle, desc));
+    }
+
+    // ── Rest: prompts, hints, tables in document order ──
+    var promptBuf = [];
+    var promptH3 = null; // h3 header sticks with next prompt group
+
+    function flushPrompts() {
+      // Only create a slide if there are actual prompt elements (H3 alone never gets its own slide)
+      if (promptBuf.length) {
+        var els = promptH3 ? [promptH3].concat(promptBuf) : promptBuf.slice();
+        addSlide(slide(els, secTitle, 'Prompts'));
+        promptBuf = [];
+        promptH3 = null;
+      }
+    }
+
+    while (i < children.length) {
+      var c = children[i];
+      var cn = (c.className || '');
+      var tn = c.tagName;
+
+      if (cn.indexOf('prompt') !== -1) {
+        var len = c.textContent.trim().length;
+        if (len > 700) {
+          // Long prompt: flush any short ones first, then pair H3 with this long prompt
+          flushPrompts();
+          var preH3 = promptH3; promptH3 = null;
+          addSlide(slide(preH3 ? [preH3, c] : [c], secTitle, 'Prompt'));
+        } else {
+          promptBuf.push(c);
+          var groupLen = promptBuf.reduce(function(s,e){ return s + e.textContent.trim().length; }, 0);
+          if (promptBuf.length >= 3 || groupLen > 900) { flushPrompts(); }
+        }
+      } else if (cn.indexOf('hint-panel') !== -1) {
+        flushPrompts();
+        addSlide(slide([c], secTitle, 'Screenshots / hint'));
+      } else if (tn === 'TABLE' || cn.indexOf('tbl-card') !== -1) {
+        flushPrompts();
+        addSlide(slide([c], secTitle, 'Table'));
+      } else if (tn === 'H3') {
+        // H3 waits silently — it will be attached to the next prompt group
+        flushPrompts();
+        promptH3 = c;
+      }
+      i++;
+    }
+    flushPrompts();
+  });
+
+  // ── Recap: single slide with h2 + table + callout ──
+  var recap = document.querySelector('section#recap');
+  if (recap) {
+    addSlide(slide(Array.from(recap.children), 'One-glance recap', 'Summary table'));
+  }
+
+  return slides;
+}
+
+function presoRender(idx) {
+  var s = presoSlides[idx];
+  var wrap = document.getElementById('preso-slide-wrap');
+  var container = document.getElementById('preso-slide');
+  container.innerHTML = '';
+
+  if (s.hero) {
+    var h1 = document.querySelector('header.cover h1');
+    var sub = document.querySelector('header.cover .sub');
+    var byline = document.querySelector('header.cover .byline');
+    wrap.style.background = 'var(--hd-red-deep)';
+    container.innerHTML =
+      '<div style="display:flex;flex-direction:column;justify-content:center;min-height:75vh;padding:60px 0;">' +
+      (h1 ? '<h1 style="font-family:var(--serif);font-size:clamp(40px,5.5vw,72px);font-weight:700;color:#fff;margin:0 0 28px;line-height:1.08;">' + h1.textContent + '</h1>' : '') +
+      (sub ? '<p style="font-family:var(--serif);font-style:italic;font-size:clamp(18px,2.4vw,28px);color:rgba(248,247,208,.9);margin:0 0 20px;line-height:1.4;">' + sub.textContent + '</p>' : '') +
+      (byline ? '<p style="font-size:16px;color:rgba(255,255,255,.55);">' + byline.textContent + '</p>' : '') +
+      '</div>';
+  } else {
+    s.els.forEach(function(el) {
+      container.appendChild(el.cloneNode(true));
+    });
+    wrap.style.background = '';
+    // Force-expand all prompts: remove collapsed class, hide expand bar
+    container.querySelectorAll('.prompt').forEach(function(p) {
+      p.classList.remove('collapsed');
+    });
+    container.querySelectorAll('.prompt-expand-bar').forEach(function(b) {
+      b.style.display = 'none';
+    });
+  }
+
+  document.getElementById('preso-counter').textContent = (idx+1) + ' / ' + presoSlides.length;
+  document.getElementById('preso-title').textContent = s.title || 'Prototyping Games with AI';
+  presoCur = idx;
+  wrap.scrollTop = 0;
+  document.querySelectorAll('.preso-thumb').forEach(function(t, i) {
+    t.classList.toggle('preso-cur', i === idx);
+  });
+}
+
+function presoEnter() {
+  presoSlides = presoBuildSlides();
+  if (!presoSlides.length) return;
+  document.getElementById('preso-overlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  presoRender(0);
+}
+
+function presoExit() {
+  document.getElementById('preso-overlay').classList.remove('active');
+  document.getElementById('preso-grid-overlay').classList.remove('active');
+  document.body.style.overflow = '';
+  presoGridOpen = false;
+}
+
+function presoNext() {
+  if (presoCur < presoSlides.length - 1) presoRender(presoCur + 1);
+}
+
+function presoPrev() {
+  if (presoCur > 0) presoRender(presoCur - 1);
+}
+
+function presoGrid() {
+  presoGridOpen = true;
+  var gridEl = document.getElementById('preso-grid');
+  gridEl.innerHTML = '';
+  presoSlides.forEach(function(s, i) {
+    var thumb = document.createElement('div');
+    thumb.className = 'preso-thumb' + (i === presoCur ? ' preso-cur' : '');
+    thumb.innerHTML =
+      '<div class="thumb-num">' + (i+1) + '</div>' +
+      '<div class="thumb-title">' + s.title + '</div>' +
+      '<div class="thumb-desc">' + s.desc + '</div>';
+    thumb.onclick = function() {
+      presoCloseGrid();
+      presoRender(i);
+    };
+    gridEl.appendChild(thumb);
+  });
+  document.getElementById('preso-grid-overlay').classList.add('active');
+}
+
+function presoCloseGrid() {
+  document.getElementById('preso-grid-overlay').classList.remove('active');
+  presoGridOpen = false;
+}
+
+document.addEventListener('keydown', function(e) {
+  var overlay = document.getElementById('preso-overlay');
+  if (!overlay || !overlay.classList.contains('active')) return;
+  if (e.key === 'Escape') {
+    if (presoGridOpen) { presoCloseGrid(); } else { presoGrid(); }
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+    if (!presoGridOpen) presoNext();
+  } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+    if (!presoGridOpen) presoPrev();
+  } else if (e.key === 'f' || e.key === 'F') {
+    if (!presoGridOpen) {
+      var sw = document.getElementById('preso-slide-wrap');
+      if (sw.requestFullscreen) sw.requestFullscreen();
+    }
+  }
+});
+
 </script>
+
+  <!-- ── Presentation overlay ── -->
+  <div id="preso-overlay">
+    <div id="preso-topbar">
+      <span id="preso-title">Prototyping Games with AI</span>
+      <div id="preso-controls">
+        <span id="preso-counter"></span>
+        <button onclick="presoGrid()" title="Grid view (Esc)">⊞</button>
+        <button onclick="presoPrev()">◀</button>
+        <button onclick="presoNext()">▶</button>
+        <button onclick="presoExit()">✕ Exit</button>
+      </div>
+    </div>
+    <div id="preso-slide-wrap">
+      <div id="preso-slide"></div>
+    </div>
+  </div>
+  <div id="preso-grid-overlay">
+    <div id="preso-grid-header">
+      <span>Press Esc or click a slide to go back</span>
+      <button class="preso-grid-close" onclick="presoCloseGrid()">✕ Close</button>
+    </div>
+    <div class="preso-grid" id="preso-grid"></div>
+  </div>
 </body>
 
 </html>
