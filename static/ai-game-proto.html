@@ -34,6 +34,7 @@
 
     html {
       scroll-behavior: smooth;
+      scroll-padding-top: var(--sticky-offset, 0px);
     }
 
     body {
@@ -123,7 +124,6 @@
     section {
       padding: 54px 0 8px;
       border-bottom: 1px solid var(--hd-gray-border);
-      scroll-margin-top: 90px;
     }
 
     section:last-of-type {
@@ -2238,11 +2238,17 @@ Do everything you can yourself (create the workflow file, set the correct build/
       /* ---- Sticky header ---- */
       var cover = document.querySelector('.cover');
       var head = document.getElementById('stickyhead');
+      function updateStickyOffset() {
+        var offset = head.classList.contains('show') ? head.offsetHeight : 0;
+        document.documentElement.style.setProperty('--sticky-offset', offset + 'px');
+      }
       function onScroll() {
         if (window.scrollY > cover.offsetHeight - 10) head.classList.add('show');
         else head.classList.remove('show');
+        updateStickyOffset();
       }
       window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', updateStickyOffset);
       onScroll();
 
       /* ---- Copy buttons ---- */
