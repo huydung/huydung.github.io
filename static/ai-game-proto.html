@@ -985,6 +985,33 @@
       #sh-nav a { font-size: 11px; padding: 3px 9px; }
     }
 
+    /* ---- YouTube embed ---- */
+    .yt-block {
+      padding: 40px 0 8px;
+    }
+    .yt-block h3 {
+      font-family: var(--serif);
+      font-weight: 700;
+      color: var(--hd-red-deep);
+      font-size: 19px;
+      margin: 0 0 16px;
+    }
+    .yt-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%; /* 16:9 */
+      height: 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    }
+    .yt-wrap iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
     /* ---- Translate button ---- */
     .translate-btn {
       font-family: var(--sans);
@@ -1159,9 +1186,25 @@
   </div><!-- /band-cream -->
 
   <div class="wrap">
+    
+    <div class="yt-block">
+      <h2>A demo prototype I made after a few hours</h2>
+      <br/>
+      <div class="yt-wrap">
+        <iframe src="https://www.youtube.com/embed/vK4EOfWOeoE?si=12LmnC14iAcZ1F19"
+          title="YouTube video player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+          referrerpolicy="strict-origin-when-cross-origin"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+    <br/>
+    <br/>
+        <h2>Making Game Prototypes - with and without AI</h2>
+
     <div class="opening-tbl-wrap">
       <div class="tbl-card">
-        <h2>Making Game Prototypes - with and without AI</h2>
+        
         <table class="tbl task-tbl">
           <colgroup>
             <col style="width:22%">
@@ -1222,6 +1265,7 @@
           </tr>
         </table>
         </div>
+        
         <p>In this guide, we'll walk through the whole process of creating a game prototype with agentic coding AI. There are pre-made prompts in each step that you can copy-paste.</p>
         <p>Just bring your ideas, curiosity, and passion. We'll make something fun!</p>
         <div class="callout opening-callout">
@@ -2045,12 +2089,7 @@ Do everything you can yourself (create the workflow file, set the correct build/
             </div>
           </div>
         </div>
-        <div class="callout">
-          <span class="tag">Time budget</span>
-
-          <p>A small prototype can realistically be done in <b>2–6 hours</b> across <b>2–3 sessions</b> (token limits reset on a 5-hour rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
-
-        </div>
+        
       </section>
   </div><!-- /wrap -->
 
@@ -2115,6 +2154,12 @@ Do everything you can yourself (create the workflow file, set the correct build/
             <td>Agent + GitHub</td>
           </tr>
         </table>
+        <div class="callout">
+          <span class="tag">Time budget</span>
+
+          <p>A small prototype can realistically be done in <b>2–6 hours</b> across <b>2–3 sessions</b> (token limits reset on a 5-hour rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
+
+        </div>
       </section>
     </div>
   </div>
