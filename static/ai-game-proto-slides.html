@@ -1,0 +1,1818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototyping Games with AI — Workshop deck</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;0,900;1,400&family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+
+<style>
+  :root {
+    --hd-red-deep: #8E011F;
+    --hd-red-bright: #BD0129;
+    --hd-red-dark: #51000C;
+    --hd-ink: #1D1D1D;
+    --hd-white: #FFFFFF;
+    --hd-cream: #F8F7D0;
+    --hd-gray-page: #F7F7F7;
+    --hd-gray-border: #EAEAEA;
+    --hd-green: #69A257;
+    --hd-orange: #FF9200;
+    --hd-font-serif: 'Merriweather', Georgia, serif;
+    --hd-font-sans: 'Be Vietnam Pro', 'Segoe UI', sans-serif;
+    --hd-font-mono: Consolas, 'SF Mono', Menlo, monospace;
+  }
+
+  /* ===== Reveal fills the viewport edge-to-edge ===== */
+  html, body { background: var(--hd-red-deep); margin: 0; padding: 0; }
+  .reveal { font-family: var(--hd-font-sans); background: var(--hd-red-deep); }
+  .reveal .slides { text-align: left; }
+  .reveal .slides > section,
+  .reveal .slides > section > section { padding: 0 !important; }
+
+  /* Reset reveal's defaults that fight our layout */
+  .reveal .brand-slide pre,
+  .reveal .brand-slide figure,
+  .reveal .brand-slide img,
+  .reveal .brand-slide video,
+  .reveal .brand-slide iframe,
+  .reveal .brand-slide table {
+    margin: 0;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+    font-size: inherit;
+    line-height: inherit;
+    text-align: inherit;
+  }
+  .reveal .brand-slide pre { display: block; }
+  .reveal .brand-slide code { font-family: var(--hd-font-mono); background: transparent; }
+
+  /* ===== Brand canvas — 1280x720 ===== */
+  .brand-slide, .brand-slide *, .brand-slide *::before, .brand-slide *::after {
+    box-sizing: border-box;
+  }
+  .brand-slide {
+    width: 1280px;
+    height: 720px;
+    position: relative;
+    overflow: hidden;
+    color: var(--hd-ink);
+    font-family: var(--hd-font-sans);
+    background: var(--hd-white);
+  }
+  .brand-slide h1, .brand-slide h2, .brand-slide h3 {
+    font-family: var(--hd-font-serif);
+    text-transform: none;
+    letter-spacing: normal;
+    margin: 0;
+  }
+  .brand-slide p { margin: 0; }
+  .brand-slide ul { list-style: none; padding: 0; margin: 0; }
+
+  /* HDI logo top-right on every slide */
+  .brand-slide::after {
+    content: '';
+    position: absolute;
+    top: 22px;
+    right: 28px;
+    width: 64px;
+    height: 28px;
+    background: url('https://huydung.com/static/logo_small.png') no-repeat center / contain;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  /* ===== Layout 1 — TITLE BLEED ===== */
+  .brand-slide.title-bleed {
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+    padding: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .brand-slide.title-bleed h1 {
+    font-family: var(--hd-font-serif);
+    font-size: 64px;
+    line-height: 1.18;
+    color: var(--hd-white);
+    margin-bottom: 32px;
+    max-width: 1080px;
+    font-weight: 400;
+  }
+  .brand-slide.title-bleed h1 .light { font-weight: 400; }
+  .brand-slide.title-bleed h1 .bold  { font-weight: 700; }
+  .brand-slide.title-bleed .subtitle {
+    font-family: var(--hd-font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 26px;
+    color: var(--hd-cream);
+    line-height: 1.4;
+    max-width: 880px;
+    margin-bottom: 60px;
+  }
+  .brand-slide.title-bleed .meta {
+    color: var(--hd-cream);
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.8;
+  }
+  .brand-slide.title-bleed .meta .quiet { font-weight: 400; opacity: 0.85; }
+
+  /* ===== Layout 2 — DIVIDER (giant glyph, 80% size, at screen bottom) ===== */
+  .brand-slide.divider {
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+  }
+  .brand-slide.divider .glyph {
+    position: absolute;
+    bottom: 0;                    /* aligned with screen bottom, no trim */
+    left: 60px;
+    font-family: var(--hd-font-serif);
+    font-weight: 900;
+    font-size: 576px;             /* 80% of previous 720px */
+    line-height: 0.85;
+    color: var(--hd-red-bright);
+    user-select: none;
+  }
+  .brand-slide.divider .section-title {
+    position: absolute;
+    top: 50%;
+    left: 480px;
+    transform: translateY(-50%);
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 58px;
+    line-height: 1.15;
+    color: var(--hd-white);
+    max-width: 720px;
+  }
+  .brand-slide.divider .section-title small {
+    display: block;
+    font-family: var(--hd-font-sans);
+    font-weight: 400;
+    font-size: 20px;
+    color: var(--hd-cream);
+    margin-top: 16px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* ===== Layout 3 — SIDE-PANEL ===== */
+  .brand-slide.sidepanel {
+    background: var(--hd-white);
+    display: flex;
+    flex-direction: row;
+  }
+  .brand-slide.sidepanel .panel {
+    width: 320px;
+    flex-shrink: 0;
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+    padding: 60px 36px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .brand-slide.sidepanel .panel .tag {
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--hd-cream);
+    opacity: 0.7;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .brand-slide.sidepanel .panel .name {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 44px;
+    line-height: 1.1;
+    color: var(--hd-white);
+    margin-top: 12px;
+  }
+  .brand-slide.sidepanel .panel .tagline {
+    font-family: var(--hd-font-serif);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--hd-cream);
+    margin-top: 18px;
+  }
+  .brand-slide.sidepanel .content {
+    flex: 1;
+    padding: 60px 70px 70px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    justify-content: center;
+  }
+  .brand-slide.sidepanel .block { display: flex; flex-direction: column; gap: 12px; }
+  .brand-slide.sidepanel .block .h {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--hd-red-bright);
+    line-height: 1.25;
+  }
+  .brand-slide.sidepanel .bullets li {
+    font-family: var(--hd-font-sans);
+    font-weight: 400;
+    font-size: 22px;
+    line-height: 1.5;
+    color: var(--hd-ink);
+    padding-left: 26px;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  .brand-slide.sidepanel .bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 10px;
+    height: 10px;
+    background: var(--hd-red-bright);
+  }
+  .brand-slide.sidepanel .bullets.sm li { font-size: 19px; margin-bottom: 8px; }
+  .brand-slide.sidepanel .accent { color: var(--hd-red-bright); font-weight: 700; }
+  .brand-slide.sidepanel .callout {
+    background: var(--hd-cream);
+    border-left: 4px solid var(--hd-red-dark);
+    padding: 16px 22px;
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    color: var(--hd-red-bright);
+    font-size: 19px;
+    line-height: 1.45;
+  }
+  .brand-slide.sidepanel .callout .quiet { color: var(--hd-ink); font-weight: 400; font-style: italic; }
+  .brand-slide.sidepanel .big-number {
+    font-family: var(--hd-font-serif);
+    font-weight: 900;
+    font-size: 96px;
+    color: var(--hd-red-bright);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  /* ===== Layout 4 — BORDER ===== */
+  .brand-slide.bordered {
+    background: var(--hd-white);
+    border: 5px solid var(--hd-red-deep);
+    padding: 40px 48px 48px 48px;
+    display: flex;
+    flex-direction: column;
+  }
+  .brand-slide.bordered .title {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 34px;
+    line-height: 1.25;
+    color: var(--hd-red-bright);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+  .brand-slide.bordered .title-note {
+    background: var(--hd-cream);
+    padding: 10px 22px;
+    margin: 0 auto 18px;
+    max-width: 940px;
+    font-family: var(--hd-font-serif);
+    font-style: italic;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--hd-ink);
+    text-align: center;
+  }
+  .brand-slide.bordered .title-note .accent {
+    color: var(--hd-red-bright);
+    font-weight: 700;
+  }
+  .brand-slide.bordered .body {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+    min-height: 0;
+  }
+  .brand-slide.bordered .body.one-col { grid-template-columns: 1fr; }
+  .brand-slide.bordered .body.three-col { grid-template-columns: repeat(3, 1fr); }
+  .brand-slide.bordered .col { display: flex; flex-direction: column; gap: 12px; }
+  .brand-slide.bordered .col-header {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--hd-red-bright);
+    text-align: center;
+    margin-bottom: 2px;
+  }
+  .brand-slide.bordered .card {
+    background: var(--hd-gray-page);
+    border-top: 3px solid var(--hd-red-bright);
+    padding: 12px 16px;
+  }
+  .brand-slide.bordered .card-title {
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--hd-ink);
+    margin-bottom: 4px;
+  }
+  .brand-slide.bordered .card-bullets li {
+    font-family: var(--hd-font-sans);
+    font-size: 13px;
+    line-height: 1.45;
+    color: var(--hd-ink);
+    padding-left: 16px;
+    position: relative;
+    margin-bottom: 2px;
+  }
+  .brand-slide.bordered .card-bullets li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    background: var(--hd-red-bright);
+  }
+
+  /* Recap / comparison table */
+  .brand-slide.bordered table.recap {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    font-family: var(--hd-font-sans);
+    table-layout: fixed;
+  }
+  .brand-slide.bordered table.recap th {
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 10px;
+    word-break: break-word;
+  }
+  .brand-slide.bordered table.recap td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--hd-gray-border);
+    color: var(--hd-ink);
+    word-break: break-word;
+  }
+  .brand-slide.bordered table.recap tr:nth-child(even) td {
+    background: var(--hd-gray-page);
+  }
+  .brand-slide.bordered table.recap td.yes { color: var(--hd-green); font-weight: 600; }
+  .brand-slide.bordered table.recap td.warn { color: var(--hd-orange); font-weight: 600; }
+  .brand-slide.bordered table.recap td.no { color: var(--hd-red-bright); font-weight: 600; }
+
+  /* Mini-prompt block — used inside bordered slides to combine multiple short prompts */
+  .brand-slide.bordered .mini-prompt {
+    display: flex;
+    flex-direction: column;
+    background: #fdfdfb;
+    border: 1px solid var(--hd-gray-border);
+    border-radius: 4px;
+    overflow: hidden;
+    height: 100%;
+    min-height: 0;
+  }
+  .brand-slide.bordered .mini-prompt .mhead {
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+    padding: 7px 12px;
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+  }
+  .brand-slide.bordered .mini-prompt .mhead .mtag {
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    background: var(--hd-cream);
+    color: var(--hd-red-deep);
+    padding: 2px 7px;
+    border-radius: 9px;
+  }
+  .brand-slide.bordered .mini-prompt pre {
+    padding: 10px 12px;
+    font-family: var(--hd-font-mono);
+    font-size: 10.5px;
+    line-height: 1.5;
+    flex: 1;
+    color: var(--hd-ink);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow: hidden;
+  }
+  .brand-slide.bordered .mini-prompt pre.sm { font-size: 11.5px; }
+  .brand-slide.bordered .mini-prompt pre .fill {
+    background: var(--hd-cream);
+    color: var(--hd-red-deep);
+    font-weight: 700;
+    padding: 0 3px;
+    border-radius: 2px;
+  }
+
+  /* ===== Layout 5 — PROMPT (verbatim, monospace) ===== */
+  .brand-slide.prompt {
+    background: var(--hd-white);
+    display: flex;
+    flex-direction: column;
+    padding: 36px 56px 50px;
+  }
+  .brand-slide.prompt .ptitle {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--hd-red-bright);
+    margin-bottom: 12px;
+  }
+  .brand-slide.prompt .pwrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--hd-gray-border);
+  }
+  .brand-slide.prompt .phead {
+    background: var(--hd-red-deep);
+    color: var(--hd-white);
+    padding: 8px 16px;
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .brand-slide.prompt .phead .ptag {
+    font-family: var(--hd-font-sans);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    background: var(--hd-cream);
+    color: var(--hd-red-deep);
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+  .brand-slide.prompt pre {
+    background: #fdfdfb;
+    padding: 14px 18px;
+    font-family: var(--hd-font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--hd-ink);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    flex: 1;
+    overflow: hidden;
+    margin: 0;
+  }
+  .brand-slide.prompt pre.s-sm { font-size: 12px; line-height: 1.5; }
+  .brand-slide.prompt pre.s-xs { font-size: 11px; line-height: 1.45; padding: 12px 16px; }
+  .brand-slide.prompt pre.s-xxs { font-size: 10px; line-height: 1.4; padding: 10px 14px; }
+  .brand-slide.prompt pre .fill {
+    background: var(--hd-cream);
+    color: var(--hd-red-deep);
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 2px;
+  }
+
+  /* Two-prompt variant — side-by-side for merged short prompts */
+  .brand-slide.prompt .pgrid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    min-height: 0;
+  }
+  .brand-slide.prompt .pgrid > .pwrap { height: 100%; }
+
+  /* ===== Layout 6 — IMAGE SHOWCASE (single image, no border, max size) ===== */
+  .brand-slide.image-show {
+    background: var(--hd-white);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 50px 44px;
+    gap: 10px;
+  }
+  .brand-slide.image-show .caption {
+    font-family: var(--hd-font-serif);
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--hd-red-bright);
+    text-align: center;
+  }
+  .brand-slide.image-show .caption .sub {
+    display: block;
+    font-family: var(--hd-font-sans);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 15px;
+    color: var(--hd-ink);
+    margin-top: 4px;
+  }
+  .brand-slide.image-show .image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    overflow: hidden;
+  }
+  .brand-slide.image-show .image img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* Reveal chrome — slide number right-aligned with HDI logo, dimmer, smaller */
+  .reveal .slide-number {
+    background: transparent;
+    color: rgba(189, 1, 41, 0.55);
+    font-family: var(--hd-font-sans);
+    font-weight: 500;
+    font-size: 11px;
+    right: 28px;
+    bottom: 12px;
+    left: auto;
+    top: auto;
+    text-shadow: none;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- 1 — TITLE -->
+<section>
+  <div class="brand-slide title-bleed">
+    <h1>
+      <span class="bold">Prototyping Games</span> <span class="light">with</span> <span class="bold">AI</span>
+    </h1>
+    <p class="subtitle">Turn your wild idea into a playable prototype in 1 day. Even if you can't code.</p>
+    <div class="meta">
+      Huy Dũng (DaveHD)<br>
+      <span class="quiet">huydung.com · 2026</span>
+    </div>
+  </div>
+  <aside class="notes">
+    Open with energy. Hold 3 seconds before speaking. "Until recently, this was impossible. Now it's a Saturday afternoon. Not for big studios — for you. By the end of today, you'll have a playable prototype of your own game idea." Pause. "I'm teaching you a method, not just prompts. The method matters more." Set contract: phones down for 90 minutes, hands on at the end.
+  </aside>
+</section>
+
+<!-- 2 — OLD CONSTRAINT -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">The problem</span>
+        <div class="name">Cost killed ideas</div>
+        <p class="tagline">"Days or weeks per prototype."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <div class="h">Making a prototype used to need</div>
+        <ul class="bullets">
+          <li>Coding</li>
+          <li>A game engine</li>
+          <li>Art &amp; sound</li>
+          <li>Rules balancing</li>
+          <li>Either a unicorn — or a budget</li>
+        </ul>
+      </div>
+      <div class="callout">When prototyping is expensive, <span class="quiet">ideas stay stuck in notebooks.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    What it took: code, engine, art, audio, balance. You needed ALL five. "And in any case, it took time. Days. Or weeks." The cost wasn't hours — it was the chilling effect. Studios went safe: sequels, proven genres. Innovation filtered out. "Who has an idea in a notebook right now you've never tried? Hands up." Pause. That's the cost we remove today.
+  </aside>
+</section>
+
+<!-- 3 — CONSTRAINT COLLAPSED -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Now</span>
+        <div class="name">It collapsed</div>
+        <p class="tagline">"Concept → playable in hours."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <div class="big-number">1 day</div>
+        <div class="h">From idea to playable prototype</div>
+        <ul class="bullets">
+          <li>AI handles the full technical execution</li>
+          <li>You decide if it's fun</li>
+          <li>Discard cheaply if it's not</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    The 30-year constraint just collapsed. AI handles code, graphics, docs, deployment — the full stack. Your job shifts from "executor" to "creative director with taste." Test. Feel if it's fun. Decide if it's worth pursuing BEFORE committing real resources. If not fun: discard cheaply, try the next. That changes everything about what gets built.
+  </aside>
+</section>
+
+<!-- 4 — ALONE vs CHAT vs AGENT -->
+<section>
+  <div class="brand-slide bordered">
+    <h2 class="title">Alone vs AI Chat vs AI Agent</h2>
+    <div class="title-note">
+      The gap between <span class="accent">"AI helps a bit"</span> and <span class="accent">"AI does it"</span> is the whole story.
+    </div>
+    <div class="body one-col">
+      <table class="recap">
+        <colgroup><col style="width:24%"><col style="width:25%"><col style="width:25%"><col style="width:26%"></colgroup>
+        <tr>
+          <th>Task</th>
+          <th>Alone</th>
+          <th>+ AI Chat</th>
+          <th>+ AI Agent</th>
+        </tr>
+        <tr><td>Game design &amp; rules</td><td class="yes">✅ Can do</td><td class="yes">✅ Thinking partner</td><td class="yes">✅ Writes &amp; saves docs</td></tr>
+        <tr><td>Game programming</td><td class="no">❌ Needs coding</td><td class="warn">⚠️ Snippets only</td><td class="yes">✅ End-to-end</td></tr>
+        <tr><td>2D art &amp; sprites</td><td class="no">❌ Needs art skills</td><td class="warn">⚠️ Generates, you place</td><td class="yes">✅ Generate + integrate</td></tr>
+        <tr><td>Animation</td><td class="no">❌ Needs animation</td><td class="no">❌ Cannot produce</td><td class="warn">⚠️ Basic CSS / sprites</td></tr>
+        <tr><td>Sound &amp; music</td><td class="no">❌ Needs audio skills</td><td class="warn">⚠️ Suggests sources</td><td class="warn">⚠️ Sources + wires in</td></tr>
+        <tr><td>Git &amp; deploy</td><td class="no">❌ Needs tech skills</td><td class="warn">⚠️ Explains, you do</td><td class="yes">✅ Commits + deploys</td></tr>
+        <tr><td>Debug &amp; iterate</td><td class="warn">⚠️ Hard to self-fix</td><td class="warn">⚠️ Snippet fixes only</td><td class="yes">✅ Full loop</td></tr>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">
+    Walk each row quickly. Punchline: "Chat AI gives advice — Agent AI does the work." Most have used chat AI. Few have used an agent. That gap is where the magic is. ChatGPT writing a snippet ≠ Codex opening your folder, writing 12 files, running tests, fixing bugs, committing. One is a tutor. The other is a junior dev. We're hiring the junior dev today.
+  </aside>
+</section>
+
+<!-- 5 — METHOD OVERVIEW -->
+<section>
+  <div class="brand-slide bordered">
+    <h2 class="title">The method — 8 phases</h2>
+    <div class="title-note">
+      Skip a phase and you'll pay for it later. <span class="accent">Each one earns its place.</span>
+    </div>
+    <div class="body three-col">
+      <div class="col">
+        <div class="col-header">THINK</div>
+        <div class="card"><div class="card-title">0 · Set up</div><ul class="card-bullets"><li>GitHub · VS Code · AI agent</li></ul></div>
+        <div class="card"><div class="card-title">1 · Idea</div><ul class="card-bullets"><li>10+ ideas, rated</li></ul></div>
+        <div class="card"><div class="card-title">2 · GDD</div><ul class="card-bullets"><li>Design doc + wireframe</li></ul></div>
+      </div>
+      <div class="col">
+        <div class="col-header">PLAN</div>
+        <div class="card"><div class="card-title">3 · TDD</div><ul class="card-bullets"><li>Engineering rules baked in</li></ul></div>
+        <div class="card"><div class="card-title">4 · Plan</div><ul class="card-bullets"><li>2–4 milestones</li></ul></div>
+      </div>
+      <div class="col">
+        <div class="col-header">BUILD</div>
+        <div class="card"><div class="card-title">5 · Build</div><ul class="card-bullets"><li>Milestone by milestone</li></ul></div>
+        <div class="card"><div class="card-title">6 · Bugs</div><ul class="card-bullets"><li>Screenshots + console</li></ul></div>
+        <div class="card"><div class="card-title">7 · Iterate</div><ul class="card-bullets"><li>Features + docs in sync</li></ul></div>
+        <div class="card"><div class="card-title">8 · Ship</div><ul class="card-bullets"><li>Live GitHub Pages link</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    Three groups: Think, Plan, Build. The biggest mistake is going straight to "code something." Fails because AI without a target is fast but wrong. Think tells AI WHAT. Plan tells AI HOW. Build is then almost easy. Skip 0–4: triple time in phase 5 going in circles. Each phase has copy-paste prompts — they're not magic, they're checklists that force slowdown where it matters.
+  </aside>
+</section>
+
+<!-- 6 — DIVIDER 0 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">0</div>
+    <h2 class="section-title">Set up your tools<small>one-time pain</small></h2>
+  </div>
+  <aside class="notes">
+    Phase 0 is boring. Do it once. Never again. "This is the only phase that's not fun. Push through." Three things: a place to store code, an editor, an AI agent. That's it.
+  </aside>
+</section>
+
+<!-- 7 — 3 TOOLS -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 0</span>
+        <div class="name">3 tools</div>
+        <p class="tagline">"Install once. Use forever."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li><span class="accent">GitHub</span> — store, version, free hosting</li>
+          <li><span class="accent">VS Code</span> — edit, search, manage git</li>
+          <li><span class="accent">One AI coding agent</span> — Claude, Codex, or Gemini</li>
+        </ul>
+      </div>
+      <div class="callout">~$20/month for any one of them. <span class="quiet">Plus / Pro tier — ~500K VND.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    GitHub — sign up, create a PUBLIC repo. Public matters because GitHub Pages hosting is free for public. VS Code — install. Mostly let AI write code, but VS Code is where you do quick text-search-and-replace across files. Pick ONE agent. Don't pick three. Get fluent. Switch later if needed. $20/month is the entry ticket — free tiers run out fast.
+  </aside>
+</section>
+
+<!-- 8 — AGENT COMPARISON -->
+<section>
+  <div class="brand-slide bordered">
+    <h2 class="title">Which AI agent?</h2>
+    <div class="title-note">
+      Mid-2026. <span class="accent">Pick what you already have</span> — the prompts work across all three.
+    </div>
+    <div class="body one-col">
+      <table class="recap">
+        <colgroup><col style="width:22%"><col style="width:26%"><col style="width:26%"><col style="width:26%"></colgroup>
+        <tr>
+          <th>Aspect</th>
+          <th>Claude Desktop</th>
+          <th>ChatGPT Codex</th>
+          <th>Gemini Antigravity</th>
+        </tr>
+        <tr><td>Sign-up in VN</td><td class="warn">⚠️ Blocks VN phones</td><td class="yes">☑️ Easy</td><td class="yes">✅ Already have it</td></tr>
+        <tr><td>Code &amp; reasoning</td><td class="yes">✅ Strongest</td><td class="yes">✅ Strong for games</td><td>☑️ Solid</td></tr>
+        <tr><td>Image generation</td><td class="warn">⚠️ None built-in</td><td class="yes">✅ Yes</td><td class="yes">✅ Yes</td></tr>
+        <tr><td>Video / music</td><td class="warn">⚠️ None</td><td class="warn">⚠️ None</td><td class="yes">✅ Veo · Lyria</td></tr>
+        <tr><td>Connects to apps</td><td class="yes">✅ MCP, Office</td><td>☑️ MCP, plugins</td><td class="yes">✅ Native Google apps</td></tr>
+        <tr><td>Bundled perks</td><td>None</td><td class="yes">✅ Free Plus month</td><td class="yes">✅ YouTube Premium · 5TB Drive</td></tr>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">
+    Honest takes: Gemini Antigravity shines during planning (Canvas to draft GDD/TDD/plan live; export when happy) and has best bundled value. Codex is standout for executing — capable coder, game-studio plugin for sprites, free Plus month to try. Claude is strongest for pure reasoning and writing; Cowork mode adds non-coding tasks. No preference? Start with Codex for the free month. Have Claude? Stick with it. Have Google One? Gemini is a no-brainer.
+  </aside>
+</section>
+
+<!-- 9 — IMAGE: agent interface -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">The agent interface looks like chat — but it's much more
+      <span class="sub">Give it a local folder, set permissions, pick the right model. This is Codex.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/agent-interface.png" alt="Codex agent interface"></div>
+  </div>
+  <aside class="notes">
+    What looks like a chat window is actually a desktop agent with file system access. Key things: give it a folder, set permission level (read-only / ask-each-time / auto), pick a model. That's it. Once configured, it can read files, write files, run terminal commands. Codex shown here. Claude Desktop and Gemini Antigravity look similar conceptually.
+  </aside>
+</section>
+
+<!-- 10 — PICK THE MODEL -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 0</span>
+        <div class="name">Pick the model</div>
+        <p class="tagline">"Bigger isn't always better."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li><span class="accent">Brainstorm:</span> mid / creative model</li>
+          <li><span class="accent">Tech design &amp; plan:</span> highest, max thinking</li>
+          <li><span class="accent">Coding:</span> start mid, escalate only if stuck</li>
+        </ul>
+      </div>
+      <div class="callout">Top models over-optimize for logic, <span class="quiet">and under-deliver on creativity.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    Counter-intuitive: strongest model is not always best. For brainstorming, top models over-optimize for logic and under-deliver on creativity. Mid models give wilder, more usable ideas. For tech design and planning: strongest model, max thinking. For coding: start mid. Works fine for simple prototypes. Escalate only when you genuinely can't get the result. Reason: cost and speed. Strongest burns tokens 5x faster.
+  </aside>
+</section>
+
+<!-- 11 — DIVIDER 1 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">1</div>
+    <h2 class="section-title">Find the idea<small>The best one still comes from you</small></h2>
+  </div>
+  <aside class="notes">
+    Big shift in mindset. AI does NOT come up with your idea. AI helps you EXTRACT your idea. Use it as a thinking partner. Force it to ask YOU questions before proposing. The best ideas live in your head — AI is a mirror, not a source.
+  </aside>
+</section>
+
+<!-- 12 — PHASE 1 RULES -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 1</span>
+        <div class="name">Rules</div>
+        <p class="tagline">"Constraints unlock creativity."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>Use a <span class="accent">creative (mid-tier) model</span>, in English</li>
+          <li>State <span class="accent">who plays</span> — first</li>
+          <li>Make AI <span class="accent">ask you questions</span></li>
+          <li>Get <span class="accent">10+ ideas</span> with rated annotations</li>
+          <li>Discuss until <span class="accent">clear favorite</span></li>
+        </ul>
+      </div>
+      <div class="callout">If AI jumps straight to answers, <span class="quiet">you skipped a step. Go back.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    Audience first. Kids vs puzzle fans → wildly different ideas. Make AI ask clarifying questions BEFORE proposing. If it jumps to answers, stop it. 10+ ideas with annotated ratings (Innovativeness, Mobile fit, Mechanic clarity, Feasibility in hours, Player appeal). Why ratings? Forces concreteness, lets you compare objectively. Discuss back and forth. Reject. Ask for more. Don't settle.
+  </aside>
+</section>
+
+<!-- 13 — PROMPT: Brainstorm OPEN -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Brainstorm prompt A — open (no fixed theme)</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Brainstorm — open</span><span class="ptag">PHASE 1 · CHAT AI</span></div>
+<pre class="s-xs">I want to prototype a game. Help me find ONE creative, fun game idea worth building.
+
+The game is for this audience (the people who'll play it): <span class="fill">[DESCRIBE PLAYERS — e.g. "casual mobile players", "kids 8–12", "puzzle fans"]</span>.
+
+Let's brainstorm together — ask me clarifying questions first if anything is vague, don't jump straight to answers.
+
+Constraints for the idea:
+- Must play well on BOTH desktop and mobile (fun with touch / tap / swipe)
+- ONE interesting, reasonably innovative core mechanic — not a clone
+- Small enough to prototype in a few hours (a vertical slice, not a full game)
+
+My hobbies / interests to draw from (optional): <span class="fill">[FILL IN — e.g. Poker, Pool, Piano, Origami — or delete this line]</span>
+
+When I say "ready", present at least 10 ideas as a numbered list. For each idea:
+- One short paragraph describing the gameplay clearly and concretely (what the player does, what the game responds with, what makes it fun — no inspirational fluff, just how it actually plays).
+- Annotated ratings: Innovativeness · Mobile fit · Mechanic clarity · Feasibility (hrs) · Player appeal — each rated Low/Med/High with one phrase of reasoning.
+
+Then call out your top 3 picks with one sentence on why each is a strong prototype for this audience.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Read the prompt aloud once, fast. Then highlight: (1) "ask me clarifying questions first" — the magic words, (2) the two FILL-IN brackets — fill them carefully, (3) the rating dimensions force AI to be concrete. Tell them: copy from the checklist on huydung.com, don't retype.
+  </aside>
+</section>
+
+<!-- 14 — PROMPT: Brainstorm THEMED -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Brainstorm prompt B — themed (AI researches first)</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Brainstorm — with a theme</span><span class="ptag">PHASE 1 · CHAT AI</span></div>
+<pre class="s-xs">I want to prototype a game built around a specific theme. Help me find ONE creative, fun idea worth building.
+
+The game is for this audience (the people who'll play it): <span class="fill">[DESCRIBE PLAYERS — e.g. "casual mobile players", "fans of the theme", "kids 8–12"]</span>.
+
+Theme: <span class="fill">[STATE YOUR THEME — e.g. "Dragon Mania Legends", "Vietnamese folk tales", "outer space"]</span>.
+
+First, RESEARCH the theme so the ideas feel authentic:
+- Look up the theme's signature elements, characters, mechanics, tone, and visual identity.
+- Summarize back to me, in a short list, the 5–8 most distinctive things about it that a game could build on.
+
+Then brainstorm with me. Ask clarifying questions if needed. Each idea must:
+- Stay true to the theme's identity
+- Play well on BOTH desktop and mobile (fun with touch / tap / swipe)
+- Have ONE interesting, reasonably innovative core mechanic — not a clone
+- Be small enough to prototype in a few hours (a vertical slice)
+
+When I say "ready", present at least 10 theme-based ideas as a numbered list. For each idea:
+- One short paragraph describing the gameplay clearly and concretely.
+- Annotated ratings: Innovativeness · Mobile fit · Mechanic clarity · Feasibility (hrs) · Theme authenticity · Player appeal — each Low/Med/High with one phrase of reasoning.
+
+Then call out your top 3 picks with one sentence on why each is a strong prototype that fits the theme and this audience.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Difference vs Prompt A: AI RESEARCHES the theme first and summarizes 5–8 distinctive elements before brainstorming. Without that, themed brainstorms produce generic ideas with a thin coat of paint. Plus a "theme authenticity" rating column so off-theme ideas get flagged. Examples: "Dragon Mania Legends", "Vietnamese folk tales", "outer space."
+  </aside>
+</section>
+
+<!-- 15 — IMAGE: brainstorm output -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Example brainstorm output
+      <span class="sub">Claude in normal chat mode. It's a bit of an overkill 😆</span>
+    </div>
+    <div class="image"><img src="game-proto-images/brainstorm-output.png" alt="Brainstorm output"></div>
+  </div>
+  <aside class="notes">
+    What the output actually looks like. Every idea has the rating dimensions called out. You can scan and compare. The format forces a level of rigor that makes the next decision (pick one) actually possible.
+  </aside>
+</section>
+
+<!-- 16 — DIVIDER 2 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">2</div>
+    <h2 class="section-title">Lock the design<small>Write the GDD</small></h2>
+  </div>
+  <aside class="notes">
+    Biggest time-saver in the workflow. Nail the mechanic in plain words BEFORE any code exists. Sounds boring. Saves 5 hours later. Changing design after coding costs 10x more than on paper.
+  </aside>
+</section>
+
+<!-- 17 — GDD RULES -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 2</span>
+        <div class="name">GDD rules</div>
+        <p class="tagline">"Design only. Under 2 pages."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>Core mechanic in <span class="accent">one sentence</span></li>
+          <li>Labelled <span class="accent">wireframe</span> of main screen</li>
+          <li>Define the <span class="accent">vertical slice</span></li>
+          <li>Write the <span class="accent">non-goals</span></li>
+          <li>Every rule implementable by a stranger</li>
+          <li>No file names, code, formulas, configs</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    Core mechanic in ONE sentence you can say out loud. If you can't, keep refining. Wireframe surfaces layout problems BEFORE any code. Vertical slice = smallest thing that proves the mechanic is fun. Non-goals matter as much as goals — prevent scope creep. "Implementable by a stranger" is the test. Keep GDD under 2 pages — prototype, not a commercial doc.
+  </aside>
+</section>
+
+<!-- 18 — PROMPT: GDD -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">The GDD prompt — generates gdd.md + wireframe</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Generate gdd.md</span><span class="ptag">PHASE 2 · CHAT AI</span></div>
+<pre class="s-xs">Let's lock the design for <span class="fill">[GAME NAME / chosen idea]</span>. Write a PROTOTYPE GDD as a Markdown file: gdd.md
+
+Rules:
+- This is a PROTOTYPE design doc, not a commercial GDD. Keep it lean — aim for under ~2 pages.
+- Pure design only. NO technical content (no file names, no code, no formulas, no configs) — that goes in the TDD.
+- Structure: Pitch · Design Pillars (2–4) · Core Mechanic · Core Loop · Rules · Controls (mobile + desktop) · UI layout/elements · UX flow · Win/Lose · In-Scope (vertical slice) · Non-Goals.
+- Every rule must be unambiguous enough that a coder who never spoke to me could implement it.
+- Where a number matters (turn limit, hand size, timing window), state it — but keep it in plain language, not code.
+
+Also produce a VISUAL MOCKUP of the main gameplay screen: a clean labelled wireframe (inline SVG or simple HTML/CSS in an artifact) showing where the play area, controls, HUD/score, and key UI elements sit. Keep it schematic, not polished art.
+
+Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Use Gemini Canvas to draft this LIVE — edit as you chat. Save as gdd.md when happy. The wireframe is the secret weapon — layout problems become visible before any code exists. If something looks wrong in the wireframe, fix the GDD now. Changing layout after coding costs 10x. The "ask up to 3 questions BEFORE writing" cue is critical — don't let AI skip it.
+  </aside>
+</section>
+
+<!-- 19 — IMAGE: GDD example -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">A GDD example
+      <span class="sub">Preview in the agent app or VS Code. The wireframe pairs with the doc.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/gdd-example.png" alt="GDD example in the editor"></div>
+  </div>
+  <aside class="notes">
+    What a real GDD looks like once written. Note: it's lean. Two pages or so. The wireframe and the doc move together — if you tweak the layout in the wireframe, mirror that in the doc. The single most expensive mistake is letting them drift.
+  </aside>
+</section>
+
+<!-- 20 — DIVIDER 3 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">3</div>
+    <h2 class="section-title">Write the TDD<small>Engineering rules, baked in</small></h2>
+  </div>
+  <aside class="notes">
+    Where most people fail. Generic "technical design document" gives bland output. The trick: hand AI YOUR engineering constraints. The key principles below turn a sloppy AI codebase into a maintainable one. Steal them.
+  </aside>
+</section>
+
+<!-- 21 — TDD KEY PRINCIPLES (merged 21+22) -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 3</span>
+        <div class="name">TDD principles</div>
+        <p class="tagline">"What turns AI code into maintainable code."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets sm">
+          <li><span class="accent">Centralized config + zero magic numbers</span> — non-coders can tweak &amp; playtest</li>
+          <li><span class="accent">Self-documenting config</span> — every key has a comment + sensible range</li>
+          <li><span class="accent">Separation of concerns</span> — states, physics, UI decoupled</li>
+          <li><span class="accent">Commit after every turn</span> — build check + conventional message</li>
+          <li><span class="accent">Tests every turn</span> — AI fixes failures before reporting back</li>
+          <li><span class="accent">Logging + non-coder comments</span> — debug easily, modify safely</li>
+          <li><span class="accent">Canvas-only rendering</span> — HTML is just a container</li>
+          <li><span class="accent">Senior-dev voice</span> — guidance for juniors, not implementation detail</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    Walk through these but quickly. The TWO that matter most: centralized config + zero magic numbers — once those land, non-coders can tweak the game without touching code. Tests every turn means broken changes never reach you. Commit after every turn means easy rollback. Canvas-only stops AI from polluting HTML with positioning hacks. Senior-dev voice keeps the TDD readable: a roof structure, not a cabinet of details.
+  </aside>
+</section>
+
+<!-- 22 — PROMPT: TDD (verbatim) -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">The TDD prompt — all principles baked in</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Generate tdd.md</span><span class="ptag">PHASE 3 · AGENT</span></div>
+<pre class="s-xxs">Put on the Game Architect hat. Create tdd.md (Technical Design Document) for this prototype, based on gdd.md.
+
+Move ALL technical content here: architecture, code conventions, math/formulas, and the full list of tunable configs.
+
+The TDD MUST explicitly encode these requirements:
+1. Single centralized configuration file. ALL mechanical, physical, and rules-based constants live in one dedicated config file (e.g. src/config.js) so non-coders can tweak and playtest.
+2. Zero Magic Numbers. No pixel dimensions, speeds, friction, colors, or turn limits hardcoded in game loop, physics, or render files.
+3. Self-documenting config. Every config key has a natural-language comment explaining what it changes and its recommended range.
+4. Maximum separation of concerns — decoupled source files between game states, physics, ui, etc.
+6. Commit after every turn. On completing a request: run a local compile/build check, and if it passes, do a Git commit with a clear conventional message (feat:/fix:/chore:/test:). If the build fails, fix it first.
+7. Automated workspace diagnostics. Before reporting done, verify the local dev server is running; if not, start it. Note any sandbox limitation that blocks running the server/tests locally and tell me to run it on my machine instead.
+8. Health &amp; compilation check. Confirm the build compiles cleanly with no errors before reporting success.
+9. Logging. Add log messages with essential info at all key interactions for easy debugging.
+10. Comments for non-coders. Add enough code comments to guide a non-coder on how to modify important behavior.
+11. Tests. Write a test suite for all logic-based code and run it every turn. Update tests for each new feature or design change.
+12. ALL UI elements, game characters, event handlers, etc. must be created inside the Canvas. The html is purely a container. Do not put any logic or visuals in html.
+
+IMPORTANT: The TDD should be concise, clear, but not too detailed. It should confirm the overall architecture, and is a doc written by senior developers as GUIDANCE for junior devs to implement, but do not go into actual implementation itself. Ask me about my game's specific layers/mechanic if you need to before finalizing.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    The longest prompt in the workflow — every rule earns its place. Read aloud the headlines (1, 2, 4, 6, 11, 12) and skip the rest unless asked. Land the closing: "guidance for juniors" — not implementation. The TDD is a roof structure. The build phase fills it in.
+  </aside>
+</section>
+
+<!-- 23 — IMAGE: TDD -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">A real TDD inside Codex
+      <span class="sub">Preview in the agent app or VS Code — both work.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/tdd.png" alt="TDD preview"></div>
+  </div>
+  <aside class="notes">
+    What a TDD looks like when generated this way. Notice the config section near the top — every constant exposed, every comment explaining what it does. That's the contract that lets non-coders tweak the game without touching code.
+  </aside>
+</section>
+
+<!-- 24 — DIVIDER 4 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">4</div>
+    <h2 class="section-title">Build plan<small>2 to 4 milestones</small></h2>
+  </div>
+  <aside class="notes">
+    Split build into stages — each ends in something playable. Without milestones, AI tries to build the whole game in one shot and you get a broken mess at 80%. With milestones, working foundation before adding complexity.
+  </aside>
+</section>
+
+<!-- 25 — MILESTONE STRUCTURE -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 4</span>
+        <div class="name">Split it right</div>
+        <p class="tagline">"By the mechanic, not a template."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li><span class="accent">M1 · Foundation</span> — scaffold, config, scene laid out</li>
+          <li><span class="accent">M2 · Core mechanic</span> — the ONE thing that makes it fun</li>
+          <li><span class="accent">M3 · Win/lose + ship</span> — rules wrapped, deployed</li>
+        </ul>
+      </div>
+      <div class="callout">No "polish pass" milestone. <span class="quiet">Every milestone delivers real functionality.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    M1 = static foundation: scaffold, centralized config, scene laid out, HUD placeholders, clean modules. Runs and looks right; core interaction not live. M2 = core mechanic end-to-end: input, simulation, feedback. The milestone that proves the idea. M3 = rules, win/lose, full loop, deploy to GitHub Pages. Adapt — simple game = M1 + M2 only. Never a "polish" milestone. Each ends with a user-facing test checklist + copy-paste agent prompt.
+  </aside>
+</section>
+
+<!-- 26 — PROMPT: plan.md -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">The plan.md prompt — 2–4 meaningful milestones</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Generate plan.md</span><span class="ptag">PHASE 4 · AGENT</span></div>
+<pre class="s-xs">Put on the Tech Lead hat. Create plan.md — a build plan with 2 to 4 milestones.
+
+Important: the milestones must be split MEANINGFULLY around THIS game's own mechanic — not a generic template. Read gdd.md and tdd.md, then divide the work into functional layers that each build on the previous one and each end in something I can actually play or test. As a rough guide (adapt to the game):
+- Milestone 1 is usually the static foundation: scaffold, centralized config, the scene/board/world laid out correctly, HUD placeholders, clean module boundaries. It runs and looks right; the core interaction isn't live yet.
+- Milestone 2 is usually the core mechanic itself — the ONE thing that makes the game fun, working end-to-end (input → simulation/logic → feedback). This is the milestone that proves the idea.
+- Milestone 3 (if needed) is usually the rules, win/lose, and full game loop wrapped around that mechanic, plus a GitHub Pages deploy so it's shareable. Skip this if the game is simple enough that it can be included in Milestone 2.
+Tell me your reasoning for the split before listing the details. Do NOT make the last milestone a generic "polish" pass; every milestone must deliver real functionality.
+
+Each milestone must include:
+(a) a short scope paragraph,
+(b) a checklist of things to test FROM THE END-USER's perspective,
+(c) a single copy-paste prompt for the local AI coding agent — and that prompt must explicitly remind the user to run the test checklist.
+
+Follow tdd.md for all conventions. Write plan.md now. Then summarize back in chat the list of milestones, its main scope, and your reasoning.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Two non-negotiables: (1) "Tell me your reasoning for the split before listing details" — forces AI to explain its mental model before going deep, (2) end-user-perspective test checklist. "The ball bounces off walls" is a player test. "The physics engine initialized" is not. If you can't describe what to test in plain terms, the milestone scope is too vague.
+  </aside>
+</section>
+
+<!-- 27 — IMAGE: build plan -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">A plan.md example
+      <span class="sub">Player-perspective test checklists at the end of each milestone.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/build-plan.png" alt="plan.md example"></div>
+  </div>
+  <aside class="notes">
+    Notice each milestone has its OWN agent prompt baked in. You don't have to re-prompt for the next milestone — copy the one from plan.md. AI gave it to itself. That's the leverage.
+  </aside>
+</section>
+
+<!-- 28 — DIVIDER 5 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">5</div>
+    <h2 class="section-title">Build<small>Milestone by milestone</small></h2>
+  </div>
+  <aside class="notes">
+    Switch tools. Out of chat AI. Into the agent. Agent reads, writes, runs files directly. Where the fun starts.
+  </aside>
+</section>
+
+<!-- 29 — GIT DISCIPLINE -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 5 · setup</span>
+        <div class="name">Git habit</div>
+        <p class="tagline">"Set it once, save yourself forever."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <div class="h">Run this once, early</div>
+        <ul class="bullets">
+          <li>Init repo, commit current files</li>
+          <li><span class="accent">After every turn:</span> build check → commit</li>
+          <li>If build fails: fix before committing</li>
+          <li>If design shifts: <span class="accent">update GDD/TDD live</span></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    Run this ONCE, early. Sets a meta-rule for every future turn. From now on: build check → conventional commit (feat:/fix:/chore:/test:). If build fails, fix before replying. Critical: if instructions change game design vs gdd.md/tdd.md, update those docs live. Docs are AI's memory. Stale docs = hallucinations next session.
+  </aside>
+</section>
+
+<!-- 30 — PROMPT: init git -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Set the git + commit habit</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Initialize git + commit habit</span><span class="ptag">PHASE 5 · AGENT</span></div>
+<pre class="s-sm">Initialize a git repo and commit all current files in this folder.
+
+From now on, in ALL of our conversations, after each turn:
+- Run a build/compile check; if it passes, commit all changes with a clear, concise, conventional message (feat:/fix:/chore:/test:)
+- If the build fails, fix it before answer back and committing.
+- If you notice a change in game design or technical direction in my instructions compared to the gdd.md or tdd.md — update those files to sync with latest information</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Short prompt. Big impact. Sets the contract for every future turn. AI commits its own work, fixes its own breakages, keeps docs current. This is the moment you go from "chat helper" to "junior dev with git discipline." Don't skip it.
+  </aside>
+</section>
+
+<!-- 31 — BUILD LOOP -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 5 · loop</span>
+        <div class="name">Build loop</div>
+        <p class="tagline">"Talk to it like a developer."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>Run milestone prompt → <span class="accent">do the test checklist</span></li>
+          <li>Converse: say what to change</li>
+          <li>Tweak config yourself in VS Code</li>
+          <li>After milestone: <span class="accent">refresh docs</span></li>
+          <li>Stay in session while in flow</li>
+          <li>Fresh session when AI loops or gets confused</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    Treat agent like a junior dev. Say what — let it implement how. After each milestone prompt, DO the test checklist yourself. You're the QA. VS Code open: tweak config values directly when AI is slow on small things. After each milestone: refresh docs. Stay in session while in flow. Start fresh ONLY when AI loops or you're shifting topics. Always paste current docs at the start of new session.
+  </aside>
+</section>
+
+<!-- 32 — PROMPT: run milestone -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Run a milestone</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Run a milestone</span><span class="ptag">PHASE 5 · AGENT</span></div>
+<pre class="s-sm">We are building <span class="fill">[GAME NAME]</span>. Read gdd.md, tdd.md, and plan.md first.
+
+Execute Milestone <span class="fill">[1 / 2 / 3]</span> from plan.md, following every convention in tdd.md (centralized config, zero magic numbers, separation of concerns, incremental edits, logging, comments, tests, commit-after-turn).
+
+Work in small testable steps. When done, verify that the game is runnable and accessible via an URL, create and run tests on the logic parts, report the results.
+
+After everything is done, show user both the URL to test the game AND the list of things to verify on their end, for this milestone.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Start every milestone with this. The "Read gdd.md, tdd.md, plan.md first" cue is mandatory — otherwise AI starts cold and misses conventions. The "show me a URL + verification list" close means you can play the result immediately. That's the loop. Run, play, give feedback, repeat.
+  </aside>
+</section>
+
+<!-- 33 — IMAGE: milestone 1 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Milestone 1 — agent builds the foundation
+      <span class="sub">Scaffold, config, scene laid out. The game runs but mechanic isn't live yet.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/milestone1.png" alt="Milestone 1 session"></div>
+  </div>
+  <aside class="notes">
+    A real session. Agent reads docs, writes files, runs tests, opens a browser to verify, summarizes. Watch. Jump in only when you see it heading the wrong way. Otherwise: hands off, eyes on. The milestone-1 deliverable is "it runs and looks right" — not "it plays."
+  </aside>
+</section>
+
+<!-- 34 — IMAGE: milestone 2 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Milestone 2 — the core mechanic working
+      <span class="sub">Input → simulation → feedback. The milestone that proves the idea.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/milestone2.png" alt="Milestone 2 session"></div>
+  </div>
+  <aside class="notes">
+    Milestone 2 is where the magic happens. The core loop is alive. You play it. You feel whether it's fun. This is the moment the prototype answers its only real question: "Is this idea worth pursuing?" Yes → continue. No → discard cheaply. Either answer was worth getting.
+  </aside>
+</section>
+
+<!-- 35 — IMAGE: auto-test breakage -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">The test suite catches its own regressions
+      <span class="sub">When AI breaks something, the suite tells AI — AI fixes it before reporting back.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/auto-test-identify-breaking-change.png" alt="Test suite identifying breaking change"></div>
+  </div>
+  <aside class="notes">
+    This is the test rule from the TDD paying off. The suite runs every turn. When a change breaks logic, the suite fails. AI sees the failure. AI fixes. AI re-runs. Only THEN reports back. You never see the in-between state. That's how a real dev workflow feels — and now your prototype has it.
+  </aside>
+</section>
+
+<!-- 36 — DIVIDER 6 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">6</div>
+    <h2 class="section-title">Fix bugs smart<small>Evidence beats words</small></h2>
+  </div>
+  <aside class="notes">
+    Iteration is normal. Even human devs don't get it right in one shot. Give AI the right EVIDENCE. Words alone are too vague. Show, don't tell. Three prompts on the next slide — match the prompt to the bug type.
+  </aside>
+</section>
+
+<!-- 37 — MERGED: Three bug prompts verbatim -->
+<section>
+  <div class="brand-slide bordered">
+    <h2 class="title">Three bug prompts</h2>
+    <div class="title-note">
+      Match the prompt to the bug type. <span class="accent">Evidence in, fix out.</span>
+    </div>
+    <div class="body three-col">
+      <div class="col">
+        <div class="mini-prompt">
+          <div class="mhead"><span>📷 Visual / UI bug</span><span class="mtag">PHASE 6</span></div>
+<pre>Here's a visual/UI bug. <span class="fill">[ATTACH SCREENSHOT]</span>
+
+What's wrong: <span class="fill">[DESCRIBE what you see vs. what you expect]</span>
+
+Find the cause, fix it via the centralized config or the render layer (not by hardcoding), keep the fix incremental, then tell me exactly what you changed and which config value I can tweak to adjust it further.</pre>
+        </div>
+      </div>
+      <div class="col">
+        <div class="mini-prompt">
+          <div class="mhead"><span>🪵 Logic bug</span><span class="mtag">PHASE 6</span></div>
+<pre>Here's a logic bug. Console output below. <span class="fill">[PASTE the full console log from F12 → Console]</span>
+
+What happened: <span class="fill">[DESCRIBE the wrong behavior]</span>
+What I expected: <span class="fill">[DESCRIBE correct behavior]</span>
+
+Diagnose the root cause, add temporary debug logs if helpful, fix it incrementally, update the relevant test, and explain the fix in plain language.</pre>
+        </div>
+      </div>
+      <div class="col">
+        <div class="mini-prompt">
+          <div class="mhead"><span>🧭 Stuck — diagnose first</span><span class="mtag">PHASE 6</span></div>
+<pre>We've been stuck on this bug for a while. Don't patch blindly.
+
+First, review the relevant code end-to-end and explain to me, in plain language, the full flow of how <span class="fill">[FEATURE]</span> is supposed to work. Then point to where the flow breaks. Wait for my confirmation before changing anything.</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    Three prompts side by side — pick the one that matches your bug. Visual: screenshot. Words alone don't convey layout problems. "Not by hardcoding" is the critical rule — fix via config or render layer. Logic: F12 Console, paste FULL log, never summarize. Tell AI to update the relevant test so the bug never comes back. Stuck: when AI is on attempt #4, force a re-think. AI explains the flow; you spot the gap. Often the bug is in AI's mental model, not the code.
+  </aside>
+</section>
+
+<!-- 38 — IMAGE: debug 1 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">DevTools console + screenshot
+      <span class="sub">Two killer tools. Most logic bugs land here.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/debug.png" alt="DevTools console"></div>
+  </div>
+  <aside class="notes">
+    Screenshot + console log unlock 90% of debug sessions. F12 opens DevTools. Console tab. Paste the FULL log, not a summary. The trace is what AI needs to find the root cause.
+  </aside>
+</section>
+
+<!-- 39 — IMAGE: debug 2 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Tracing a logic bug
+      <span class="sub">Sometimes the unblock is a sharp human observation, not AI.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/debug2.png" alt="Tracing a logic bug"></div>
+  </div>
+  <aside class="notes">
+    The remaining 10% — those are the ones where a human notices "wait, the ball should be ABOVE the paddle, not below" and AI just couldn't see it. Trust your eyes. AI is fast but not always wise.
+  </aside>
+</section>
+
+<!-- 40 — DEBUG MINDSET -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 6</span>
+        <div class="name">Debug mindset</div>
+        <p class="tagline">"Watch the thinking."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>Watch AI's reasoning — <span class="accent">stop early if wrong</span></li>
+          <li>Tell it to add debug logs when bugs are subtle</li>
+          <li>Fresh session if stuck for a while</li>
+          <li>Human observation still wins sometimes</li>
+        </ul>
+      </div>
+      <div class="callout">Two killer tools: <span class="quiet">screenshots and console logs.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    Watch AI think. Heading wrong way? Stop early. Saves tokens and time. Both Claude and Codex show reasoning traces — read them. Tell AI to add temporary debug logs when bugs are subtle. Stuck for 30+ minutes? Fresh session. Old session has accumulated wrong assumptions.
+  </aside>
+</section>
+
+<!-- 41 — DIVIDER 7 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">7</div>
+    <h2 class="section-title">Iterate<small>Features &amp; docs in sync</small></h2>
+  </div>
+  <aside class="notes">
+    Prototype is never done in one pass. Core loop works — now iterate. Add. Tweak. Try. Docs are AI's memory; keep them in sync after each meaningful change.
+  </aside>
+</section>
+
+<!-- 42 — ITERATE RULES -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 7</span>
+        <div class="name">Iterate rules</div>
+        <p class="tagline">"One feature. Propose first."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li><span class="accent">One feature at a time</span> — AI proposes before coding</li>
+          <li>Run <span class="accent">parallel agents</span> on independent tasks</li>
+          <li>Refresh docs after meaningful changes</li>
+          <li>Fresh session when AI loops — paste docs first</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    One feature at a time. AI proposes implementation BEFORE coding — flags risks, lists files. You say go. Parallel agents: independent tasks (1 on images, 1 on UI bug, 1 on new mechanic) — saves time. Keep isolated. Refresh docs whenever a decision changes how the game works. Fresh session when AI loops — always paste current docs first.
+  </aside>
+</section>
+
+<!-- 43 — MERGED: Add feature + Keep docs (was 45+46) -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Two iterate prompts — add a feature · refresh the docs</div>
+    <div class="pgrid">
+      <div class="pwrap">
+        <div class="phead"><span>PROMPT · Add a new feature</span><span class="ptag">PHASE 7 · AGENT</span></div>
+<pre class="s-sm">Read the current docs (gdd.md, tdd.md, plan.md).
+
+I want to add this feature: <span class="fill">[DESCRIBE the feature clearly — what the player does, what the game responds with]</span>
+
+Before coding: propose how you'd implement it, what files you'd touch, and flag any risks. Wait for my go-ahead before writing any code.</pre>
+      </div>
+      <div class="pwrap">
+        <div class="phead"><span>PROMPT · Keep docs up to date</span><span class="ptag">PHASE 7 · AGENT</span></div>
+<pre class="s-sm">Review the current state of the code and update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed along the way. Keep each doc concise — remove anything that's no longer accurate, add anything that's now true. Commit the updated docs.</pre>
+      </div>
+    </div>
+  </div>
+  <aside class="notes">
+    Two prompts side by side. Left: "propose before coding" — magic phrase. AI tells you the approach + risks; you sanity-check; one round of conversation is cheaper than 10 rounds of refactor. Right: run this every few hours or after each milestone. Docs are AI's memory. Stale docs = wrong assumptions next session. Concise — remove what's no longer true.
+  </aside>
+</section>
+
+<!-- 44 — BEYOND CODE -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 7</span>
+        <div class="name">Beyond code</div>
+        <p class="tagline">"AI is not just for coding."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li><span class="accent">Scrape</span> reference sites for assets</li>
+          <li><span class="accent">Generate sprites</span> (Codex game-studio plugin)</li>
+          <li>Remove image backgrounds, resize, flip</li>
+          <li>Find assets in folders of <span class="accent">thousands of files</span></li>
+          <li>Even build full <span class="accent">game editors</span></li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    From my own projects: AI scraped dragon images from a reference site, generated ship sprites, removed backgrounds, resized assets in seconds, even built me a full game editor. The shift: stop thinking "coder," start thinking "teammate who can do most digital tasks." Throughput jumps.
+  </aside>
+</section>
+
+<!-- 45 — IMAGE: generate-images -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Generate game sprites
+      <span class="sub">Codex's game-studio plugin produces sprite series from a description.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/generate-images.png" alt="Generate game sprites"></div>
+  </div>
+  <aside class="notes">
+    Ship sprites generated from one description. No artist needed. Iterate by asking for variations. The plugin produces sprite sheets that drop straight into the game.
+  </aside>
+</section>
+
+<!-- 46 — IMAGE: scrape-dragons -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Scrape reference assets
+      <span class="sub">Pull dragon images from a fan wiki, normalize them for the game.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/scrape-dragons.png" alt="Scrape reference assets"></div>
+  </div>
+  <aside class="notes">
+    Agent visited the reference site, identified the dragon images, downloaded them, cleaned the backgrounds, resized to game spec. Five minutes of agent work replaced what would've been hours of manual collection.
+  </aside>
+</section>
+
+<!-- 47 — IMAGE: explore-assets -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Find assets in folders of thousands
+      <span class="sub">"Find me a wave splash sprite in this 2,000-file pack." Done in seconds.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/explore-assets.png" alt="Explore assets in a large pack"></div>
+  </div>
+  <aside class="notes">
+    Asset packs come with thousands of files. Browsing manually is a nightmare. Ask agent: "find a wave splash sprite." It searches, previews, names the file. Saved 30 minutes of scrolling.
+  </aside>
+</section>
+
+<!-- 48 — IMAGE: editor -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Even build a full game editor
+      <span class="sub">Level-editing UI, generated end-to-end. For the prototype that needed it.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/editor.png" alt="Custom game editor"></div>
+  </div>
+  <aside class="notes">
+    A prototype needed a level editor for me to design test maps. Asked the agent. It built one — a real editor with drag-drop, save/load, preview. The agent doesn't just code the game; it codes the tools you need around the game.
+  </aside>
+</section>
+
+<!-- 49 — IMAGE: edit-images -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Bulk image editing
+      <span class="sub">"Remove white backgrounds from these 40 sprites, then flip the right-facing ones." 30 seconds.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/edit-images.png" alt="Bulk image edit"></div>
+  </div>
+  <aside class="notes">
+    Bulk image edits. Tell agent the recipe. 30 seconds. Done. Would take an hour by hand. The kind of work that used to require Photoshop actions — now a sentence.
+  </aside>
+</section>
+
+<!-- 50 — DIVIDER 8 -->
+<section>
+  <div class="brand-slide divider">
+    <div class="glyph">8</div>
+    <h2 class="section-title">Ship<small>One link. Real players.</small></h2>
+  </div>
+  <aside class="notes">
+    Easiest phase. Agent writes the GitHub Pages workflow; you flip one setting. Send the link. That's the whole point of a prototype — real hands on it.
+  </aside>
+</section>
+
+<!-- 51 — SHIP STEPS -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Phase 8</span>
+        <div class="name">Ship it</div>
+        <p class="tagline">"GitHub Pages, free, live."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>AI prepares the GitHub Actions workflow</li>
+          <li>GitHub → Settings → Pages → <span class="accent">Source: GitHub Actions</span></li>
+          <li>Test the live URL on <span class="accent">a real phone</span></li>
+          <li>Send to playtesters — collect feedback</li>
+        </ul>
+      </div>
+      <div class="callout">Every push auto-updates the live link. <span class="quiet">No manual deploy ever again.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    AI writes the entire GitHub Actions workflow. Commit, push. Then ONE manual step: Settings → Pages → Source = "GitHub Actions." After that, every push auto-deploys. Test on a real phone — desktop alone misses touch bugs. Send the link. Watch them play.
+  </aside>
+</section>
+
+<!-- 52 — PROMPT: Deploy -->
+<section>
+  <div class="brand-slide prompt">
+    <div class="ptitle">Set up auto-deploy to GitHub Pages</div>
+    <div class="pwrap">
+      <div class="phead"><span>PROMPT · Set up auto-deploy to GitHub Pages</span><span class="ptag">PHASE 8 · AGENT</span></div>
+<pre class="s-sm">Prepare this project for a GitHub Pages workflow that auto-publishes after every push to the main branch.
+
+Do everything you can yourself (create the workflow file, set the correct build/base settings, commit, push). Then tell me exactly what I need to do on my side in the GitHub web UI, step by step.</pre>
+    </div>
+  </div>
+  <aside class="notes">
+    Short prompt. Powerful result. AI sets up the entire CI/CD pipeline. Only manual step is one UI toggle. After that, every commit auto-deploys. That's a workflow that used to take a DevOps engineer half a day.
+  </aside>
+</section>
+
+<!-- 53 — IMAGE: game 1 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Dragon Draw Defense — main screen
+      <span class="sub">huydung.github.io/Dragon-Draw-Defense · shipped this exact way.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/game1.png" alt="Dragon Draw Defense main"></div>
+  </div>
+  <aside class="notes">
+    A prototype I shipped using this workflow. Not perfect — but playable, on a phone, with friends. Which means the question "is the mechanic fun?" has an answer. That's the whole point.
+  </aside>
+</section>
+
+<!-- 54 — IMAGE: game 2 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Dragon Draw Defense — mid game
+      <span class="sub">Draw a glyph. Strike the matching dragon. Score climbs.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/game2.png" alt="Dragon Draw Defense mid-game"></div>
+  </div>
+  <aside class="notes">
+    The core mechanic: you trace a glyph with your finger or mouse; the matching dragon takes damage. The recognition algorithm is the heart of the game — and the agent built it in 2 hours.
+  </aside>
+</section>
+
+<!-- 55 — IMAGE: game 3 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Dragon Draw Defense — late game
+      <span class="sub">Difficulty ramps; more dragons, faster. The pressure test.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/game3.png" alt="Dragon Draw Defense late game"></div>
+  </div>
+  <aside class="notes">
+    Late game stresses the mechanic. Does it scale? Does it still feel fair? Real playtest data tells you fast. Some mechanics that felt clever on paper feel confusing on a phone — and you only find that out from real hands.
+  </aside>
+</section>
+
+<!-- 56 — IMAGE: game 4 -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Dragon Draw Defense — game over
+      <span class="sub">Score, summary, replay. The end of the loop.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/game4.png" alt="Dragon Draw Defense game over"></div>
+  </div>
+  <aside class="notes">
+    Game over screen closes the loop. Score, what you defended, replay button. Simple. The agent generated all of this from the GDD's "win/lose" section. No extra prompting needed.
+  </aside>
+</section>
+
+<!-- 57 — IMAGE: pokerpool -->
+<section>
+  <div class="brand-slide image-show">
+    <div class="caption">Another prototype — PokerPool
+      <span class="sub">Mash-up of poker and pool, built end-to-end with this same workflow.</span>
+    </div>
+    <div class="image"><img src="game-proto-images/pokerpool.png" alt="PokerPool prototype"></div>
+  </div>
+  <aside class="notes">
+    Same workflow, different idea. Poker × Pool. The mechanic: pot the balls in poker hand patterns. Took an afternoon. Once playable, you immediately know: yes, this is fun → keep iterating, OR no, the mash-up doesn't click → discard. Either answer was worth getting.
+  </aside>
+</section>
+
+<!-- 58 — TIME BUDGET -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Reality check</span>
+        <div class="name">Time budget</div>
+        <p class="tagline">"Stop when you know."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <div class="big-number">2–6 hrs</div>
+        <div class="h">Across 2–3 sessions</div>
+        <ul class="bullets">
+          <li>5-hour rolling token windows</li>
+          <li>If mechanic is proven fun: <span class="accent">stop there</span></li>
+          <li>That was the goal</li>
+        </ul>
+      </div>
+    </main>
+  </div>
+  <aside class="notes">
+    Realistic: 2–6 hours, 2–3 sessions. Token limits reset on rolling 5-hour windows. Critical mindset: if mechanic is proven fun, you're DONE. Don't polish. Don't add features. Don't keep "improving." The goal was: is this idea worth pursuing? Yes → you saved weeks. No → you saved weeks. Stop. Next idea.
+  </aside>
+</section>
+
+<!-- 59 — ONE-GLANCE RECAP -->
+<section>
+  <div class="brand-slide bordered">
+    <h2 class="title">One-glance recap</h2>
+    <div class="body one-col">
+      <table class="recap">
+        <colgroup><col style="width:18%"><col style="width:36%"><col style="width:22%"><col style="width:24%"></colgroup>
+        <tr><th>Phase</th><th>Output</th><th>Model</th><th>Tool</th></tr>
+        <tr><td>1 · Idea</td><td>Ideas list → 1 chosen idea</td><td>Creative / mid</td><td>Chat AI</td></tr>
+        <tr><td>2 · Game Design</td><td>gdd.md (≤2 pages) + wireframe</td><td>Creative / mid</td><td>Chat AI (Canvas)</td></tr>
+        <tr><td>3 · Tech Design</td><td>tdd.md (principles baked in)</td><td>Highest</td><td>Agent</td></tr>
+        <tr><td>4 · Project Plan</td><td>plan.md (2–4 milestones)</td><td>Highest</td><td>Agent</td></tr>
+        <tr><td>5 · Build</td><td>Playable prototype + sprites</td><td>Mid first, escalate</td><td>Agent + VS Code</td></tr>
+        <tr><td>6 · Bugs</td><td>Screenshots + logs → fixes</td><td>Mid first, escalate</td><td>Agent</td></tr>
+        <tr><td>7 · Iterate</td><td>Add features, docs in sync</td><td>Mid first, escalate</td><td>Agent</td></tr>
+        <tr><td>8 · Ship</td><td>Live GitHub Pages link</td><td>Mid first, escalate</td><td>Agent + GitHub</td></tr>
+      </table>
+    </div>
+  </div>
+  <aside class="notes">
+    The whole workflow on one slide. Snapshot for them. Two patterns: chat AI for thinking phases (1–2), agent for execution (3–8). Mid model unless you genuinely need more. Output of each phase feeds the next — that's why order matters. Skip phase 2: phase 3 produces garbage. Skip phase 3: phase 5 burns hours on rework. Take a photo of this slide.
+  </aside>
+</section>
+
+<!-- 60 — THE SHIFT -->
+<section>
+  <div class="brand-slide sidepanel">
+    <aside class="panel">
+      <div>
+        <span class="tag">Mindset</span>
+        <div class="name">The shift</div>
+        <p class="tagline">"From executor to director."</p>
+      </div>
+    </aside>
+    <main class="content">
+      <div class="block">
+        <ul class="bullets">
+          <li>AI does the <span class="accent">technical heavy lifting</span></li>
+          <li>You bring the <span class="accent">idea</span>, the <span class="accent">taste</span></li>
+          <li>You make the call: <span class="accent">worth pursuing or not</span></li>
+        </ul>
+      </div>
+      <div class="callout">The part that matters <span class="quiet">— still you.</span></div>
+    </main>
+  </div>
+  <aside class="notes">
+    Land the big principle. Job has shifted. You're no longer the executor. You're the creative director with taste. The thing AI cannot do: have an idea worth chasing. Have the taste to know when something is fun. Have the judgment to kill an idea that doesn't work. That part is still yours. And that's the part that matters. Technical execution was always the moat. The moat disappeared. The differentiator now: taste, judgment, willingness to actually try.
+  </aside>
+</section>
+
+<!-- 61 — CLOSING -->
+<section>
+  <div class="brand-slide title-bleed">
+    <h1>
+      <span class="light">Now go prove</span><br>
+      <span class="bold">your idea is fun.</span>
+    </h1>
+    <p class="subtitle">Bring your ideas, curiosity, and passion. We'll make something fun.</p>
+    <div class="meta">
+      Huy Dũng (DaveHD)<br>
+      <span class="quiet">huydung.com</span>
+    </div>
+  </div>
+  <aside class="notes">
+    Close strong. "Can you build it" is no longer the bar. "Is it worth building" is. That's a question only you can answer — but now, in an afternoon. Final line: "Open the checklist on huydung.com. Pick one idea you've been sitting on. Today. Don't wait for a perfect plan. The cost of trying just collapsed. So try." Then Q&amp;A.
+  </aside>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+<script>
+  Reveal.initialize({
+    width: 1280,
+    height: 720,
+    margin: 0,
+    minScale: 0.1,
+    maxScale: 10,
+    center: true,
+    transition: 'fade',
+    controls: false,
+    progress: false,
+    hash: true,
+    slideNumber: 'c/t',
+    plugins: [ RevealNotes ]
+  });
+</script>
+
+</body>
+</html>

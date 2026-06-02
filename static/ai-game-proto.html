@@ -1073,7 +1073,7 @@
     }
     /* Recap table: darker header so it contrasts with cream background */
     section#recap .tbl th {
-      background: var(--hd-red-dark);
+      background: var(--hd-red-bright);
       color: #fff;
     }
     section#recap .tbl tr:nth-child(even) td {
@@ -1143,9 +1143,7 @@
     <div class="wrap">
       <section class="opening" id="opening">
         <p class="opening-lead">Not long ago, making even a rough game prototype meant mastering a full stack of
-          disciplines most people don't have: coding, game engine, graphic asset creation, audio editing, writing and
-          balancing rules, etc. You either have to be an excellent all-rounder technical person, or having the budget to
-          hire several people. And in any case, <span class="fill">it takes time</span>. Days, or even Weeks.</p>
+          disciplines: coding, game engine, graphic asset creation, audio editing, writing and balancing rules, etc. You either have to be an excellent all-rounder technical person, or having the budget to hire several people. And in any case, <span class="fill">it takes time</span>. Days, or even Weeks.</p>
         <p>The consequences went beyond inconvenience. When prototyping is expensive: </p>
         <ul>
           <li>Ideas stay stuck in notebooks</li>
@@ -1201,13 +1199,13 @@
             <td><b>Animation</b><span class="task-sub">sprite sheets, UI transitions, motion</span></td>
             <td class="no">❌ Requires animation skills — must learn or hire</td>
             <td class="no">❌ Chat AI cannot produce animation files</td>
-            <td class="warn">⚠️ Basic CSS / spritesheet animation only</td>
+            <td class="warn">⚠️ Basic animation only</td>
           </tr>
           <tr>
             <td><b>Sound &amp; music</b><span class="task-sub">sound effects, background music</span></td>
             <td class="no">❌ Requires audio skills — must learn or hire</td>
             <td class="warn">⚠️ AI suggests free sources; cannot create or integrate</td>
-            <td class="warn">⚠️ Can source from free libraries &amp; wire into project</td>
+            <td class="yes">✅ Can Generate or source from free libraries &amp; wire into project</td>
           </tr>
           <tr>
             <td><b>Version control &amp; deployment</b><span class="task-sub">git setup, commits, live URL</span></td>
@@ -1726,6 +1724,11 @@ From now on, in ALL of our conversations, after each turn:
             Talk as if you are talking to a dev — say what you need to change, and let the dev do it.
 
           </li>
+          <li>
+            <b>Watch the AI "think"</b>
+            — if it's heading the wrong way, stop it early to save time and tokens.
+
+          </li>
           
           <li>
             <b>Make your own manual edits:</b>
@@ -1759,19 +1762,34 @@ After everything is done, show user both the URL to test the game AND the list o
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
           <p>Here you can see the agent worked autonomously for 12 minutes and create dozens of files, to finish the
-            first 2 milestones. It even write automated test scripts and run the game in a browser to verify its work.
+            first 2 milestones.
           </p>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/milestone1.png" alt="Agent mid-session"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
-            </div>
+            </div>            
+          </div>
+          <br/>
+          <p>AI agent even write its own automated testing script, spawn a browser and <strong>draw</strong> on it to verify game logic, and capture screenshot. That's better discipline in smoke-testing than many junior devs!
+          </p>
+          <div class="hint-imgs">            
             <div class="hint-img"><img src="game-proto-images/milestone2.png" alt="Agent mid-session"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
             </div>
           </div>
+          <br/>
+          <p>This is an example when I stop the AI mid-thinking to correct its direction.
+          </p>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/stop-ai-mid-thinking-to-steer.png" alt="Agent mid-session"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent mid-session</div>
+            </div>            
+          </div>
         </div>
+        
       </section>
 
       <!-- PHASE 6 -->
@@ -1790,11 +1808,7 @@ After everything is done, show user both the URL to test the game AND the list o
             <b>Logic bug → open DevTools (F12) → Console → paste the full log.</b>
 
           </li>
-          <li>
-            <b>Watch the AI "think"</b>
-            — if it's heading the wrong way, stop it early to save time and tokens.
-
-          </li>
+          
           <li>
             <b>Stuck for a while? Start a fresh session</b>
             and ask it to explain the feature's flow before fixing.
@@ -1847,19 +1861,25 @@ First, review the relevant code end-to-end and explain to me, in plain language,
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Two things are extremely useful: screenshots, and console log. Still, sometime, the best thing that helps
-            unblock a tricky situation is a sharp human-observation!</p>
+          <p>Two things are extremely useful: screenshots, and console log.</p>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/debug.png" alt="DevTools Console"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
             </div>
+            
+          </div>
+          <br/>
+          <p>Still, sometime, the best thing that helps unblock a tricky situation is a sharp human-observation!</p>
+          <div class="hint-imgs">
+            
             <div class="hint-img"><img src="game-proto-images/debug2.png" alt="DevTools Console"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
             </div>
           </div>
         </div>
+        
       </section>
 
       <!-- PHASE 6b -->
@@ -1922,8 +1942,7 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package
-            of thousand files, and even build a full-features game editor</p>
+          <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package of thousand files, generate SFX, and even build a full-features game editor</p>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/generate-images.png"
                 alt="Game before / after a new feature"
@@ -1933,18 +1952,24 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
             </div>
             <div class="hint-img"><img src="game-proto-images/scrape-dragons.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
 
           </div>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/explore-assets.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
+            <div class="hint-img"><img src="game-proto-images/generate_audio_by_itself.png" alt="Updated docs in VS Code"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+          </div>
+          <div class="hint-imgs">            
             <div class="hint-img"><img src="game-proto-images/editor.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
           </div>
         </div>
@@ -1976,6 +2001,10 @@ Before coding: propose how you'd implement it, what files you'd touch, and flag 
             and collect feedback — the whole point of a prototype.
 
           </li>
+          <li>
+            <b>Remember, it's just a prototype!</b>
+            Code still slop, performance can be meh, and bugs are expected.
+          </li>
         </ul>
         <div class="prompt">
           <div class="prompt-head">
@@ -1991,8 +2020,7 @@ Do everything you can yourself (create the workflow file, set the correct build/
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
           <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push from the agent
-            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately:
-            getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p>
+            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately: getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/game1.png"
                 alt="Game before / after a new feature"
@@ -2002,27 +2030,25 @@ Do everything you can yourself (create the workflow file, set the correct build/
             </div>
             <div class="hint-img"><img src="game-proto-images/game2.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
 
           </div>
           <div class="hint-imgs">
             <div class="hint-img"><img src="game-proto-images/game3.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
             <div class="hint-img"><img src="game-proto-images/game4.png" alt="Updated docs in VS Code"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Updated docs in VS Code</div>
+              
             </div>
           </div>
         </div>
         <div class="callout">
           <span class="tag">Time budget</span>
 
-          <p>A small prototype is realistically <b>2–6 hours</b> across <b>2–3 sessions</b> (token limits reset on a
-            5-hour
-            rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
+          <p>A small prototype can realistically be done in <b>2–6 hours</b> across <b>2–3 sessions</b> (token limits reset on a 5-hour rolling window). If you've proven the mechanic is fun, you're done — stop there. That was the goal.</p>
 
         </div>
       </section>
