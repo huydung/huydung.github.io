@@ -746,8 +746,8 @@
       position: relative;
       border-radius: 4px;
       overflow: hidden;
-      border: 1.5px dashed var(--hd-gray-mid);
-      background: #fff;
+      /* border: 1.5px dashed var(--hd-gray-mid);
+      background: #fff; */
       flex: 1;
       min-width: 180px;
       height: 440px; /* single image */
@@ -1149,12 +1149,19 @@
       padding: 5px 10px;
       font-size: 12px;
     }
-    /* Cover: both buttons same height */
+    /* Cover: both buttons identical size */
+    .cover-btns {
+      align-items: stretch;
+    }
     .cover-btns .translate-btn,
     .cover-btns .btn-present {
       margin-top: 0;
-      padding: 8px 20px;
+      padding: 9px 22px;
       font-size: 14px;
+      font-weight: 600;
+      line-height: 1.4;
+      height: auto;
+      align-self: auto;
     }
 
     #preso-overlay {
@@ -1218,6 +1225,13 @@
       align-items: flex-start;
       justify-content: center;
       padding: 0;
+      background: #fff; /* explicit white so fullscreen doesn't go black */
+    }
+    /* fullscreen pseudo-class: keep white */
+    #preso-slide-wrap:fullscreen,
+    #preso-slide-wrap:-webkit-full-screen,
+    #preso-slide-wrap:-moz-full-screen {
+      background: #fff;
     }
     #preso-slide {
       width: 100%;
@@ -1225,6 +1239,7 @@
       padding: 56px 72px;
       font-size: 1.12em;
       box-sizing: border-box;
+      background: #fff;
     }
     @media (max-width: 700px) {
       #preso-slide { padding: 28px 20px; font-size: 1em; }
@@ -1325,32 +1340,30 @@
     }
 
   
-    /* Image slides: fill the slide, caption below */
+    /* Image slides: full bleed, no max-width restriction */
     #preso-slide .hint-img {
       height: auto !important;
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
     }
     #preso-slide .hint-img img {
       width: 100%;
       height: auto;
-      max-height: 82vh;
+      max-height: 90vh;
       object-fit: contain;
       object-position: top center;
-      border-radius: 4px;
+      display: block;
     }
     #preso-slide .hint-img p {
-      font-size: 14px;
-      color: #666;
+      font-size: 13px;
+      color: #888;
       font-style: italic;
       margin: 0;
       line-height: 1.4;
-    }
-    /* preso slide container: less padding for image slides */
-    #preso-overlay.img-slide #preso-slide {
-      padding: 24px 40px;
+      padding: 0 4px;
+      text-align: center;
     }
 
   </style>
@@ -1363,7 +1376,7 @@
       <div class="sh-title">Prototyping Games with AI <span>· The Checklist</span></div>
 
       <div class="sh-right">
-        <button class="btn-present btn-present--sm" onclick="presoEnter()">▶ Present</button>
+        <button class="btn-present btn-present--sm" onclick="presoEnter()">⊞ Present</button>
         <button class="translate-btn translate-btn--sm"
           onclick="window.open('https://translate.google.com/translate?sl=en&tl=vi&u='+encodeURIComponent(window.location.href),'_blank')">🌐</button>
         <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
@@ -1377,8 +1390,8 @@
       <a href="#p3">3 · Tech Design</a>
       <a href="#p4">4 · Project Plan</a>
       <a href="#p5">5 · Build</a>
-      <a href="#p6">6 · Fix bugs</a>
-      <a href="#p6b">7 · Iterate</a>
+      <a href="#p6">6 · Iterate</a>
+      <a href="#p6b">7 · Fix bugs</a>
       <a href="#p7">8 · Ship</a>
     </div>
   </div>
@@ -1393,7 +1406,7 @@
       <div class="cover-btns">
         <button class="translate-btn"
           onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🌐 Vietnamese</button>
-        <button class="btn-present" onclick="presoEnter()">▶ Present</button>
+        <button class="btn-present" onclick="presoEnter()">⊞ Present</button>
       </div>
     </div>
     <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
@@ -1404,6 +1417,7 @@
       <div class="band-cream band-cream-bottom">
     <div class="wrap">
       <section class="opening" id="opening">
+        <h2>Making game prototype used to be hard</h2>
         <p class="opening-lead">Not long ago, making even a rough game prototype meant mastering a full stack of
           disciplines: coding, game engine, graphic asset creation, audio editing, writing and balancing rules, etc. You either have to be an excellent all-rounder technical person, or having the budget to hire several people. And in any case, <span class="fill">it takes time</span>. Days, or even Weeks.</p>
         <p>The consequences went beyond inconvenience. When prototyping is expensive: </p>
@@ -1412,7 +1426,8 @@
           <li>Investment flows toward "safe" bets — sequels, proven genres, low-risk variants</li>
           <li>Innovation gets filtered out before it ever gets a fair try.</li>
         </ul>
-        <p><span class="fill">That constraint has now collapsed</span>. AI handles the full technical execution — code,
+        <h2>That constraint has now collapsed</h2>
+          <p>AI can now handle the full technical execution — code,
           graphics, docs, and more — so you can take any idea from concept to playable prototype in a few hours. Test
           it. Feel whether it's actually fun. Decide if it's worth pursuing before committing real resources. And if
           it's not — discard it and try the next one, at a cost that makes that affordable.</p>
@@ -1590,7 +1605,7 @@
         </table> 
       </section>
       <section id="p0b">
-        <h3>On choosing the main AI service provider</h3>
+        <h2>On choosing the main AI service provider</h2>
         <ul>
           <li><a href="https://antigravity.google/" target="_blank"><b>Gemini (Antigravity)</b></a> shines during planning (use Canvas
             to draft GDD/TDD/plan live, export to .md when done) and has the best bundled value-for-money overall.</li>
@@ -1600,7 +1615,7 @@
           <li><a href="https://claude.ai/download" target="_blank"><b>Claude (Claude Code)</b></a> is strongest for pure reasoning and writing, and working on a large codebase.</li>
         </ul>
         <p>For game prototypes, start with whichever you already have — the prompts work across all three.</p>
-        <h3>On choosing models within the app</h3>
+        <h2>On choosing models within the app</h2>
         <ul>
           <li>During <b>brainstorming &amp; design</b>, use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</li>
           <li>During <b>technical design and planning</b>, use the <b>highest</b> model and thinking effort.</li>
@@ -1608,11 +1623,12 @@
             prototype. Only switch up to the strongest model when you genuinely can't get the result you want.</li>
         </ul>
         <div class="hint">
-          <span class="hint-label">💡 In practice</span>
-          <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The key things are: giving it access to a local folder, pick the right permissions level, and the right model. Below is a screenshot of Codex.</p>
+          <span class="hint-label">💡 In practice</span>         
 
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
+            <div class="hint-img">
+              <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The key things are: giving it access to a local folder, pick the right permissions level, and the right model. Below is a screenshot of Codex.</p>
+              <img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent interface screenshot</div>
             </div>
@@ -1719,10 +1735,12 @@ Then call out your top 3 picks with one sentence on why each is a strong prototy
         </div>
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Below is an example of output given by Claude, in normal Chat mode. It's a bit of an Overkill, yeah 😆</p>
+          
 
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/brainstorm-output.png" alt="Example brainstorm output"
+            <div class="hint-img">
+              <p>Below is an example of output given by Claude, in normal Chat mode. It's a bit of an Overkill, yeah 😆</p>
+              <img src="game-proto-images/brainstorm-output.png" alt="Example brainstorm output"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Example brainstorm output</div>
             </div>
@@ -1738,8 +1756,25 @@ Then call out your top 3 picks with one sentence on why each is a strong prototy
 
         <ul class="check">
           <li>
-            <b>The core mechanic is one sentence</b>
-            you can say out loud. Keep refining until you can.
+            <b>GDD is design only, under ~2 pages</b>
+            — no file names, code, formulas, or configs (that's the TDD's job).
+
+          </li>          
+          
+          <li>
+            <b>The aim is a prototype - to prove the fun</b>
+            — So do not get bogged down on features or progression yet.
+
+          </li>
+          <li>
+            <b>Write the non-goals.</b>
+            What you <i>won't</i> build matters as much as what you will.
+
+          </li>
+          
+          <li>
+            <b>Every rule should be implementable by a stranger</b>
+            — no "you know what I mean".
 
           </li>
           <li>
@@ -1748,28 +1783,8 @@ Then call out your top 3 picks with one sentence on why each is a strong prototy
 
           </li>
           <li>
-            <b>Define the vertical slice</b>
-            — the smallest thing that proves the mechanic is fun.
-
-          </li>
-          <li>
-            <b>Write the non-goals.</b>
-            What you <i>won't</i> build matters as much as what you will.
-
-          </li>
-          <li>
-            <b>GDD is design only, under ~2 pages</b>
-            — no file names, code, formulas, or configs (that's the TDD's job).
-
-          </li>
-          <li>
-            <b>Every rule is implementable by a stranger</b>
-            — no "you know what I mean".
-
-          </li>
-          <li>
-            <b>Review the GDD in VS Code</b>
-            and fix small things yourself before moving on.
+            <b>Review the GDD </b>
+            and ensure it capture your idea correctly before moving on.
 
           </li>
         </ul>
@@ -1798,9 +1813,7 @@ Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
 
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          <p>Use Gemini to draft the GDD (and later the TDD and plan) directly in <b>Canvas</b> — it lets you edit the
-            document live as you chat, which is ideal for iterating on design decisions. When you're happy with it, copy
-            the text and save it as <code>gdd.md</code> manually.</p>
+          <p>Gemini allows you to draft the docs directly in <b>Canvas</b>, which is ideal for iterating on design decisions. When you're happy, copy the text and save it as Markdown files manually.</p>
           
           <div class="hint-imgs">
             <div class="hint-img">
@@ -1817,9 +1830,7 @@ Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
       <!-- PHASE 3 -->
       <section id="p3">
         <h2><span class="num">3</span>Write the TDD — with all the rules baked in</h2>
-        <p class="lead">Don't ask for a "technical design document" generically — the AI will give you something bland.
-          Hand it <b>your exact engineering constraints</b>. This prompt already contains all of them. Save the result
-          as <code>tdd.md</code>.</p>
+        <p class="lead">Ensure a good blueprint before you build. Apply best practices on building games (and software in general).</p>
 
         <ul class="check">
           <li>
@@ -1829,22 +1840,19 @@ Ask me up to 3 questions if anything is ambiguous BEFORE writing.</pre>
           </li>
           <li>
             <b>Strict separation of concerns</b>
-            (physics / render / rules) — keeps the AI from breaking everything on a refactor.
+            (physics / render / rules) — easier to fix, expand, and maintain.
 
           </li>
           <li>
             <b>Incremental edits + commit after every turn</b>
-            with conventional messages.
+            of conversation.
 
           </li>
           <li>
-            <b>Logging, non-coder comments, and a test suite</b>
-            run every turn.
-
+            <b>Add logs, code comments, and test suite</b>
           </li>
           <li>
-            <b>Workspace &amp; build health checks</b>
-            before the AI reports success.
+            <b>And many more rules</b> provided in the prompt below.
 
           </li>
         </ul>
@@ -1892,29 +1900,15 @@ IMPORTANT: The TDD should be concise, clear, but not too detailed. It should con
       <!-- PHASE 4 -->
       <section id="p4">
         <h2><span class="num">4</span>Build plan — 2 or 3 milestones</h2>
-        <p class="lead">Split the work into 2–4 milestones depending on your game's complexity. Highly recommend. If you
-          ask AI to code everythign at once, there's a very high chance that you'll have to redo/rewrite a lot
-          afterward, and it's easy for AI to make mistake both in the first implementation and in the edits. With clear
-          milestones, you ensure solid foundation before adding complexity.</p>
+        <p class="lead">If you ask AI to code everything at once, there's a very high chance that you'll have to redo/rewrite a lot afterward, and it's easy for AI to make mistake both in the first implementation and in the edits. <br/>With clear milestones, you ensure solid foundation before adding complexity.</p>
 
         <ul class="check">
           <li>
-            <b>2–4 functional milestones</b>
-            , each building on the last.
-
-          </li>
-          <li>
-            <b>Divided by what THIS game needs</b>
-            — the mechanic drives the split, not a generic template.
-
-          </li>
-          <li>
-            <b>Every milestone delivers real functionality progression</b>
+            <b>2–4 functional milestones</b>, each building on the last.
 
           </li>
           <li>
             <b>Each milestone has a user-facing test checklist and a copy-paste agent prompt.</b>
-
           </li>
           <li>
             <b>Sanity-check the plan</b>
@@ -1987,20 +1981,17 @@ From now on, in ALL of our conversations, after each turn:
         </div>
 
         <p class="lead">Switch to your AI coding <b>agent</b> (not chat) — it reads, writes, and runs files directly.
-          Context windows are large and auto-compress, so <b>stay in the same session while you're in flow</b>. Start a
-          fresh session when the AI gets confused, loops on a fix, or you're shifting to something unrelated. Always
-          instruct AI to chech the current docs at the start of any new session. Start with the mid-level model; only escalate if you get stuck.</p>
+          Context windows are large and auto-compress, so <b>stay in the same session while you're in flow</b>. <br/>Start a fresh session when the AI gets confused, loops on a fix, or you're shifting to something unrelated. Always instruct AI to chech the GDD and TDD at the start of any new session. </p>
 
         <ul class="check">
           
           <li>
             <b>Run the milestone prompt</b>
-            (below), then <b>do the test checklist</b> from plan.md yourself.
+            (below), then <b>do the test checklist</b> yourself.
 
           </li>
           <li>
-            <b>Converse back and forth with the AI:</b>
-            Talk as if you are talking to a dev — say what you need to change, and let the dev do it.
+            <b>Converse back and forth with the AI</b>           
 
           </li>
           <li>
@@ -2010,15 +2001,9 @@ From now on, in ALL of our conversations, after each turn:
           </li>
           
           <li>
-            <b>Make your own manual edits:</b>
+            <b>Make your own manual edits when appropriate</b>
             open the folder in VS Code and tweak config file as needed. Perform text search across all files
             (Ctrl+Shift+F) and make text adjustments.
-
-          </li>
-          <li>
-            <b>After a milestone, refresh the docs</b>
-            (gdd/tdd/plan). Then continue in the same session or start fresh — current docs make either option equally
-            easy.
 
           </li>
         </ul>
@@ -2070,7 +2055,114 @@ After everything is done, show user both the URL to test the game AND the list o
 
       <!-- PHASE 6 -->
       <section id="p6">
-        <h2><span class="num">6</span>Fix bugs the smart way</h2>
+        <h2><span class="num">6</span>Iterate — add features &amp; keep docs current</h2>
+        <p class="lead">A prototype is never truly done in one pass. Once the core loop works, you iterate: add a
+          feature, tweak a mechanic, try something new. Keep the docs in sync after each meaningful change — they're the
+          AI's memory.</p>
+
+        <ul class="check">
+          <li>
+            <b>One thing at a time.</b>
+            Describe it clearly, let AI propose the implementation approach before coding.
+
+          </li>
+          <li>
+            <b>Request multiple agents to perform tasks in parallel</b> to save time, if the tasks are fairly independent and contained (for example 1 agent on images, 1 agent on sprites, 1 agent on UI bug...)
+
+          </li>
+          <li>
+            <b>Keep the docs updated</b>
+            whenever you make a decision that changes the design or technical structures.
+
+          </li>
+          <li>
+            <b>Start a fresh session when the AI gets confused or loops</b> - tell AI to review the GDD, TDD, and current code first, before giving new request.
+          </li>
+          <li>
+            <b>Try to ask AI to help with non-coding tasks too</b>. They can do more than you expected.
+
+          </li>
+        </ul>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Add a new feature</span>
+
+            <button class="copy-btn" data-target="p-feature">Copy</button>
+          </div>
+          <pre
+            id="p-feature">Read the current docs (gdd.md, tdd.md, plan.md).
+
+I want to add this feature: [DESCRIBE the feature clearly — what the player does, what the game responds with]
+
+Before coding: propose how you'd implement it, what files you'd touch, and flag any risks. Wait for my go-ahead before writing any code.</pre>
+        </div>
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Keep docs up to date</span>
+
+            <button class="copy-btn" data-target="p-refresh">Copy</button>
+          </div>
+          <pre
+            id="p-refresh">Review the current state of the code and update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed along the way. Keep each doc concise — remove anything that's no longer accurate, add anything that's now true. Commit the updated docs.</pre>
+        </div>
+
+        <div class="hint">
+          <span class="hint-label">💡 In practice</span>
+          
+          <div class="hint-imgs">
+            <div class="hint-img">
+              <p>AI is not just for coding. Here, it helped me generate ships.</p><img src="game-proto-images/generate-images.png"
+                alt="Game before / after a new feature"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
+              </div>
+            </div>
+            
+
+          </div>
+          <div class="hint-imgs">
+            
+            <div class="hint-img">
+              <p>AI is not just for coding. Here, it helped me scrape the dragons.</p>
+              <img src="game-proto-images/scrape-dragons.png" 
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img">
+              <p>AI is not just for coding. Here, it helped me find assets in a package of thousand files.</p>
+              <img src="game-proto-images/explore-assets.png" 
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+            
+          </div>
+          <div class="hint-imgs">
+            
+            <div class="hint-img">
+              <p>AI is not just for coding. Here, it helped me generate SFX.</p>
+              <img src="game-proto-images/generate_audio_by_itself.png" 
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+          </div>
+          <div class="hint-imgs">            
+            <div class="hint-img">
+              <p>
+                AI is not just for coding. Here, it even build a full-featured glyph editor!
+              </p><img src="game-proto-images/editor.png" 
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PHASE 6b -->
+      <section id="p6b">
+        <h2><span class="num">7</span>Fix bugs the smart way</h2>
         <p class="lead">Iteration is normal — even human devs never get it right in one shot. Give the AI the right
           evidence and it fixes fast.</p>
 
@@ -2147,110 +2239,18 @@ First, review the relevant code end-to-end and explain to me, in plain language,
             
           </div>
           <br/>
-          <p>Still, sometime, the best thing that helps unblock a tricky situation is a sharp human-observation!</p>
+          
           <div class="hint-imgs">
             
-            <div class="hint-img"><img src="game-proto-images/debug2.png" alt="DevTools Console"
+            <div class="hint-img">
+              <p>Still, sometime, the best thing that helps unblock a tricky situation is a sharp human-observation!</p>
+              <img src="game-proto-images/debug2.png" alt="DevTools Console"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>DevTools Console</div>
             </div>
           </div>
         </div>
         
-      </section>
-
-      <!-- PHASE 6b -->
-      <section id="p6b">
-        <h2><span class="num">7</span>Iterate — add features &amp; keep docs current</h2>
-        <p class="lead">A prototype is never truly done in one pass. Once the core loop works, you iterate: add a
-          feature, tweak a mechanic, try something new. Keep the docs in sync after each meaningful change — they're the
-          AI's memory.</p>
-
-        <ul class="check">
-          <li>
-            <b>One feature at a time.</b>
-            Describe it clearly, let the AI propose the implementation approach before coding.
-
-          </li>
-          <li>
-            <b>Request multiple agents to perform tasks in parallel</b> to save time, if the tasks are fairly independent and contained (for example 1 agent on images, 1 agent on sprites, 1 agent on UI bug...)
-
-          </li>
-          <li>
-            <b>Keep the docs updated</b>
-            whenever you make a decision that changes how the game works or how it's built.
-
-          </li>
-          <li>
-            <b>Start a fresh session when the AI gets confused or loops</b>
-            — not on a fixed schedule. If you're in flow, keep going. Always paste the current docs at the start of any
-            new session.
-
-          </li>
-          <li>
-            <b>Use the AI for non-code tasks too:</b>
-            scrape reference sites, generate sprite sheets (Codex game-studio plugin), remove image backgrounds, resize
-            &amp; flip assets — the agent can handle all of this.
-
-          </li>
-        </ul>
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Add a new feature</span>
-
-            <button class="copy-btn" data-target="p-feature">Copy</button>
-          </div>
-          <pre
-            id="p-feature">Read the current docs (gdd.md, tdd.md, plan.md).
-
-I want to add this feature: [DESCRIBE the feature clearly — what the player does, what the game responds with]
-
-Before coding: propose how you'd implement it, what files you'd touch, and flag any risks. Wait for my go-ahead before writing any code.</pre>
-        </div>
-        <div class="prompt">
-          <div class="prompt-head">
-            <span class="prompt-label">PROMPT · Keep docs up to date</span>
-
-            <button class="copy-btn" data-target="p-refresh">Copy</button>
-          </div>
-          <pre
-            id="p-refresh">Review the current state of the code and update gdd.md, tdd.md, and plan.md to reflect what we actually built and any decisions that changed along the way. Keep each doc concise — remove anything that's no longer accurate, add anything that's now true. Commit the updated docs.</pre>
-        </div>
-
-        <div class="hint">
-          <span class="hint-label">💡 In practice</span>
-          
-          <div class="hint-imgs">
-            <div class="hint-img">
-              <p>AI is not just for coding. Here, it helped me scrape the dragons, generate ships, find assets in a package of thousand files, generate SFX, and even build a full-features game editor</p><img src="game-proto-images/generate-images.png"
-                alt="Game before / after a new feature"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
-              </div>
-            </div>
-            <div class="hint-img"><img src="game-proto-images/scrape-dragons.png" alt="Updated docs in VS Code"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              
-            </div>
-
-          </div>
-          <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/explore-assets.png" alt="Updated docs in VS Code"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              
-            </div>
-            <div class="hint-img"><img src="game-proto-images/generate_audio_by_itself.png" alt="Updated docs in VS Code"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              
-            </div>
-          </div>
-          <div class="hint-imgs">            
-            <div class="hint-img"><img src="game-proto-images/editor.png" alt="Updated docs in VS Code"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              
-            </div>
-          </div>
-        </div>
       </section>
 
       <!-- PHASE 7 -->
@@ -2300,25 +2300,32 @@ Do everything you can yourself (create the workflow file, set the correct build/
           
           <div class="hint-imgs">
             <div class="hint-img">
-              <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push from the agent
-            automatically updates the live link — no manual deploy needed. Share the link with playtesters immediately: getting real hands on the prototype is the whole point. Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p><img src="game-proto-images/game1.png"
+              <p>The GitHub Pages setting is the only manual step in the web UI. After that, every push to github will automatically updates the live version. Share the link with playtesters immediately: getting real hands on the prototype is the whole point. <br/> Here is a look of <a href="https://huydung.github.io/Dragon-Draw-Defense" target="_blank">Dragon Draw Defense: </a></p><img src="game-proto-images/game1.png"
                 alt="Game before / after a new feature"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Game before / after a new feature
               </div>
             </div>
-            <div class="hint-img"><img src="game-proto-images/game2.png" alt="Updated docs in VS Code"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              
-            </div>
+            
 
           </div>
           <div class="hint-imgs">
-            <div class="hint-img"><img src="game-proto-images/game3.png" alt="Updated docs in VS Code"
+            
+            <div class="hint-img"><img src="game-proto-images/game4.png" 
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               
             </div>
-            <div class="hint-img"><img src="game-proto-images/game4.png" alt="Updated docs in VS Code"
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/game3.png" 
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              
+            </div>
+            
+          </div>
+          
+          <div class="hint-imgs">
+            <div class="hint-img"><img src="game-proto-images/game2.png" 
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               
             </div>
@@ -2342,51 +2349,51 @@ Do everything you can yourself (create the workflow file, set the correct build/
           </tr>
           <tr>
             <td>1 · Idea</td>
-            <td>Ideas list → 1 chosen idea</td>
-            <td>Creative / mid</td>
+            <td>A rough game idea</td>
+            <td>Mid</td>
             <td>Chat AI</td>
           </tr>
           <tr>
             <td>2 · Game Design</td>
-            <td><code>gdd.md</code> (≤2 pages, design only, with wireframe)</td>
-            <td>Creative / mid</td>
+            <td>All the design decisions in GDD</td>
+            <td>Mid</td>
             <td>Chat AI (Gemini Canvas)</td>
           </tr>
           <tr>
             <td>3 · Tech Design</td>
-            <td><code>tdd.md</code> (all rules baked in)</td>
+            <td>Tech architecture and best practices in TDD</td>
             <td>Highest</td>
             <td>Agent</td>
           </tr>
           <tr>
             <td>4 · Project Plan</td>
-            <td><code>plan.md</code> (2–4 functional milestones)</td>
+            <td>A set of milestones and detail tasks list</td>
             <td>Highest</td>
             <td>Agent</td>
           </tr>
           <tr>
             <td>5 · Build</td>
-            <td>Playable prototype + sprites</td>
+            <td>Functional prototype</td>
             <td>Mid first, escalate if stuck</td>
             <td>Agent + VS Code</td>
           </tr>
           <tr>
-            <td>6 · Bugs</td>
-            <td>Screenshots + console logs → fixes</td>
+            <td>6 · Iterate</td>
+            <td>Playable prototype</td>
             <td>Mid first, escalate if stuck</td>
             <td>Agent</td>
           </tr>
           <tr>
-            <td>7 · Iterate</td>
-            <td>Add features, keep docs in sync</td>
+            <td>7 · Fix bugs</td>
+            <td>Enjoyable prototype</td>
             <td>Mid first, escalate if stuck</td>
             <td>Agent</td>
           </tr>
           <tr>
             <td>8 · Ship</td>
-            <td>Live GitHub Pages link</td>
-            <td>Mid first, escalate if stuck</td>
-            <td>Agent + GitHub</td>
+            <td>Sharable prototype</td>
+            <td>Mid</td>
+            <td>GitHub Pages</td>
           </tr>
         </table>
         <div class="callout">
@@ -2624,7 +2631,7 @@ function presoBuildSlides() {
   var secs = Array.from(document.querySelectorAll('main section[id]:not(.opening):not(#recap)'));
   secs.forEach(function(sec) {
     var h2 = sec.querySelector(':scope > h2');
-    var secTitle = h2 ? h2.textContent.replace(/\s+/g,' ').trim() : '';
+    var secTitle = h2 ? h2.textContent.replace(/\s+/g,' ').trim().replace(/^\d+\s*/, '') : '';
     var children = Array.from(sec.children);
     var i = 0;
 
@@ -2723,11 +2730,15 @@ function presoRender(idx) {
   var container = document.getElementById('preso-slide');
   container.innerHTML = '';
 
+  var overlay = document.getElementById('preso-overlay');
   if (s.hero) {
     var h1 = document.querySelector('header.cover h1');
     var sub = document.querySelector('header.cover .sub');
     var byline = document.querySelector('header.cover .byline');
+    overlay.style.background = 'var(--hd-red-deep)';
     wrap.style.background = 'var(--hd-red-deep)';
+    container.style.background = 'var(--hd-red-deep)';
+    container.style.maxWidth = '100%';
     container.innerHTML =
       '<div style="display:flex;flex-direction:column;justify-content:center;min-height:75vh;padding:60px 0;">' +
       (h1 ? '<h1 style="font-family:var(--serif);font-size:clamp(40px,5.5vw,72px);font-weight:700;color:#fff;margin:0 0 28px;line-height:1.08;">' + h1.textContent + '</h1>' : '') +
@@ -2735,7 +2746,10 @@ function presoRender(idx) {
       (byline ? '<p style="font-size:16px;color:rgba(255,255,255,.55);">' + byline.textContent + '</p>' : '') +
       '</div>';
   } else if (s.footer) {
+    overlay.style.background = 'var(--hd-red-deep)';
     wrap.style.background = 'var(--hd-red-deep)';
+    container.style.background = 'var(--hd-red-deep)';
+    container.style.maxWidth = '100%';
     container.innerHTML =
       '<div style="display:flex;flex-direction:column;justify-content:center;min-height:75vh;padding:60px 0;">' +
       '<h1 style="font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:700;color:#fff;margin:0 0 28px;line-height:1.08;">Now go prove your idea is fun!</h1>' +
@@ -2743,13 +2757,17 @@ function presoRender(idx) {
       '<p style="font-size:15px;color:rgba(255,255,255,.45);letter-spacing:.02em;">Huy Dũng (DaveHD) · huydung.com</p>' +
       '</div>';
   } else {
+    overlay.style.background = '#fff';
+    wrap.style.background = '#fff';
+    container.style.background = '';
     s.els.forEach(function(el) {
       container.appendChild(el.cloneNode(true));
     });
-    wrap.style.background = '';
     // Minimal padding for pure image slides
     var isImgSlide = s.els.length === 1 && s.els[0].classList && s.els[0].classList.contains('hint-img');
-    container.style.padding = isImgSlide ? '16px 32px' : '';
+    container.style.padding  = isImgSlide ? '12px 20px' : '';
+    container.style.maxWidth = isImgSlide ? '100%' : '';
+    wrap.style.alignItems    = isImgSlide ? 'stretch' : '';
     // Force-expand all prompts: remove collapsed class, hide expand bar
     container.querySelectorAll('.prompt').forEach(function(p) {
       p.classList.remove('collapsed');
