@@ -1385,7 +1385,8 @@
     </div>
   <div id="sh-nav">
     <div id="sh-nav-inner">
-      <a href="#p0">0 · Setup</a>
+      <a href="#pqs">⚡ Quick start</a>
+        <a href="#p0">0 · Setup</a>
       <a href="#p1">1 · Idea</a>
       <a href="#p2">2 · Game Design</a>
       <a href="#p3">3 · Tech Design</a>
@@ -1437,10 +1438,80 @@
   </div><!-- /band-cream -->
 
   <div class="wrap">
-    
-    <div class="yt-block">
-      <h2>A demo prototype I made after a few hours</h2>
-      <br/>
+    <!-- QUICK PROOF OF CONCEPT -->
+    <section id="pqs">
+      <h2>⚡ AI Chatbot is very capable now</h2>
+      <p class="lead">Modern AI chatbots can turn a game idea into something playable in minutes, with zero setup. Try this first to get a sense of the limit.</p>
+
+      <ul class="check">
+        <li>
+          <b>Open any chatbot</b> — <a href="https://claude.ai" target="_blank">Claude.ai</a>, <a href="https://chatgpt.com" target="_blank">ChatGPT</a>, or <a href="https://gemini.google.com" target="_blank">Gemini</a>.          
+        </li>
+        <li>
+          <b>Give it a simple prompt asking for a game, and hit send.</b> </span>
+        </li>
+        <li>
+          <b>Few tweaks is fine if something obvious is broken.</b> Stop after 3-4 prompts.
+          <span class="why">If you've already decided it's worth building — do it properly with the agent workflow instead.</span>
+        </li>
+      </ul>
+
+      <h3  data-preso-merge>A super simple and well-known game (to warm up)</h3>
+      <div class="prompt collapsed" id="prompt-flappy">
+        <div class="prompt-head">
+          <span class="prompt-label">PROMPT · One-shot simple game</span>
+          <button class="copy-btn" data-target="p-flappy">Copy</button>
+        </div>
+        <pre id="p-flappy">Build the Flappy Brd game, as close to the original as possible.</pre>
+      </div>
+
+      <h3  data-preso-merge>A more ambitious prompt</h3>
+      <div class="prompt collapsed" id="prompt-soccer">
+        <div class="prompt-head">
+          <span class="prompt-label">PROMPT · One-shot complex game</span>
+          <button class="copy-btn" data-target="p-soccer">Copy</button>
+        </div>
+        <pre id="p-soccer">Create a HTML5 Canvas first-person pixel-art soccer shooting game with a retro arcade aesthetic. Include visible legs/cleats, camera bobbing, dynamic stadium atmosphere, goalkeeper, and cinematic kick animation. Add randomized outcomes (goal, save, post, miss, rare curved shot), arcade polish (particles, screen shake, CRT feel), and controls: SPACE shoot, mouse/arrow aim, click restart. Make it dense, nostalgic, dramatic, and visually rich.</pre>
+      </div>
+
+      <div class="hint">
+        <span class="hint-label">💡 What to expect</span>
+        <p>Modern chatbots tend to nail the prompt quickly — the game is playable right away or after just a few tweaks. You'll have something to play in under 5 minutes.</p>
+        <div class="hint-imgs">
+          <div class="hint-img">
+            <p>Simple prompt, simple game — Flappy Bird. <a href="https://chatgpt.com/canvas/shared/6a1508d898648191aad641c77fe4f024" target="_blank">Play it</a>.</p>
+            <img src="game-proto-images/flappy-one-shot.png" alt="One-shot Flappy Bird prompt result"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="ph" style="display:none"><span class="ph-icon">📷</span>Flappy Bird one-shot result</div>
+          </div>
+        </div>
+        <div class="hint-imgs">
+          <div class="hint-img">
+            <p>The soccer game Gemini built is even more sophisticated than the prompt. <a href="https://gemini.google.com/share/b748b2814f44" target="_blank">Play it.</a></p>
+            <img src="game-proto-images/retro-soccer-one-shot.png" alt="Complex game prompt result"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="ph" style="display:none"><span class="ph-icon">📷</span>Complex one-shot result</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h3>You WILL eventually outgrow this approach</h3>
+        <ul>
+          <li>The more features you add, the longer the context — AI starts making inconsistent changes and introducing bugs</li>
+          <li>You can't edit the code directly, so you're 100% dependent on AI to change anything</li>
+          <li>Graphics are limited to what can be drawn in code — shapes, canvas, emoji. No real sprites.</li>
+          <li>Some things are nearly impossible to describe in words: maze layouts, exact physics feel, level design</li>
+        </ul>
+        <p><b>This is why the rest of this guide exists.</b> Once you know the idea is worth pursuing, the agent workflow gives you real control, a real codebase, and real assets.</p>
+      </div>
+    </section>
+    <section id="p00">
+      <h2>Making Game Prototypes with agentic AI</h2>
+      <p>The following guide will walk you through the whole process of creating a game prototype with agentic coding AI. There are pre-made prompts in each step that you can copy-paste.</p>     
+      
+      <div class="yt-block">
+      <h3>A demo prototype I made after a few hours</h3>
       <div class="yt-wrap">
         <iframe src="https://www.youtube.com/embed/vK4EOfWOeoE?si=12LmnC14iAcZ1F19"
           title="YouTube video player"
@@ -1450,79 +1521,7 @@
       </div>
     </div>
     <br/>
-    <br/>
-        <h2>Making Game Prototypes - with and without AI</h2>
-
-    <div class="opening-tbl-wrap">
-      <div class="tbl-card">
         
-        <table class="tbl task-tbl">
-          <colgroup>
-            <col style="width:22%">
-            <col style="width:26%">
-            <col style="width:26%">
-            <col style="width:26%">
-          </colgroup>
-          <tr>
-            <th></th>
-            <th>Non-tech person — alone</th>
-            <th>+ AI Chat<br><small style="font-weight:400;opacity:.65">GPT / Claude / Gemini</small></th>
-            <th>+ AI Agent<br><small style="font-weight:400;opacity:.65">Codex / Claude Desktop</small></th>
-          </tr>
-          <tr>
-            <td><b>Game design, story &amp; wireframing</b><span class="task-sub">concept, rules, narrative, design
-                docs</span></td>
-            <td class="yes">✅ Can do</td>
-            <td class="yes">✅ AI as thinking partner; structures &amp; writes GDD, rules, narrative, draw wireframe</td>
-            <td class="yes">✅ Agent writes &amp; saves all docs/visuals directly to your project</td>
-          </tr>
-
-          <tr>
-            <td><b>Game programming</b><span class="task-sub">architecture, logic, physics, input, UI code</span></td>
-            <td class="no">❌ Requires coding skills — must learn or hire</td>
-            <td class="warn">⚠️ AI writes snippets; you still assemble, integrate &amp; debug manually</td>
-            <td class="yes">✅ Agent architects, writes, runs, and fixes end-to-end</td>
-          </tr>
-          <tr>
-            <td><b>2D art &amp; visual assets</b><span class="task-sub">sprites, backgrounds, UI graphics</span></td>
-            <td class="no">❌ Requires art skills — must learn or hire</td>
-            <td class="warn">⚠️ AI generates images in chat; you place them in the game manually</td>
-            <td class="yes">✅ Generate + integrate into project automatically</td>
-          </tr>
-          <tr>
-            <td><b>Animation</b><span class="task-sub">sprite sheets, UI transitions, motion</span></td>
-            <td class="no">❌ Requires animation skills — must learn or hire</td>
-            <td class="no">❌ Chat AI cannot produce animation files</td>
-            <td class="warn">⚠️ Basic animation only</td>
-          </tr>
-          <tr>
-            <td><b>Sound &amp; music</b><span class="task-sub">sound effects, background music</span></td>
-            <td class="no">❌ Requires audio skills — must learn or hire</td>
-            <td class="warn">⚠️ AI suggests free sources; cannot create or integrate</td>
-            <td class="yes">✅ Can generate or source from free libraries &amp; wire into project</td>
-          </tr>
-          <tr>
-            <td><b>Version control &amp; deployment</b><span class="task-sub">git setup, commits, live URL</span></td>
-            <td class="no">❌ Requires technical skills — must learn</td>
-            <td class="warn">⚠️ AI explains each step; you execute manually</td>
-            <td class="yes">✅ Agent sets up, commits automatically, deploys to live URL</td>
-          </tr>
-          <tr>
-            <td><b>Debug, Playtest &amp; Iterate</b><span class="task-sub">playing, observing, giving feedback</span>
-            </td>
-            <td class="warn">⚠️ Come up with improvement ideas. Hard to self-implement.</td>
-            <td class="warn">⚠️ AI can only suggest fixes on very specific snippets, from your description</td>
-            <td class="yes">✅ Agents read files, think, make changes, test, report. The full loop.</td>
-          </tr>
-        </table>
-        </div>
-        
-    </div>
-    <section id="p00">
-      <h2>Making Game Prototypes with agentic AI</h2>
-
-        <p>In this guide, we'll walk through the whole process of creating a game prototype with agentic coding AI. There are pre-made prompts in each step that you can copy-paste.</p>
-        <p>Just bring your ideas, curiosity, and passion. We'll make something fun!</p>
         <div class="callout opening-callout">
           <span class="tag">🤔 Something unclear?</span>
           <p><b>Ask your AI first</b> — describe what you don't understand and it will almost certainly explain it clearly. If you're still stuck after that, I'm happy to help: <a href="https://huydung.com" target="_blank">huydung.com</a></p>
@@ -1667,9 +1666,13 @@
 
           </li>
           <li>
-            <b>Discuss back and forth with AI untilyou have a clear
-              favorite.</b> Or ask for more. 
+            <b>Discuss back and forth with AI until you have a clear
+              favorite.</b> Or ask for more.
 
+          </li>
+          <li>
+            <b>Validate with a quick one-shot prototype</b> before committing to the full workflow. <a href="#pqs">See ⚡ Quick start</a>.
+            <span class="why">2 minutes of playing beats 2 hours of planning. If the core loop isn't fun in a rough chatbot prototype, it probably won't be in a polished one either. Only move to Step 2 when you've felt that it's actually fun.</span>
           </li>
         </ul>
 
@@ -2614,10 +2617,6 @@ function presoBuildSlides() {
   if (opening) {
     addSlide(slide(Array.from(opening.children), 'Introduction', 'Why AI changes prototyping'));
   }
-
-  // ── Slide 2: YouTube demo ──
-  var yt = document.querySelector('.yt-block');
-  if (yt) addSlide(slide([yt], 'Demo video', 'Game prototype demo'));
 
   // ── Slide 3: Comparison table (tbl-card only) ──
   var openTblWrap = document.querySelector('.opening-tbl-wrap');
