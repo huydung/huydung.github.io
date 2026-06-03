@@ -5,6 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Prototyping Games with AI — The Checklist</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -1373,12 +1374,12 @@
 
   <div id="stickyhead">
     <div class="sh-wrap">
-      <div class="sh-title">Prototyping Games with AI <span>· The Checklist</span></div>
+      <div class="sh-title">Prototyping Games with AI</div>
 
       <div class="sh-right">
-        <button class="btn-present btn-present--sm" onclick="presoEnter()">⊞ Present</button>
+        <button class="btn-present btn-present--sm" onclick="presoEnter()"><i class="ti ti-presentation" aria-hidden="true" style="font-size:20px"></i></button>
         <button class="translate-btn translate-btn--sm"
-          onclick="window.open('https://translate.google.com/translate?sl=en&tl=vi&u='+encodeURIComponent(window.location.href),'_blank')">🌐</button>
+          onclick="window.open('https://translate.google.com/translate?sl=en&tl=vi&u='+encodeURIComponent(window.location.href),'_blank')">🇻🇳</button>
         <div class="sh-pct"><span id="pb-pct">0%</span> complete</div>
       </div>
     </div>
@@ -1405,8 +1406,8 @@
       <p class="byline">By <b>Huy Dũng (DaveHD)</b></p>
       <div class="cover-btns">
         <button class="translate-btn"
-          onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🌐 Vietnamese</button>
-        <button class="btn-present" onclick="presoEnter()">⊞ Present</button>
+          onclick="window.open('https://translate.google.com/translate?sl=en&amp;tl=vi&amp;u='+encodeURIComponent(window.location.href),'_blank')">🇻🇳 Tiếng Việt</button>
+        <button class="btn-present" onclick="presoEnter()"><i class="ti ti-presentation" aria-hidden="true" style="font-size:20px"></i> Slides Mode</button>
       </div>
     </div>
     <img class="hdi-logo" src="https://huydung.com/static/logo_small.png" alt="HDI">
@@ -2754,7 +2755,7 @@ function presoRender(idx) {
       '<div style="display:flex;flex-direction:column;justify-content:center;min-height:75vh;padding:60px 0;">' +
       '<h1 style="font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:700;color:#fff;margin:0 0 28px;line-height:1.08;">Now go prove your idea is fun!</h1>' +
       '<p style="font-family:var(--serif);font-style:italic;font-size:clamp(16px,2vw,24px);color:var(--hd-cream);margin:0 0 24px;line-height:1.5;max-width:70ch;">The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it’s worth pursuing.</p>' +
-      '<p style="font-size:15px;color:rgba(255,255,255,.45);letter-spacing:.02em;">Huy Dũng (DaveHD) · huydung.com</p>' +
+      '<p style="font-size:20px;color:rgba(255,255,255,.45);letter-spacing:.02em;">Huy Dũng (DaveHD) · huydung.com</p>' +
       '</div>';
   } else {
     overlay.style.background = '#fff';
