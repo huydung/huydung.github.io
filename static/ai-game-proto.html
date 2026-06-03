@@ -1286,6 +1286,14 @@
       font-size: 12px;
     }
 
+    /* Slides Mode is desktop-only — the deck UI needs keyboard nav,
+       enough screen to be readable, and a landscape aspect ratio.
+       Hide both the cover button and the sticky-header button on phones,
+       small screens, or any portrait viewport. */
+    @media (max-width: 768px), (orientation: portrait) {
+      .btn-present { display: none !important; }
+    }
+
     /* Cover: both buttons identical size */
     .cover-btns {
       align-items: stretch;
@@ -3190,11 +3198,18 @@ Do everything you can yourself (create the workflow file, set the correct build/
     }, true);
 
     function presoEnter() {
+      // Bail out on mobile / small screens / portrait — the deck UI isn't usable there.
+      if (window.matchMedia && window.matchMedia('(max-width: 768px), (orientation: portrait)').matches) return;
       presoSlides = presoBuildSlides();
       if (!presoSlides.length) return;
-      document.getElementById('preso-overlay').classList.add('active');
+      var overlay = document.getElementById('preso-overlay');
+      overlay.classList.add('active');
       document.body.style.overflow = 'hidden';
       presoRender(0);
+      // Make sure arrow-key keydown reaches our handler — focus the overlay
+      // so events don't get stranded on the (now hidden) Slides Mode button.
+      overlay.setAttribute('tabindex', '-1');
+      overlay.focus({ preventScroll: true });
     }
 
     function presoExit() {
@@ -3237,22 +3252,27 @@ Do everything you can yourself (create the workflow file, set the correct build/
       presoGridOpen = false;
     }
 
-    document.addEventListener('keydown', function (e) {
+    // Listen on window in capture phase so the handler fires no matter
+    // where focus currently is — including inside the fullscreened slide-wrap
+    // or on a topbar button. preventDefault stops the browser from also
+    // scrolling the slide-wrap when arrow keys fire.
+    window.addEventListener('keydown', function (e) {
       var overlay = document.getElementById('preso-overlay');
       if (!overlay || !overlay.classList.contains('active')) return;
       if (e.key === 'Escape') {
         if (presoGridOpen) { presoCloseGrid(); } else { presoGrid(); }
-      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        if (!presoGridOpen) presoNext();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        if (!presoGridOpen) presoPrev();
+      } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+        if (!presoGridOpen) { presoNext(); e.preventDefault(); }
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+        if (!presoGridOpen) { presoPrev(); e.preventDefault(); }
       } else if (e.key === 'f' || e.key === 'F') {
         if (!presoGridOpen) {
           var sw = document.getElementById('preso-slide-wrap');
           if (sw.requestFullscreen) sw.requestFullscreen();
+          e.preventDefault();
         }
       }
-    });
+    }, true);
 
   </script>
 
