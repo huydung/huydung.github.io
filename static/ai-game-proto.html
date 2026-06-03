@@ -124,7 +124,7 @@
 
     section {
       padding: 54px 0 8px;
-      border-bottom: 1px solid var(--hd-gray-border);
+      border-bottom: 1px dashed var(--hd-red-deep);
     }
 
     section:last-of-type {
@@ -307,7 +307,7 @@
     /* ---- Callout ---- */
     .callout {
       background: var(--hd-cream);
-      border-left: 4px solid var(--hd-red-dark);
+      border-left: 4px solid var(--hd-red-bright);
       padding: 16px 20px;
       margin: 22px 0;
       border-radius: 2px;
@@ -709,7 +709,7 @@
     /* ---- Hint panel ---- */
     .hint {
       background: var(--hd-cream);
-      border-left: 4px solid var(--hd-red-dark);
+      border-left: 4px solid var(--hd-orange);
       border-radius: 0 4px 4px 0;
       padding: 16px 20px 14px;
       margin: 22px 0 26px;
@@ -1036,7 +1036,41 @@
 
     /* ---- YouTube embed ---- */
     .yt-block {
-      padding: 40px 0 8px;
+      padding: 10px 0 8px;
+    }
+
+    /* ---- Principle cards ---- */
+    .principles-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin: 28px 0 8px;
+    }
+    .principle-card {
+      border: 1.5px solid var(--hd-gray-border);
+      border-top: 3px solid var(--hd-red-deep);
+      border-radius: 6px;
+      padding: 18px 20px;
+      background: var(--hd-white);
+    }
+    .principle-card .pc-num {
+      font-family: var(--serif);
+      font-weight: 900;
+      font-size: 11px;
+      color: var(--hd-red-deep);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .principle-card p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--hd-ink);
+    }
+    .principle-card b {
+      color: var(--hd-red-deep);
     }
 
     .yt-block h3 {
@@ -1193,7 +1227,7 @@
     }
 
     section#recap .tbl tr:nth-child(even) td {
-      background: rgba(0, 0, 0, .04);
+      background: var(--hd-off-white);
     }
 
     section#recap .tbl td {
@@ -1486,31 +1520,35 @@
     }
 
 
-    /* Image slides: full bleed, no max-width restriction */
-    #preso-slide .hint-img {
-      height: auto !important;
+    /* Image slides: fill the full slide area, image centred */
+    #preso-slide.img-slide {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
+    #preso-slide.img-slide .hint-img {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      gap: 6px;
     }
-
-    #preso-slide .hint-img img {
+    #preso-slide.img-slide .hint-img img {
       width: 100%;
       height: auto;
-      max-height: 90vh;
+      max-height: calc(100vh - 90px); /* subtract topbar + caption row */
       object-fit: contain;
-      object-position: top center;
+      object-position: center;
       display: block;
     }
-
-    #preso-slide .hint-img p {
-      font-size: 13px;
-      color: #888;
+    #preso-slide.img-slide .hint-img p {
+      font-size: 12px;
+      color: #999;
       font-style: italic;
       margin: 0;
       line-height: 1.4;
-      padding: 0 4px;
       text-align: center;
     }
     /* ── PDF / Print export ── */
@@ -1708,9 +1746,6 @@
       </section>
       <section id="p00">
         <h2>Making Game Prototypes with agentic AI</h2>
-        <p>The following guide will walk you through the whole process of creating a game prototype with agentic coding
-          AI. There are pre-made prompts in each step that you can copy-paste.</p>
-
         <div class="yt-block">
           <h3>A demo prototype I made after a few hours</h3>
           <div class="yt-wrap">
@@ -1719,14 +1754,22 @@
               referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
           </div>
         </div>
-        <br />
 
-        <div class="callout opening-callout">
-          <span class="tag">🤔 Something unclear?</span>
-          <p><b>Ask your AI first</b> — describe what you don't understand and it will almost certainly explain it
-            clearly. If you're still stuck after that, I'm happy to help: <a href="https://huydung.com"
-              target="_blank">huydung.com</a></p>
+        <div class="principles-grid">
+          <div class="principle-card">
+            <span class="pc-num">Principle 1 · Roles</span>
+            <p>You are the <b>orchestrator</b> — you design, direct, and validate. <b>AI agents</b> (not chatbots) are the executors — they write and run the code.</p>
+          </div>
+          <div class="principle-card">
+            <span class="pc-num">Principle 2 · Process</span>
+            <p>Apply <b>proper process</b> — templates, best practices, clear structure — in both design and coding. <b>Plan thoroughly first</b>, then execute in small focused steps.</p>
+          </div>
+          <div class="principle-card">
+            <span class="pc-num">Principle 3 · Scope</span>
+            <p>This is a <b>prototype</b> — don't get lost in polishing or fixing minor bugs. <b>Stay focused on testing the core experiences</b>, and be ready to redo the game later.</p>
+          </div>
         </div>
+        
       </section>
 
       <!-- PHASE 0 -->
@@ -3086,9 +3129,12 @@ Do everything you can yourself (create the workflow file, set the correct build/
         });
         // Minimal padding for pure image slides
         var isImgSlide = s.els.length === 1 && s.els[0].classList && s.els[0].classList.contains('hint-img');
-        container.style.padding = isImgSlide ? '12px 20px' : '';
-        container.style.maxWidth = isImgSlide ? '100%' : '';
-        wrap.style.alignItems = isImgSlide ? 'stretch' : 'center';
+        container.style.padding    = isImgSlide ? '8px 16px' : '';
+        container.style.maxWidth   = isImgSlide ? '100%' : '';
+        container.style.height     = isImgSlide ? '100%' : '';
+        wrap.style.alignItems      = isImgSlide ? 'stretch' : 'center';
+        if (isImgSlide) { container.classList.add('img-slide'); }
+        else { container.classList.remove('img-slide'); }
         // Force-expand all prompts: remove collapsed class, hide expand bar
         container.querySelectorAll('.prompt').forEach(function (p) {
           p.classList.remove('collapsed');
