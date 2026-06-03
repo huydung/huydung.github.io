@@ -1513,6 +1513,42 @@
       padding: 0 4px;
       text-align: center;
     }
+    /* ── PDF / Print export ── */
+    #preso-print { display: none; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
+      body > *:not(#preso-print) { display: none !important; }
+      #preso-print { display: block !important; }
+      .print-slide {
+        width: 100vw;
+        min-height: 100vh;
+        page-break-after: always;
+        break-after: page;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 52px 72px;
+        box-sizing: border-box;
+        background: #fff;
+        font-family: var(--sans);
+        font-size: 13px;
+        overflow: hidden;
+        position: relative;
+      }
+      .print-slide--red { background: #8E011F !important; }
+      .print-slide .ph { display: none !important; }
+      .print-slide .prompt { border: 1px solid #eee; border-radius: 4px; margin: 8px 0; overflow: visible !important; }
+      .print-slide .prompt-head { padding: 6px 10px; background: #8E011F; display: flex; justify-content: space-between; }
+      .print-slide .prompt-head span { color: #fff; font-size: 11px; }
+      .print-slide .copy-btn { display: none !important; }
+      .print-slide pre { max-height: none !important; mask-image: none !important; -webkit-mask-image: none !important; overflow: visible !important; font-size: 11px; padding: 10px; margin: 0; }
+      .print-slide .prompt-expand-bar { display: none !important; }
+      .print-slide .hint-img { height: auto !important; }
+      .print-slide .hint-img img { max-height: 70vh; width: 100%; object-fit: contain; }
+      .print-slide .check { list-style: none; padding: 0; }
+      .print-slide .check li { padding: 6px 0 6px 28px; border-bottom: 1px solid #eee; font-size: 13px; }
+      .print-slide .check .box { display: none; }
+    }
   </style>
 </head>
 
@@ -1590,7 +1626,7 @@
     <div class="wrap">
       <!-- QUICK PROOF OF CONCEPT -->
       <section id="pqs">
-        <h2>⚡ AI Chatbot is very capable now</h2>
+        <h2>⚡ AI Chatbot is quite capable now</h2>
         <p class="lead">Modern AI chatbots can turn a game idea into something playable in minutes, with zero setup. Try
           this first to get a sense of their capability.</p>
 
@@ -2827,6 +2863,50 @@ Do everything you can yourself (create the workflow file, set the correct build/
     })();
 
 
+    // PDF EXPORT
+    function presoPrint() {
+      if (!presoSlides.length) presoSlides = presoBuildSlides();
+      var printDiv = document.getElementById('preso-print');
+      if (!printDiv) {
+        printDiv = document.createElement('div');
+        printDiv.id = 'preso-print';
+        document.body.appendChild(printDiv);
+      }
+      printDiv.innerHTML = '';
+      var h1El     = document.querySelector('header.cover h1');
+      var subEl    = document.querySelector('header.cover .sub');
+      var bylineEl = document.querySelector('header.cover .byline');
+      presoSlides.forEach(function(s) {
+        var page = document.createElement('div');
+        page.className = 'print-slide';
+        if (s.hero) {
+          page.classList.add('print-slide--red');
+          page.innerHTML =
+            (h1El     ? '<h1 style="font-family:var(--serif);font-size:52px;font-weight:700;color:#fff;margin:0 0 20px;line-height:1.1;">'     + h1El.textContent     + '</h1>' : '') +
+            (subEl    ? '<p style="font-family:var(--serif);font-style:italic;font-size:22px;color:rgba(248,247,208,.9);margin:0 0 14px;">'     + subEl.textContent    + '</p>'  : '') +
+            (bylineEl ? '<p style="font-size:13px;color:rgba(255,255,255,.45);">'                                                                + bylineEl.textContent + '</p>'  : '');
+        } else if (s.footer) {
+          page.classList.add('print-slide--red');
+          page.innerHTML =
+            '<h1 style="font-family:var(--serif);font-size:48px;font-weight:700;color:#fff;margin:0 0 18px;line-height:1.08;">Now go prove your idea is fun!</h1>' +
+            '<p style="font-family:var(--serif);font-style:italic;font-size:20px;color:#F8F7D0;margin:0 0 16px;max-width:70ch;">The AI does the technical heavy lifting. You do the part that matters — the idea, the taste, the call on whether it\'s worth pursuing.</p>' +
+            '<p style="font-size:13px;color:rgba(255,255,255,.45);">Huy Dũng (DaveHD) · huydung.com</p>';
+        } else {
+          s.els.forEach(function(el) {
+            var clone = el.cloneNode(true);
+            clone.querySelectorAll('.prompt').forEach(function(p) { p.classList.remove('collapsed'); });
+            clone.querySelectorAll('.prompt-expand-bar').forEach(function(b) { b.style.display = 'none'; });
+            page.appendChild(clone);
+          });
+        }
+        printDiv.appendChild(page);
+      });
+      setTimeout(function() {
+        window.print();
+        setTimeout(function() { printDiv.innerHTML = ''; }, 1500);
+      }, 400);
+    }
+
     // ════════════════════════════════════════
     // PRESENTATION MODE
     // ════════════════════════════════════════
@@ -3103,6 +3183,7 @@ Do everything you can yourself (create the workflow file, set the correct build/
         <button onclick="presoGrid()" title="Grid view (Esc)">⊞</button>
         <button onclick="presoPrev()">◀</button>
         <button onclick="presoNext()">▶</button>
+        <button onclick="presoPrint()" title="Export all slides as PDF">⬇ PDF</button>
         <button onclick="presoExit()">✕ Exit</button>
       </div>
     </div>
