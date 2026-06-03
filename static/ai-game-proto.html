@@ -1538,7 +1538,11 @@
     #preso-slide.img-slide .hint-img img {
       width: 100%;
       height: auto;
-      max-height: calc(100vh - 90px); /* subtract topbar + caption row */
+      /* Fallback for first paint; JS sets the real value via --img-max-h
+         so the image refits when the user resizes the window or toggles
+         fullscreen (fullscreen is on #preso-slide-wrap only, so the topbar
+         space changes). */
+      max-height: var(--img-max-h, calc(100vh - 90px));
       object-fit: contain;
       object-position: center;
       display: block;
@@ -3151,7 +3155,41 @@ Do everything you can yourself (create the workflow file, set the correct build/
       document.querySelectorAll('.preso-thumb').forEach(function (t, i) {
         t.classList.toggle('preso-cur', i === idx);
       });
+      // Fit image slides to actual available space; run twice (now + after
+      // images decode) so first-paint sizing is correct even before load.
+      presoFitImgSlide();
+      requestAnimationFrame(presoFitImgSlide);
     }
+
+    // Measure slide-wrap and caption, then size the image. Re-run on
+    // window resize and fullscreenchange so manual resizing or toggling
+    // fullscreen recomputes max-height (fullscreen targets the slide-wrap
+    // alone, so the topbar disappears and the image can grow).
+    function presoFitImgSlide() {
+      var overlay = document.getElementById('preso-overlay');
+      if (!overlay || !overlay.classList.contains('active')) return;
+      var slide = document.getElementById('preso-slide');
+      if (!slide || !slide.classList.contains('img-slide')) return;
+      var wrap = document.getElementById('preso-slide-wrap');
+      var hintImg = slide.querySelector('.hint-img');
+      var img = slide.querySelector('.hint-img img');
+      if (!wrap || !hintImg || !img) return;
+      var caption = hintImg.querySelector('p');
+      var captionH = caption ? caption.offsetHeight : 0;
+      var slideStyle = getComputedStyle(slide);
+      var padV = parseFloat(slideStyle.paddingTop) + parseFloat(slideStyle.paddingBottom);
+      var hintStyle = getComputedStyle(hintImg);
+      var gap = parseFloat(hintStyle.rowGap || hintStyle.gap || 0);
+      var available = wrap.clientHeight - captionH - padV - gap - 4;
+      slide.style.setProperty('--img-max-h', Math.max(80, available) + 'px');
+    }
+    window.addEventListener('resize', presoFitImgSlide);
+    document.addEventListener('fullscreenchange', presoFitImgSlide);
+    document.addEventListener('webkitfullscreenchange', presoFitImgSlide);
+    // Re-fit once each image has loaded (offsetHeight is reliable then).
+    document.addEventListener('load', function (e) {
+      if (e.target && e.target.tagName === 'IMG') presoFitImgSlide();
+    }, true);
 
     function presoEnter() {
       presoSlides = presoBuildSlides();
