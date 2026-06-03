@@ -1223,7 +1223,7 @@
       flex: 1;
       overflow-y: auto;
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: center;
       padding: 0;
       background: #fff; /* explicit white so fullscreen doesn't go black */
@@ -1385,8 +1385,7 @@
     </div>
   <div id="sh-nav">
     <div id="sh-nav-inner">
-      <a href="#pqs">⚡ Quick start</a>
-        <a href="#p0">0 · Setup</a>
+      <a href="#p0">0 · Setup</a>
       <a href="#p1">1 · Idea</a>
       <a href="#p2">2 · Game Design</a>
       <a href="#p3">3 · Tech Design</a>
@@ -1441,7 +1440,7 @@
     <!-- QUICK PROOF OF CONCEPT -->
     <section id="pqs">
       <h2>⚡ AI Chatbot is very capable now</h2>
-      <p class="lead">Modern AI chatbots can turn a game idea into something playable in minutes, with zero setup. Try this first to get a sense of the limit.</p>
+      <p class="lead">Modern AI chatbots can turn a game idea into something playable in minutes, with zero setup. Try this first to get a sense of their capability.</p>
 
       <ul class="check">
         <li>
@@ -1603,9 +1602,22 @@
             <td class="yes">✅ YouTube Premium · 5TB Google Drive</td>
           </tr>
         </table> 
+        <div class="hint">
+        <span class="hint-label">💡 In practice</span>         
+
+        <div class="hint-imgs">
+          <div class="hint-img">
+            <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The key things are: giving it access to a local folder, pick the right permissions level, and the right model. Below is a screenshot of Codex.</p>
+            <img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent interface screenshot</div>
+          </div>
+        </div>         
+      </div>
       </section>
+      
       <section id="p0b">
-        <h2>On choosing the main AI service provider</h2>
+        <h3>On choosing the main AI service provider</h3>
         <ul>
           <li><a href="https://antigravity.google/" target="_blank"><b>Gemini (Antigravity)</b></a> shines during planning (use Canvas
             to draft GDD/TDD/plan live, export to .md when done) and has the best bundled value-for-money overall.</li>
@@ -1615,44 +1627,31 @@
           <li><a href="https://claude.ai/download" target="_blank"><b>Claude (Claude Code)</b></a> is strongest for pure reasoning and writing, and working on a large codebase.</li>
         </ul>
         <p>For game prototypes, start with whichever you already have — the prompts work across all three.</p>
-        <h2>On choosing models within the app</h2>
+        <h3>On choosing models within the app</h3>
         <ul>
           <li>During <b>brainstorming &amp; design</b>, use a <b>mid / creative model</b> (e.g. Claude Sonnet, Gemini Flash, ChatGPT "medium" reasoning) — top models over-optimize for logic and under-deliver on creativity.</li>
           <li>During <b>technical design and planning</b>, use the <b>highest</b> model and thinking effort.</li>
           <li>During <b>the coding</b>, <b>start with the mid-level model</b> — it should works fine for simple game
             prototype. Only switch up to the strongest model when you genuinely can't get the result you want.</li>
         </ul>
-        <div class="hint">
-          <span class="hint-label">💡 In practice</span>         
-
-          <div class="hint-imgs">
-            <div class="hint-img">
-              <p>The agent interface may looks similar to normal chat window. But do explore - it's much more powerful. The key things are: giving it access to a local folder, pick the right permissions level, and the right model. Below is a screenshot of Codex.</p>
-              <img src="game-proto-images/agent-interface.png" alt="Agent interface screenshot"
-                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Agent interface screenshot</div>
-            </div>
-          </div>         
-        </div>
+        
       </section>
 
       <!-- PHASE 1 -->
       <section id="p1">
-        <h2><span class="num">1</span>Find the idea</h2>
+        <h2><span class="num">1</span>Confirm the idea</h2>
         <p class="lead">Use the chat AI as a thinking partner. Make it ask <i>you</i> questions — the best idea still
-          comes from you. Pick whichever prompt matches your situation: an open brainstorm, or one anchored to a
-          specific theme.</p>
+          comes from you. Pick whichever prompt matches your situation: an open brainstorm, one anchored to a
+          specific theme, or one that refine your existing idea.</p>
 
         <ul class="check">
           <li>
-            <b>Use a creative (mid-tier) model</b>
-            , in English if you can.
+            <b>Use a creative (mid-tier) model</b>, in English if you can.
             <span class="why">Saves tokens and improves quality.</span>
 
           </li>
           <li>
-            <b>State who the players are</b>
-            — both prompts ask for it, because a game for kids and a game for puzzle fans lead to very different ideas.
+            <b>State who the players are</b>— both prompts ask for it.
 
           </li>
           <li>
@@ -1661,18 +1660,16 @@
 
           </li>
           <li>
-            <b>Get 10+ ideas, each with a clear gameplay description and annotated ratings</b>
+            <b>If brainstorming, get 10+ ideas, each with a clear gameplay description and annotated ratings</b>
             — concrete "what the player does" language, not inspirational copy. Ratings let you compare objectively.
 
           </li>
           <li>
-            <b>Discuss back and forth with AI until you have a clear
-              favorite.</b> Or ask for more.
+            <b>Discuss back and forth with AI until you have a clear idea to pursue.</b> 
 
           </li>
           <li>
-            <b>Validate with a quick one-shot prototype</b> before committing to the full workflow. <a href="#pqs">See ⚡ Quick start</a>.
-            <span class="why">2 minutes of playing beats 2 hours of planning. If the core loop isn't fun in a rough chatbot prototype, it probably won't be in a polished one either. Only move to Step 2 when you've felt that it's actually fun.</span>
+            <b>Optionally validate that idea with a quick one-shot prototype</b> before committing to the full workflow.
           </li>
         </ul>
 
@@ -1737,14 +1734,58 @@ When I say "ready", present at least 10 theme-based ideas as a numbered list. Fo
 
 Then call out your top 3 picks with one sentence on why each is a strong prototype that fits the theme and this audience.</pre>
         </div>
+        <h3>Version C — I already have an idea, help me stress-test it</h3>
+
+        <div class="prompt">
+          <div class="prompt-head">
+            <span class="prompt-label">PROMPT · Strengthen an existing idea</span>
+            <button class="copy-btn" data-target="p-brain-refine">Copy</button>
+          </div>
+          <pre id="p-brain-refine">I already have a game idea I want to prototype. I don't need more ideas — I need you to help me stress-test this one, spot the blindspots, and sharpen it.
+
+My idea: [DESCRIBE YOUR GAME — what the player does, what the core mechanic is, what makes it fun in your head]
+
+Target audience: [DESCRIBE PLAYERS — e.g. "casual mobile players", "kids 8–12", "puzzle fans"]
+
+Do this in order:
+
+1. MARKET SCAN — Search for similar games that already exist. List the 3–5 closest examples with a one-line description of each. For each, say: what does my idea share with it, and what (if anything) is genuinely different?
+
+2. AUDIENCE FIT — Based on the audience I described, honestly assess: does this mechanic actually match what these players enjoy? What friction might push them away?
+
+3. BLINDSPOTS — Play devil's advocate. What assumptions am I making that could be wrong? What would make this idea fail as a game or as a prototype? Be direct, not polite.
+
+4. QUESTIONS — Ask me up to 5 clarifying questions about parts of the idea that are still vague or risky.
+
+5. STRENGTHENED VERSION — After I answer your questions, restate the idea in a cleaner, sharper form. Keep what's good. Fix what's weak. Flag anything still uncertain.
+
+Don't hold back on step 3 — I'd rather hear the hard truth now than discover it after coding.</pre>
+        </div>
+
         <div class="hint">
           <span class="hint-label">💡 In practice</span>
-          
+
 
           <div class="hint-imgs">
             <div class="hint-img">
               <p>Below is an example of output given by Claude, in normal Chat mode. It's a bit of an Overkill, yeah 😆</p>
               <img src="game-proto-images/brainstorm-output.png" alt="Example brainstorm output"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Example brainstorm output</div>
+            </div>
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img">
+              <p>I asked Gemini to expand on the idea I'm interested in</p>
+              <img src="game-proto-images/ddd-design-explain.png" alt="Example brainstorm output"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+              <div class="ph" style="display:none"><span class="ph-icon">📷</span>Example brainstorm output</div>
+            </div>
+          </div>
+          <div class="hint-imgs">
+            <div class="hint-img">
+              <p>The one-shot version of <a href="https://gemini.google.com/share/81daa5411365" target="_blank">Dragon Draw Defense</a>.</p>
+              <img src="game-proto-images/one-show-dragon-draw.png" alt="Example brainstorm output"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
               <div class="ph" style="display:none"><span class="ph-icon">📷</span>Example brainstorm output</div>
             </div>
@@ -2767,7 +2808,7 @@ function presoRender(idx) {
     var isImgSlide = s.els.length === 1 && s.els[0].classList && s.els[0].classList.contains('hint-img');
     container.style.padding  = isImgSlide ? '12px 20px' : '';
     container.style.maxWidth = isImgSlide ? '100%' : '';
-    wrap.style.alignItems    = isImgSlide ? 'stretch' : '';
+    wrap.style.alignItems    = isImgSlide ? 'stretch' : 'center';
     // Force-expand all prompts: remove collapsed class, hide expand bar
     container.querySelectorAll('.prompt').forEach(function(p) {
       p.classList.remove('collapsed');
