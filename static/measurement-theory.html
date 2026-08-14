@@ -1,0 +1,1033 @@
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#8e011f; --red-bright:#bd0129; --red-dark:#51000c; --cream:#f8f7d0;
+  --ink:#1a1a1a; --ink2:#4a4a4a; --bg:#fff; --line:#e8e8e8;
+  --ok:#69a257; --warn:#ff9200;
+  --title:'Merriweather',Georgia,serif;
+  --body:'Be Vietnam Pro','Inter',-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+#mt{font-family:var(--body);color:var(--ink);line-height:1.6;font-size:16px;background:var(--bg);
+  hyphens:none;word-break:keep-all;max-width:1180px;margin:0 auto}
+#mt h1,#mt h2,#mt h3{font-family:var(--title);color:var(--red);line-height:1.25;margin:0}
+#mt h1{font-size:34px;font-weight:700}
+#mt h2{font-size:24px}
+#mt h3{font-size:19px}
+#mt p{margin:0 0 12px}
+#mt a{color:var(--red-bright)}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+
+/* ---- header ---- */
+.hd{border-bottom:3px solid var(--red);padding:22px 4px 16px;display:flex;
+  justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap}
+.hd .sub{color:var(--ink2);font-size:14px;margin-top:6px;max-width:52ch}
+.hd .right{text-align:right;font-size:13px;color:var(--ink2)}
+.bignum{font-family:var(--title);font-weight:900;font-size:44px;color:var(--red-bright);
+  line-height:1;display:block}
+
+/* ---- ruler progress (signature) ---- */
+.ruler{display:flex;align-items:flex-end;gap:2px;height:34px;margin:18px 4px 6px;
+  border-bottom:2px solid var(--red);padding-bottom:0}
+.tick{flex:1;background:var(--line);border-radius:1px 1px 0 0;transition:height .25s,background .25s;
+  cursor:pointer;position:relative}
+.tick.done{background:var(--red)}
+.tick.here{background:var(--red-bright)}
+.rulerlab{display:flex;justify-content:space-between;font-size:11px;color:var(--ink2);
+  margin:0 4px 26px;letter-spacing:.04em}
+
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:264px 1fr;gap:34px;padding:0 4px 60px}
+@media(max-width:820px){.wrap{grid-template-columns:1fr;gap:20px}}
+
+/* ---- rail ---- */
+.unit{margin-bottom:20px}
+.unit .ut{font-family:var(--title);font-weight:700;color:var(--red);font-size:14px;
+  border-left:4px solid var(--red);padding-left:9px;margin-bottom:9px}
+.slist{list-style:none;margin:0;padding:0}
+.sitem{display:flex;gap:9px;align-items:baseline;padding:6px 8px 6px 13px;font-size:14px;
+  cursor:pointer;border-radius:3px;color:var(--ink)}
+.sitem:hover{background:#fdf3f4}
+.sitem.active{background:var(--red);color:#fff}
+.sitem.active .sn{color:#fff}
+.sn{font-family:var(--title);font-weight:700;color:var(--red-bright);font-size:12px;min-width:20px}
+.sitem.done .st{text-decoration:line-through;text-decoration-color:var(--ok);opacity:.62}
+
+/* ---- main panel ---- */
+.pane{min-height:60vh}
+.ptop{border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:20px}
+.meta{font-size:12.5px;color:var(--ink2);margin-top:8px}
+.meta b{color:var(--red-bright)}
+.sec{margin:26px 0}
+.sec>.eyebrow{border-top:1px solid var(--line);padding-top:8px;display:block;margin-bottom:10px}
+.brief p{max-width:70ch}
+.brief b{font-weight:600}
+.callout{background:var(--cream);border-left:4px solid var(--red);padding:14px 16px;margin:16px 0}
+.callout .ct{font-family:var(--title);font-weight:700;color:var(--red);font-size:15px;margin-bottom:5px}
+.callout p:last-child{margin-bottom:0}
+.doit{border:1px solid var(--line);border-top:3px solid var(--red-bright);padding:15px 17px}
+.srcs{font-size:13.5px;color:var(--ink2)}
+.srcs li{margin-bottom:5px}
+
+/* ---- quiz ---- */
+.q{border:1px solid var(--line);padding:14px 16px;margin-bottom:12px}
+.qt{font-weight:500;margin-bottom:10px}
+.opt{display:block;width:100%;text-align:left;font:inherit;font-size:14.5px;background:#fff;
+  border:1px solid var(--line);padding:8px 11px;margin-bottom:6px;cursor:pointer;border-radius:3px}
+.opt:hover{border-color:var(--red-bright)}
+.opt.right{border-color:var(--ok);background:#f2f8ef;font-weight:500}
+.opt.wrong{border-color:var(--red-bright);background:#fdf3f4;text-decoration:line-through}
+.why{font-size:14px;background:var(--cream);padding:10px 13px;margin-top:8px;border-left:3px solid var(--red)}
+
+/* ---- buttons / controls ---- */
+button{font-family:var(--body)}
+.btn{font-size:14px;font-weight:500;padding:9px 16px;border:1px solid var(--red);background:#fff;
+  color:var(--red);cursor:pointer;border-radius:3px}
+.btn:hover{background:#fdf3f4}
+.btn.solid{background:var(--red);color:#fff}
+.btn.solid:hover{background:var(--red-dark)}
+.btn.sm{padding:6px 11px;font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.navrow{display:flex;justify-content:space-between;gap:10px;margin-top:34px;
+  border-top:3px solid var(--red);padding-top:16px;flex-wrap:wrap}
+textarea{width:100%;font-family:var(--body);font-size:14.5px;line-height:1.55;padding:11px;
+  border:1px solid var(--line);border-radius:3px;min-height:96px;resize:vertical;color:var(--ink)}
+textarea:focus{outline:2px solid var(--red-bright);outline-offset:-1px}
+.saved{font-size:12px;color:var(--ok);font-weight:500}
+
+/* ---- lab ---- */
+.lab{border:1px solid var(--red);border-top-width:3px;padding:17px}
+.lab h3{margin-bottom:4px}
+.labhint{font-size:13.5px;color:var(--ink2);margin-bottom:14px;max-width:66ch}
+.ctrl{display:grid;grid-template-columns:auto 1fr 54px;gap:8px 12px;align-items:center;
+  font-size:13.5px;margin-bottom:7px}
+.ctrl label{white-space:nowrap;color:var(--ink2)}
+.ctrl output{font-family:var(--title);font-weight:700;color:var(--red-bright);text-align:right}
+input[type=range]{width:100%;accent-color:var(--red)}
+.readout{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0 4px;
+  border-top:1px solid var(--line);padding-top:13px}
+.ro{min-width:110px}
+.ro .k{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink2)}
+.ro .v{font-family:var(--title);font-weight:700;font-size:23px;color:var(--red)}
+.verdict{font-size:14.5px;font-weight:500;padding:10px 13px;margin-top:12px;border-left:4px solid}
+.verdict.bad{border-color:var(--red-bright);background:#fdf3f4;color:var(--red-dark)}
+.verdict.good{border-color:var(--ok);background:#f2f8ef;color:#35512c}
+canvas{max-width:100%;height:auto;display:block}
+table.mx{border-collapse:collapse;font-size:14px;margin:4px 0 12px}
+table.mx th,table.mx td{border:1px solid var(--line);padding:7px 11px;text-align:center;min-width:56px}
+table.mx th{background:#fdf3f4;color:var(--red);font-family:var(--title);font-size:12.5px}
+table.mx td.hi{background:var(--cream);font-weight:700;color:var(--red-dark)}
+.bars{display:flex;gap:16px;align-items:flex-end;height:120px;margin:10px 0 2px}
+.bargrp{flex:1;display:flex;gap:4px;align-items:flex-end;height:100%}
+.bar{flex:1;background:var(--red);min-height:1px;border-radius:2px 2px 0 0}
+.bar.b2{background:var(--red-bright);opacity:.55}
+.blab{font-size:11.5px;color:var(--ink2);text-align:center}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:10px;
+  background:var(--cream);color:var(--red-dark);margin-left:7px}
+
+/* ---- cards ---- */
+.card{border:1px solid var(--red);border-top-width:3px;padding:26px 20px;text-align:center;
+  min-height:172px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.card .f{font-family:var(--title);font-weight:700;font-size:19px;color:var(--red)}
+.card .b{font-size:15.5px;max-width:56ch;margin:0 auto;text-align:left}
+.dim{color:var(--ink2);font-size:13px}
+</style>
+
+<div id="mt">
+  <div class="hd">
+    <div>
+      <span class="eyebrow">A study system for practitioners</span>
+      <h1>Measurement Theory, Properly</h1>
+      <div class="sub">Eighteen sessions of thirty minutes. Read, run the lab, answer the checks,
+        then apply it to one instrument you actually own.</div>
+    </div>
+    <div class="right"><span class="bignum" id="pct">0%</span>
+      <span id="donecount">0 of 18 sessions done</span>
+      <div class="row" style="justify-content:flex-end;margin-top:9px">
+        <button class="btn sm" id="btnCards">Review cards</button>
+        <button class="btn sm" id="btnData">Backup</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ruler" id="ruler"></div>
+  <div class="rulerlab"><span>Unit 1 · What measurement is</span><span>Unit 5 · Practice</span></div>
+
+  <div class="wrap">
+    <div id="rail"></div>
+    <div class="pane" id="pane"></div>
+  </div>
+</div>
+<script>
+const UNITS=[
+ "Unit 1 — What measurement actually is",
+ "Unit 2 — The testable path",
+ "Unit 3 — Reliability, and the alpha trap",
+ "Unit 4 — Validity, the real fight",
+ "Unit 5 — Modern practice and the honest ceiling"];
+
+const S=[
+{u:0,t:"The question nobody asks",lab:"",
+brief:`<p>Start with the question that organises everything else: <b>is the attribute you are measuring quantitative at all?</b></p>
+<p>To say a person has "more" of something is an ordinal claim. To say the difference between 3 and 4 equals the difference between 7 and 8 is a much stronger claim. It says the attribute has additive structure — that differences between its levels are themselves magnitudes that can be added. Length has this. Temperature has it. Whether motivation, engagement, or leadership capability has it is an <b>empirical question</b>, and it has an answer independent of how you score your survey.</p>
+<p>Joel Michell's charge against psychometrics is precise. The field skips this question. It builds an instrument, checks whether scores correlate with other scores, and treats the numbers as quantities from the start. Michell calls this pathological science — not because the researchers are careless, but because the field has institutionalised a step it never took. Every practice you will study in later sessions (alpha, factor analysis, regression on scale scores) presupposes the answer.</p>
+<div class="callout"><div class="ct">Hold this distinction all the way through</div>
+<p><b>Assigning numbers</b> follows a rule and is always possible. <b>Measuring</b> claims the numbers represent magnitudes of a real attribute. The first does not give you the second.</p></div>
+<p>This is not an argument for giving up. It is an argument for knowing which of your claims are supported. A ranking is useful. Sold as an interval scale, it misleads.</p>`,
+doit:`<p>Take one instrument you use at work — an engagement survey, a competency rating, a performance scale. Write down the attribute it claims to measure in one sentence, then answer three questions in writing:</p>
+<ol><li>Is a person with score 40 <i>twice</i> as engaged as one with 20? What would make that true?</li>
+<li>Is the gap from 20 to 30 the same amount of engagement as 60 to 70?</li>
+<li>What evidence exists, anywhere, that the attribute has additive structure?</li></ol>
+<p>Keep this instrument. Every later session applies to it.</p>`,
+checks:[
+{q:"Your team's engagement index runs 0–100 and has a Cronbach's alpha of .91. What does that tell you about whether engagement is a quantitative attribute?",
+o:["It gives good evidence, since high alpha shows the items measure one quantity","Nothing. Alpha describes covariation among item scores and assumes quantitative structure rather than testing it","It rules out the possibility, since alpha is an ordinal statistic","It gives partial evidence, worth about the same as a factor analysis"],
+a:1,why:"Alpha is computed from variances and covariances of numbers you already decided to treat as quantities. It cannot test the assumption it rests on. This is the circularity at the centre of Michell's critique."},
+{q:"Which claim about a rating scale is ordinal rather than quantitative?",
+o:["The mean rating rose 0.4 points this quarter","Rater A gave a higher rating than rater B","The variance shrank after training","The effect size was d = 0.3"],
+a:1,why:"Only the second claim uses order alone. Means, variances, and standardised effect sizes all require that distances between scale points are meaningful and equal."}],
+monday:"Say out loud, once, in a real meeting: \"That number is a rank, not a quantity — so the average is doing more work than it can carry.\" Notice who agrees and who has never considered it.",
+cards:[["What is the quantity objection?","Psychology assumes its attributes have additive quantitative structure without ever testing that assumption empirically — Michell's central charge."],
+["Assigning numbers vs measuring","Assigning numbers follows any rule and is always possible. Measuring claims the numbers represent magnitudes of a real attribute."]],
+srcs:["Michell, J. (1999). <i>Measurement in Psychology: A Critical History of a Methodological Concept.</i> Cambridge. Ch. 1–2.",
+"Michell, J. (2000). Normal science, pathological science and psychometrics. <i>Theory &amp; Psychology</i>, 10(5), 639–667."]},
+
+{u:0,t:"Two rival definitions",lab:"scales",
+brief:`<p>There are two incompatible answers to "what is measurement", and almost every argument in your field traces back to which one someone is using.</p>
+<p><b>The classical or representational answer:</b> measurement is discovering the ratio between a magnitude and a unit of the same kind. It goes back to Euclid's theory of proportion, formalised by Hölder in 1901. On this view measurement is a discovery about the world, and it can fail.</p>
+<p><b>The operational answer:</b> Stevens, 1946 — measurement is the assignment of numerals to objects or events according to rule. On this view measurement cannot fail, because any consistent rule counts. Stevens then classified rules into four scale types, <b>nominal, ordinal, interval, ratio</b>, each defined by the transformations that leave its structure intact.</p>
+<div class="callout"><div class="ct">Why Stevens wrote it</div>
+<p>Not as neutral taxonomy. It was a defence. Session 4 covers the committee he was answering.</p></div>
+<p>The scale types are genuinely useful — they tell you which statistics are permissible. They also smuggled in the operational definition, which is why "we defined our own scale, so it is measurement" now sounds reasonable to most managers and many psychologists.</p>`,
+doit:`<p>Run the lab. Classify each variable, and pay attention to the ones you get wrong — they are wrong on purpose, and each one is a mistake that shows up in real dashboards.</p>`,
+checks:[
+{q:"On Stevens' definition, can an attempt at measurement fail?",
+o:["Yes, if the numbers do not represent a real magnitude","No, because any consistent assignment rule counts as measurement","Yes, but only if reliability is too low","Only for nominal scales"],
+a:1,why:"That is the point of the definition, and its cost. If measurement cannot fail, it cannot be tested — so a whole class of empirical questions disappears."},
+{q:"A 1–5 Likert item is treated as an interval scale. What licenses that treatment?",
+o:["The equal spacing of the printed response options","Respondents interpreting the intervals equally, which is an empirical claim nobody usually tests","Stevens' definition, which makes it a rule","Sample size above 200"],
+a:1,why:"Visual spacing on paper is typography, not psychology. Whether the psychological distance from 'disagree' to 'neutral' equals 'agree' to 'strongly agree' is testable and usually untested."}],
+monday:"Look at one dashboard. Find one number that gets averaged and is really ordinal. Write down what decision that average is feeding.",
+cards:[["Stevens' definition of measurement (1946)","The assignment of numerals to objects or events according to rule. Operational — measurement cannot fail."],
+["The four scale types","Nominal (identity), ordinal (order), interval (equal differences), ratio (true zero, so ratios hold)."],
+["Classical/representational definition","Measurement is the discovery of the ratio of a magnitude to a unit of the same kind. It can fail."]],
+srcs:["Stevens, S. S. (1946). On the theory of scales of measurement. <i>Science</i>, 103, 677–680.",
+"Michell, J. (1986). Measurement scales and statistics: a clash of paradigms. <i>Psychological Bulletin</i>, 100(3), 398–407."]},
+
+{u:0,t:"What a quantity must satisfy",lab:"",
+brief:`<p>If you want the classical definition, you need to know what it demands. Hölder's 1901 axioms state the conditions for a set of magnitudes to be a continuous quantity. In plain language, the important ones are:</p>
+<p><b>Order.</b> For any two magnitudes, exactly one holds: a &gt; b, a = b, or b &gt; a. Order is transitive.<br>
+<b>Additivity.</b> Any two magnitudes combine into a third of the same kind, and combination is associative and commutative. a + b = b + a.<br>
+<b>Solvability.</b> If a &gt; b, there is some c such that b + c = a. Differences are themselves magnitudes.<br>
+<b>Archimedean condition.</b> No magnitude is infinitely larger than another — some multiple of the smaller exceeds the larger.<br>
+<b>Continuity.</b> No gaps in the ordering.</p>
+<p>Then the payoff: any two magnitudes of a continuous quantity stand in a positive real ratio. <b>Real numbers become applicable because the structure earns them</b>, not because we chose to write numerals down.</p>
+<div class="callout"><div class="ct">The hard one for psychology</div>
+<p>Additivity. Two rods concatenate end to end and you can check that lengths add. What operation concatenates two amounts of job satisfaction? If none exists, the classical test cannot be run directly — which is exactly the problem Unit 2 solves.</p></div>`,
+doit:`<p>Take the instrument from Session 1 and walk it through the axioms one at a time. For each, write "satisfied", "violated", or "untestable, and here is why". Expect four of five to land in the third column. That column is your honest position, and it is stronger than pretending.</p>`,
+checks:[
+{q:"Why does additivity matter for whether real numbers apply to an attribute?",
+o:["It makes computation easier","Additive structure is what makes two magnitudes stand in a real-number ratio","It guarantees a true zero point","It is required for correlations to be unbiased"],
+a:1,why:"Hölder's result derives the applicability of the reals from the structure. Without additivity, ratios of magnitudes are not defined, so the numbers you write are labels rather than measures."},
+{q:"Length can be measured classically mainly because:",
+o:["Rulers are cheap and standardised","Rods can be concatenated, so additivity is directly testable","Length has a natural zero","Length is physical rather than mental"],
+a:1,why:"Concatenation is the empirical operation that lets you test additivity directly. The absence of a concatenation operation, not the mentalness of the attribute, is psychology's real obstacle."}],
+monday:"Find one place your organisation adds scores across items or people. Ask what empirical operation justifies the addition. Sit with the silence.",
+cards:[["Hölder's axioms (1901), in short","Order, additivity, solvability of differences, Archimedean condition, continuity. Together they make magnitudes stand in real-number ratios."],
+["Why concatenation matters","It is the empirical operation that tests additivity directly. Psychological attributes have no concatenation operation."]],
+srcs:["Hölder, O. (1901). Die Axiome der Quantität und die Lehre vom Mass. (Michell &amp; Ernst translation, <i>J. Math. Psych.</i> 1996–97.)",
+"Michell, J. (1999), Ch. 3–4."]},
+
+{u:0,t:"The sidestep",lab:"",
+brief:`<p>The pivotal episode in your field's history, and most practitioners have never heard of it.</p>
+<p>In 1932 the British Association for the Advancement of Science set up a committee, chaired by the physicist A. Ferguson, to decide whether it is possible to measure sensory events. It ran for eight years. Stevens' sone scale of loudness was the test case. The committee's 1940 verdict: psychophysical methods do not constitute measurement, because no additive operation has been shown for sensation intensity. By Hölder's standard they were right.</p>
+<p>Stevens' response, in 1946, was not to find additivity. It was to <b>redefine measurement</b> so the objection could not be stated. Assignment of numerals according to rule. The committee had asked an empirical question; Stevens answered with a definition.</p>
+<div class="callout"><div class="ct">The consequence you inherited</div>
+<p>Psychology adopted the definition, the definition removed the question, and the question was never reopened. Michell calls this the sidestep. It is why a field can be statistically sophisticated and measurement-naive at the same time.</p></div>
+<p>Two things to hold together. Stevens was defending real work against a standard that would have shut down a productive research programme — and the committee's question was legitimate and remains open. Unit 2 shows it was also answerable, by a route neither side saw in 1940.</p>`,
+doit:`<p>Write the sidestep in six lines, in your own words, as if briefing a sceptical executive: what was asked, what was answered, what the substitution cost. If you cannot do it without jargon you do not have it yet. Save it — you will reuse it in Session 18.</p>`,
+checks:[
+{q:"What was the Ferguson Committee's objection to psychophysical measurement?",
+o:["The measurements were unreliable","No additive operation had been demonstrated for sensation intensity","The samples were too small","Sensation is subjective and so unmeasurable in principle"],
+a:1,why:"The objection was structural and specific, not a complaint about rigour or subjectivity. That precision is what makes it answerable — and what makes the redefinition a dodge rather than a rebuttal."},
+{q:"Why does Michell call Stevens' reply a sidestep rather than a refutation?",
+o:["It contained a statistical error","It changed the definition of the term under dispute instead of answering the empirical question","It ignored the committee entirely","It relied on data that failed to replicate"],
+a:1,why:"A refutation would show the additive structure exists or show it is unnecessary on independent grounds. Redefining the word makes the question unaskable, which is not the same as answering it."}],
+monday:"Notice one place your organisation resolves an empirical dispute by redefining a term (\"let's just define engagement as this index\"). Same move, smaller stakes.",
+cards:[["The Ferguson Committee (1932–1940)","British Association committee on whether sensory events can be measured. Concluded no, because no additive operation was demonstrated."],
+["Michell's \"sidestep\"","Stevens answered the empirical question about additivity by redefining measurement, so the question could no longer be raised."]],
+srcs:["Ferguson, A. et al. (1940). Final report of the committee on the quantitative estimates of sensory events. <i>Advancement of Science</i>, 2, 331–349.",
+"Michell, J. (1999), Ch. 6."]},
+
+{u:1,t:"Additive conjoint measurement",lab:"cancel",
+brief:`<p>Here is the escape from the 1940 deadlock, and it is the single most important idea in this course.</p>
+<p>Luce and Tukey, 1964. You do not need a concatenation operation. If an outcome depends on <b>two</b> attributes jointly, the additive structure of all three can be tested using ordinal data alone — using only the ordering of the outcomes.</p>
+<p>Set out a matrix: rows are levels of attribute A, columns are levels of attribute P, cells are the ordered outcomes. If an additive representation exists (outcome increases with A plus P on some common scale), the ordering must obey cancellation axioms.</p>
+<p><b>Single cancellation</b> (independence): within any row, the ordering across columns is the same as in every other row. Within any column, same across rows.<br>
+<b>Double cancellation</b>: if cell (a2,p1) &gt; (a1,p2) and (a3,p2) &gt; (a2,p3), then (a3,p1) &gt; (a1,p3). Trade-offs must be consistent.<br>
+Higher-order cancellation follows the same logic on larger matrices.</p>
+<div class="callout"><div class="ct">What this changes for you</div>
+<p>Quantitative structure becomes <b>testable with rankings</b>. So the honest response to "we cannot test additivity in psychology" is: yes you can, and it has been possible since 1964. The reason it is rarely done is disciplinary habit.</p></div>`,
+doit:`<p>Run the lab. Work through both matrices by hand before pressing Check. Finding the violation yourself, once, is what converts this from a citation into a tool.</p>`,
+checks:[
+{q:"What does additive conjoint measurement need as input?",
+o:["Interval-level scores on two attributes","Only the ordering of outcomes across a factorial combination of two attributes","A concatenation operation for the attribute","Ratio-scaled criterion data"],
+a:1,why:"Ordinal outcome data across a two-way layout is enough. That is the whole point — it removes the excuse that psychological attributes cannot be tested for additivity."},
+{q:"A single violation of double cancellation in a well-collected dataset tells you:",
+o:["Reliability is too low","The data are not consistent with an additive representation of those attributes","The sample was unrepresentative","Nothing, since violations are expected by chance"],
+a:1,why:"It is evidence against additive structure. Real data need a probabilistic treatment of error (Session 16), but the logic is that structure is falsifiable — unlike anything alpha or factor analysis can tell you."}],
+monday:"Sketch one two-way layout from your own work: item difficulty × person ability, or task complexity × experience level. You have just designed a testable measurement study.",
+cards:[["Additive conjoint measurement (Luce & Tukey, 1964)","Additivity can be tested from ordinal outcomes of two jointly varying attributes — no concatenation needed."],
+["Single cancellation","Independence: the ordering across levels of one attribute is identical at every level of the other."],
+["Double cancellation","Trade-offs must be transitive: (a2,p1)>(a1,p2) and (a3,p2)>(a2,p3) forces (a3,p1)>(a1,p3)."]],
+srcs:["Luce, R. D. &amp; Tukey, J. W. (1964). Simultaneous conjoint measurement. <i>J. Math. Psych.</i>, 1, 1–27.",
+"Michell, J. (1990). <i>An Introduction to the Logic of Psychological Measurement.</i> Ch. 4–5."]},
+
+{u:1,t:"The representational theory",lab:"",
+brief:`<p>The formal apparatus behind everything in Unit 2, worth knowing by name because it settles arguments.</p>
+<p>Krantz, Luce, Suppes and Tversky's <i>Foundations of Measurement</i> (three volumes, 1971–1990) treats measurement as constructing a <b>homomorphism</b> from an empirical relational structure into a numerical relational structure. You have objects with observed relations; you map them to numbers so that the numerical relations mirror the empirical ones.</p>
+<p>Two theorems matter for each type of scale:</p>
+<p><b>The representation theorem</b> states the conditions under which such a mapping exists. It tells you what must be empirically true.<br>
+<b>The uniqueness theorem</b> states which transformations preserve the mapping. Ratio scales are unique up to similarity (x → ax). Interval up to affine (x → ax + b). Ordinal up to any increasing monotone transform.</p>
+<div class="callout"><div class="ct">Where the statistics rule comes from</div>
+<p>"Do not average ordinal data" is not etiquette. It follows from uniqueness. If any increasing transform of your scores represents the same empirical facts, then any conclusion that changes under such a transform is a statement about your arbitrary numerals, not about the world. Session 7 makes this concrete and unpleasant.</p></div>`,
+doit:`<p>Write out, for your own instrument: which relations you can actually observe (order? indifference? nothing but co-occurrence?), and therefore the strongest scale type you can defend. Then list every statistic in your last report that assumed more than that.</p>`,
+checks:[
+{q:"An interval scale is unique up to which transformations?",
+o:["Any increasing monotone transformation","Multiplication by a positive constant only","Positive linear transformations, x → ax + b with a > 0","No transformation at all"],
+a:2,why:"Affine transformations preserve interval structure — which is why Celsius and Fahrenheit are equally valid, and why ratios of temperatures in either are meaningless."},
+{q:"What is the practical use of a uniqueness theorem?",
+o:["It tells you the required sample size","It tells you which conclusions are invariant under permissible rescaling, and so which are about the world","It sets the reliability threshold","It identifies the number of latent factors"],
+a:1,why:"Any finding that flips when you rescale in a permitted way is an artefact of your numerals. Uniqueness is what makes 'meaningfulness' a technical notion rather than a preference."}],
+monday:"Next time someone defends a metric with \"it's directionally right\", ask what transformation of the scores would leave the direction unchanged. It is a fair question and a sharp one.",
+cards:[["Representational theory of measurement","Measurement = a homomorphism from an empirical relational structure into a numerical one. Krantz, Luce, Suppes & Tversky."],
+["Representation vs uniqueness theorem","Representation: when a numerical mapping exists. Uniqueness: which transformations preserve it (ratio → similarity, interval → affine, ordinal → monotone)."]],
+srcs:["Krantz, Luce, Suppes &amp; Tversky (1971). <i>Foundations of Measurement, Vol. I.</i>",
+"Narens, L. &amp; Luce, R. D. (1986). Measurement: the theory of numerical assignments. <i>Psychological Bulletin</i>, 99, 166–180."]},
+
+{u:1,t:"Ordinal data in metric models",lab:"reversal",
+brief:`<p>Now the damage. Everyone knows Likert data is ordinal. Nearly everyone runs t-tests and regressions on it anyway, defended by "it works fine in practice". Liddell and Kruschke, 2018, tested that defence and it does not hold.</p>
+<p>Treating ordinal responses as metric can produce four kinds of error: inflated false alarms, missed true effects, distorted effect sizes, and — the one that should frighten you — <b>inversion of the true difference</b>. The observed means can say group B is lower when B's latent mean is genuinely higher.</p>
+<p>The mechanism is floor and ceiling compression. An ordinal response collapses a continuous latent variable through thresholds. When two groups differ in <b>variance</b> as well as location, and the thresholds sit off-centre, the collapse is non-monotone in the means. Nothing about the sample size saves you. Bigger n gives you a more precise wrong answer.</p>
+<div class="callout"><div class="ct">The fix, in one line</div>
+<p>Model the responses as ordinal — ordered-probit or cumulative-link models estimate the thresholds instead of assuming them. Where that is not available, report the response distribution, not the mean.</p></div>
+<p>This is the most immediately usable session in the course. Any engagement survey where groups differ in spread is exposed.</p>`,
+doit:`<p>Run the lab and produce a sign reversal yourself. Then use the preset. Then take the last group comparison you reported and check whether the two groups differed in standard deviation. If they did, your conclusion is not safe.</p>`,
+checks:[
+{q:"Sign reversal when analysing ordinal data as metric is most likely when:",
+o:["The sample is small","The groups differ in variance and the thresholds are asymmetric","Reliability is below .70","There are more than seven response categories"],
+a:1,why:"Unequal spread plus off-centre thresholds is the dangerous combination. Small samples add noise; this adds bias, which no amount of data removes."},
+{q:"Your two studios have equal mean scores but very different spread on a 5-point item. The right response is:",
+o:["Report the means as equal","Model the data as ordinal and compare the latent distributions, since equal observed means do not imply equal latent means","Increase the number of response options","Standardise the scores within studio"],
+a:1,why:"Equal observed means are consistent with a real latent difference in either direction once spread differs. The observed mean is a compressed function of the latent distribution, not a proxy for it."}],
+monday:"Add one line to your next survey report: the response distribution per item, per group. It costs nothing and it exposes exactly the cases where the mean lies.",
+cards:[["Liddell & Kruschke (2018), main result","Metric models on ordinal data can inflate error rates, mask effects, distort effect sizes, and invert the sign of a true difference."],
+["When does ordinal-as-metric invert a difference?","When groups differ in variance and the response thresholds are asymmetric — floor/ceiling compression makes the mapping non-monotone in the means."],
+["The remedy","Ordered-probit / cumulative-link models that estimate thresholds; otherwise report full response distributions."]],
+srcs:["Liddell, T. M. &amp; Kruschke, J. K. (2018). Analyzing ordinal data with metric models: what could possibly go wrong? <i>J. Exp. Soc. Psych.</i>, 79, 328–348.",
+"Bürkner, P.-C. &amp; Vuorre, M. (2019). Ordinal regression models in psychology: a tutorial. <i>AMPPS</i>, 2(1), 77–101."]},
+
+{u:2,t:"Classical test theory",lab:"",
+brief:`<p>Unit 3 changes register. Units 1 and 2 asked whether your attribute is a quantity. Unit 3 assumes it is and asks how much noise your instrument has. Almost all applied practice lives here, which is why the earlier units matter.</p>
+<p>The model, from Spearman, 1904, is one equation: <b>X = T + E</b>. Observed score equals true score plus error. Three assumptions do the work: error has an expectation of zero, error is uncorrelated with true score, and errors on different measurements are uncorrelated with each other.</p>
+<p>Be precise about the true score, because the word misleads. <b>T is defined as the expected value of the observed score over hypothetical independent replications</b> for that person on that instrument. It is a property of person and test together. It is not the person's real standing on the attribute. A biased instrument has a stable true score that is systematically wrong.</p>
+<div class="callout"><div class="ct">The load-bearing consequence</div>
+<p>Reliability is about <b>replicability</b>, not correctness. Constant bias is invisible to every reliability coefficient, because it lives in T, not E. A perfectly reliable measure of the wrong thing is entirely possible, and common.</p></div>
+<p>From the assumptions: observed variance decomposes as σ²X = σ²T + σ²E, and reliability is defined as σ²T / σ²X — the proportion of observed variance that is true-score variance.</p>`,
+doit:`<p>Write down two ways your instrument could be systematically biased — social desirability, manager leniency, the fact that people answer engagement surveys on company laptops. Then note that a higher alpha would not detect any of them. Keep this list; Unit 4 is about it.</p>`,
+checks:[
+{q:"In classical test theory, a person's true score is:",
+o:["Their real standing on the attribute","The expected value of their observed score over independent replications of that test","The score corrected for bias","The population mean for their group"],
+a:1,why:"It is defined by replication on that instrument. So systematic bias is part of T. This is why 'true score' is one of the worst-named concepts in the field."},
+{q:"A manager rating scale where every manager is 0.8 points too lenient will have:",
+o:["Low reliability, because the scores are wrong","Potentially very high reliability, since constant bias sits in the true score and not in error","Zero reliability","Reliability that cannot be estimated"],
+a:1,why:"Consistent bias is perfectly replicable, so it inflates rather than harms reliability. This is the single most useful thing to know about the limits of reliability evidence."}],
+monday:"When someone cites a reliability figure as evidence a measure is good, ask what it rules out. Answer: random noise only.",
+cards:[["Classical test theory model","X = T + E; E has mean zero, is uncorrelated with T, and errors are uncorrelated across measurements."],
+["Definition of true score","The expected observed score over independent replications for that person on that test — a property of person and instrument, so it includes systematic bias."],
+["Definition of reliability","σ²T / σ²X — the proportion of observed variance that is true-score variance."]],
+srcs:["Spearman, C. (1904). The proof and measurement of association between two things. <i>Am. J. Psych.</i>, 15, 72–101.",
+"Lord, F. M. &amp; Novick, M. R. (1968). <i>Statistical Theories of Mental Test Scores.</i> Ch. 2–3."]},
+
+{u:2,t:"Reliability and attenuation",lab:"",
+brief:`<p>Reliability is unobservable, so it is estimated, and each method estimates something slightly different. Say which one you mean.</p>
+<p><b>Parallel forms</b> — correlation between two forms built to be equivalent. Clean in theory, rare in practice.<br>
+<b>Test–retest</b> — correlation over time. Confounds instability of the instrument with real change in the attribute. For anything genuinely dynamic, like mood or engagement, a low retest correlation may be good news about the measure.<br>
+<b>Internal consistency</b> — from a single administration, based on covariation among items. Cheap, which is why it dominates, and it estimates the least.<br>
+<b>Inter-rater</b> — agreement across judges, essential wherever humans score humans.</p>
+<p>Then the result you should carry into every analysis you read. The <b>correction for attenuation</b>: the observed correlation between two measures is the true correlation multiplied by the square root of the product of their reliabilities.</p>
+<p>So with two measures at reliability .70, a true correlation of 1.0 shows up as .70. Unreliability systematically shrinks observed relationships toward zero. Two consequences: a small correlation between noisy measures may reflect a large real one, and — the abuse — corrected correlations can be pushed above 1.0 and are easily inflated when the reliability estimates are wrong.</p>
+<div class="callout"><div class="ct">Read it both ways</div>
+<p>Unreliability hides real effects <i>and</i> the correction manufactures fake ones. Ask which reliability estimate was used and whether it was a lower bound.</p></div>`,
+doit:`<p>Find one correlation reported in a management paper or vendor white paper. Look up the two reliabilities. Compute the disattenuated value. Then ask whether the authors reported the corrected or uncorrected figure, and whether they said which.</p>`,
+checks:[
+{q:"Two measures each with reliability .64 correlate .40. The disattenuated estimate is:",
+o:[".40",".50",".625",".80"],
+a:2,why:"0.40 / sqrt(.64 × .64) = 0.40 / 0.64 = 0.625. Notice how much a routinely acceptable reliability level distorts an observed relationship."},
+{q:"A well-designed measure of daily mood shows a test–retest correlation of .35 over six weeks. This is:",
+o:["Evidence the measure is unreliable","Expected, since the attribute is genuinely unstable — retest confounds instrument instability with real change","Evidence of poor internal consistency","Grounds for dropping items"],
+a:1,why:"Retest reliability presumes the attribute is stable over the interval. For dynamic attributes the presumption fails, and high stability would be the suspicious result."}],
+monday:"Pick your instrument. Name which reliability coefficient your vendor reported. If it is alpha, Session 10 is about what you were actually told.",
+cards:[["Correction for attenuation","r_true = r_observed / sqrt(rel₁ × rel₂). Unreliability shrinks observed correlations toward zero."],
+["Four reliability estimates","Parallel forms, test–retest, internal consistency, inter-rater. Each estimates a different thing; name which you mean."],
+["Test–retest confound","It cannot separate instrument instability from real change in the attribute."]],
+srcs:["Spearman, C. (1904), on attenuation.",
+"Cronbach, L. J. et al. (1972). <i>The Dependability of Behavioral Measurements</i> (generalizability theory).",
+"Muchinsky, P. M. (1996). The correction for attenuation. <i>Educ. Psych. Meas.</i>, 56(1), 63–75."]},
+
+{u:2,t:"The alpha trap",lab:"alpha",
+brief:`<p>Cronbach's alpha is the most reported and least understood statistic in your field. Learn exactly what it is, then learn the six things it is not.</p>
+<p>What it is: a function of the number of items and their average inter-item correlation. Under the assumption of <b>essential tau-equivalence</b> — all items measure the true score with equal loadings — alpha equals reliability. When that assumption fails, which is nearly always, alpha is a <b>lower bound</b>, and not the greatest one.</p>
+<p>The six misreadings, mostly documented by Sijtsma and by Cronbach himself in 2004:</p>
+<p><b>1. Alpha does not indicate unidimensionality.</b> A two-factor scale with orthogonal factors can reach .85 with enough items. The lab shows it.<br>
+<b>2. High alpha can mean redundancy.</b> Above about .90, you may just have paraphrases. Precision bought by narrowing the construct — the attenuation paradox.<br>
+<b>3. Alpha rises with item count</b> regardless of quality. Thirty mediocre items beat five good ones on alpha.<br>
+<b>4. Alpha is a property of the administration</b>, not the instrument. It changes with the sample.<br>
+<b>5. Alpha is not the greatest lower bound.</b> Omega and the GLB dominate it. Use omega.<br>
+<b>6. Alpha says nothing about validity.</b> Nothing at all.</p>
+<div class="callout"><div class="ct">Cronbach's own view</div>
+<p>He came to regard the 1951 paper's influence as an accident and thought alpha should be replaced. The field kept the coefficient and forgot the author.</p></div>`,
+doit:`<p>Run the lab. Push item count up with a weak average correlation and watch alpha cross .80 on junk. Then switch on the two-factor case and watch alpha stay respectable while the scale measures two different things.</p>`,
+checks:[
+{q:"A 40-item scale has an average inter-item correlation of .12. Roughly what is alpha?",
+o:["about .12","about .35","about .84","cannot be computed"],
+a:2,why:"α = kr̄/(1+(k−1)r̄) = 40(.12)/(1+39(.12)) ≈ .845. Items sharing 1% of variance on average yield an alpha most journals accept without comment."},
+{q:"Alpha of .93 on a 12-item scale most likely indicates:",
+o:["An excellent measure","Possible item redundancy and a narrowed construct — the attenuation paradox","Unidimensionality confirmed","Strong construct validity"],
+a:1,why:"Very high alpha often means you asked the same question twelve ways. Reliability rose while the breadth of the construct shrank."}],
+monday:"Replace alpha with omega in your next report and add one line saying why. It is a two-minute change that puts you ahead of most published management research.",
+cards:[["Alpha formula and meaning","α = kr̄ / (1+(k−1)r̄). Equals reliability only under essential tau-equivalence; otherwise a lower bound, and not the greatest one."],
+["Does alpha show unidimensionality?","No. Multidimensional scales reach high alpha with enough items."],
+["Attenuation paradox","Beyond a point, raising reliability by adding near-duplicate items narrows the construct and reduces validity."],
+["What to use instead of alpha","Coefficient omega (from a factor model) or the greatest lower bound."]],
+srcs:["Cronbach, L. J. (1951). Coefficient alpha and the internal structure of tests. <i>Psychometrika</i>, 16, 297–334.",
+"Sijtsma, K. (2009). On the use, the misuse, and the very limited usefulness of Cronbach's alpha. <i>Psychometrika</i>, 74(1), 107–120.",
+"Cronbach, L. J. &amp; Shavelson, R. J. (2004). My current thoughts on coefficient alpha. <i>Educ. Psych. Meas.</i>, 64(3), 391–418."]},
+
+{u:3,t:"Construct validity, 1955",lab:"",
+brief:`<p>Validity is where measurement theory meets what you actually care about, and its history is a sequence of expansions.</p>
+<p>Before 1955 validity was mostly criterion prediction: a test is valid if it predicts something. Fine for typing tests, useless for attributes with no clean criterion. Cronbach and Meehl's answer introduced <b>construct validity</b> and with it the <b>nomological network</b> — the interlocking set of theoretical laws relating the construct to other constructs and to observables.</p>
+<p>On this account, to validate a measure is to test the network. Evidence accumulates when predicted relationships hold and the construct behaves as theory says it should. Validation is theory testing, not a certification step.</p>
+<div class="callout"><div class="ct">Two consequences worth arguing about</div>
+<p>Validity becomes a matter of degree and never finished. And <b>construct validity is inseparable from having a theory</b>. Where the theory is thin, as in most management constructs, validation collapses into showing your new scale correlates with existing scales — which is what most validation sections in fact are.</p></div>
+<p>Bootstrapping is the honest name Cronbach and Meehl gave the process: measure and theory improve together, neither firm first. That is genuinely how thermometry developed (Session 18). It is also an invitation to circularity when nobody checks.</p>`,
+doit:`<p>Draw the nomological network for your instrument. Nodes: the construct, three constructs it should relate to, three observable behaviours it should predict. Edges: direction and rough strength. Then mark which edges have ever been tested with your data. The unmarked edges are your validity gap, drawn to scale.</p>`,
+checks:[
+{q:"On Cronbach and Meehl's account, validating a measure means:",
+o:["Showing it correlates with an established criterion","Testing the network of theoretical relations the construct is embedded in","Demonstrating high internal consistency","Confirming expert judgement about item content"],
+a:1,why:"Construct validation is theory testing. Which is why it is hard where the theory is weak — and why weak-theory fields tend to substitute correlations among scales."},
+{q:"The main risk of \"bootstrapping\" measure and theory together is:",
+o:["It requires large samples","Circularity — the measure is justified by the theory and the theory by the measure, with no independent check","It cannot be published","It only works for physical attributes"],
+a:1,why:"Bootstrapping is real and productive, but it needs an external constraint to converge on something true rather than merely self-consistent."}],
+monday:"Ask your survey vendor for the nomological network, in those words. The answer, whatever it is, tells you what you are buying.",
+cards:[["Construct validity (Cronbach & Meehl, 1955)","Validity as the degree to which a measure behaves as the construct's theoretical network predicts. Validation = theory testing."],
+["Nomological network","The interlocking set of laws relating a construct to other constructs and to observables."]],
+srcs:["Cronbach, L. J. &amp; Meehl, P. E. (1955). Construct validity in psychological tests. <i>Psychological Bulletin</i>, 52, 281–302."]},
+
+{u:3,t:"Convergent, discriminant, and method",lab:"",
+brief:`<p>Campbell and Fiske, 1959, gave validity its most practical tool and named the problem management research is worst at.</p>
+<p>Measure several <b>traits</b> using several <b>methods</b>, then arrange all correlations in a multitrait-multimethod matrix. Four regions:</p>
+<p><b>Monotrait-heteromethod</b> — same trait, different methods. Should be high. This is <b>convergent validity</b>.<br>
+<b>Heterotrait-monomethod</b> — different traits, same method. Should be low. When it is not, you have <b>common method variance</b>.<br>
+<b>Heterotrait-heteromethod</b> — should be lowest.<br>
+<b>Monotrait-monomethod</b> — the reliability diagonal.</p>
+<p>The pattern that damns a study: different traits measured by the same method correlating more strongly than the same trait measured by different methods. Then your matrix is a picture of your method, not of your traits.</p>
+<div class="callout"><div class="ct">Why this matters more in management than anywhere else</div>
+<p>Nearly all of it is self-report questionnaires — one method, often one questionnaire, often one occasion. Podsakoff and colleagues estimate method variance can account for roughly a quarter of the variance in such studies. Any "engagement drives performance" finding from a single survey is a candidate.</p></div>`,
+doit:`<p>Take one relationship you believe in at work — say, manager quality relates to team retention. List two genuinely different methods for each side (self-report, behavioural log, archival record, third-party observation). Then check how many of your current beliefs rest on exactly one method.</p>`,
+checks:[
+{q:"Different traits measured by the same method correlate higher than the same trait measured by different methods. This indicates:",
+o:["Strong convergent validity","Common method variance dominating the matrix","Excellent discriminant validity","High reliability"],
+a:1,why:"The shared method is driving the correlations, so the matrix describes your instrument rather than the traits. It is the classic MTMM failure pattern."},
+{q:"The cheapest real defence against common method bias is:",
+o:["A larger sample","A second method or source for at least one side of the relationship","Higher alpha","More items per construct"],
+a:1,why:"Method variance is systematic, so more data of the same kind does not dilute it. One archival or behavioural indicator does more than a thousand extra respondents."}],
+monday:"For your one most-quoted internal finding, write down the method count. If it is one, label the finding accordingly wherever it appears.",
+cards:[["MTMM matrix (Campbell & Fiske, 1959)","Traits × methods correlation matrix. Convergent = same trait across methods (high); discriminant = different traits (low)."],
+["Common method variance","Shared measurement method inflates correlations among different constructs. Podsakoff et al.: can be roughly 25% of variance in self-report studies."]],
+srcs:["Campbell, D. T. &amp; Fiske, D. W. (1959). Convergent and discriminant validation by the multitrait-multimethod matrix. <i>Psychological Bulletin</i>, 56, 81–105.",
+"Podsakoff, P. M. et al. (2003). Common method biases in behavioral research. <i>J. Applied Psych.</i>, 88(5), 879–903."]},
+
+{u:3,t:"Validity as argument",lab:"",
+brief:`<p>By the 1980s the types of validity had multiplied, and Messick unified them: <b>validity is a single integrated evaluative judgement of the degree to which evidence and theory support the interpretations and uses of test scores</b>.</p>
+<p>Read that carefully. Validity is a property of <b>interpretations and uses</b>, not of the test. Nothing is "a valid instrument" full stop. It is valid for a stated interpretation, for a stated population, for a stated use. The same questionnaire can be defensible for tracking a trend and indefensible for deciding promotions.</p>
+<p>Messick's aspects give a checklist worth memorising: content, substantive (a theory of the response process), structural, generalizability, external, and <b>consequential</b> — the social consequences of the use, including adverse impact and how scores change behaviour.</p>
+<div class="callout"><div class="ct">Where you will need this</div>
+<p>Someone will propose using an engagement score in performance reviews. The Messick answer is not "the survey is invalid". It is: validity was established for one interpretation and one use, this is a different use, and the consequential evidence for it does not exist. That argument wins meetings.</p></div>
+<p>Kane later turned this into argument-based validation: state the chain of inferences from response to decision, then attack the weakest link. Also note the dissent — Borsboom, next session, thinks this expansion made validity unfalsifiable.</p>`,
+doit:`<p>Write the interpretive argument for your instrument as a numbered chain: person's state → their response → the score → the aggregate → the decision. Four or five links. Mark the weakest. That link is where your measurement work should go, whatever else is on your roadmap.</p>`,
+checks:[
+{q:"On Messick's account, which statement is well formed?",
+o:["Our engagement survey is valid","Our engagement survey supports valid inferences about year-on-year trend at studio level, for that purpose","The survey is valid because alpha is .91","The survey is valid for all HR uses"],
+a:1,why:"Validity is always relative to an interpretation, a population, and a use. The bare claim 'X is valid' is not false so much as incomplete."},
+{q:"Consequential validity concerns:",
+o:["Whether the test predicts consequential outcomes","The social consequences of score use, including adverse impact and behavioural distortion","Whether consequences were pre-registered","The cost of administering the test"],
+a:1,why:"It is about the effects of using the scores. In management this is where Goodhart's law enters validity theory rather than sitting outside it as folklore."}],
+monday:"Add the use case to the title of your next survey report: \"...for trend monitoring, not individual assessment\". You are pre-empting the misuse in writing.",
+cards:[["Messick's definition of validity (1989)","An integrated evaluative judgement of how far evidence and theory support the interpretations and uses of scores. Validity belongs to interpretations and uses, not tests."],
+["Messick's six aspects","Content, substantive, structural, generalizability, external, consequential."],
+["Argument-based validation (Kane)","State the chain of inferences from response to decision; validation = testing the weakest link."]],
+srcs:["Messick, S. (1989). Validity. In <i>Educational Measurement</i> (3rd ed.), 13–103.",
+"Kane, M. T. (2013). Validating the interpretations and uses of test scores. <i>J. Educ. Meas.</i>, 50(1), 1–73.",
+"AERA/APA/NCME (2014). <i>Standards for Educational and Psychological Testing.</i>"]},
+
+{u:3,t:"Validity as ontology",lab:"",
+brief:`<p>The sharpest paper in modern validity theory, and the one most likely to change how you talk at work. Borsboom, Mellenbergh and van Heerden, 2004.</p>
+<p>Their claim: the Messick tradition made validity a label for everything good about a test, and in doing so made it unfalsifiable and useless. They propose something austere instead.</p>
+<div class="callout"><div class="ct">The definition</div>
+<p>A test is valid for measuring an attribute if and only if <b>(a) the attribute exists</b>, and <b>(b) variation in the attribute causally produces variation in the test scores</b>.</p></div>
+<p>Three things follow, all uncomfortable and all useful.</p>
+<p><b>Validity is not about correlations.</b> Correlational evidence is indirect at best. The question is causal and, before that, ontological.<br>
+<b>You need a theory of the response process.</b> What happens between the item appearing on screen and the answer? Without an account of that mechanism you have no claim to validity, however many nomograms you draw.<br>
+<b>The hard question comes first.</b> Does the attribute exist? Not "is the construct useful" — does it exist as something with causal power over behaviour.</p>
+<p>Notice that this reconnects to Unit 1. Michell asks whether the attribute is quantitative; Borsboom asks whether it exists and does causal work. Both put ontology before statistics, which is precisely what applied practice has learned to skip.</p>`,
+doit:`<p>Apply the two-part test to your instrument, in writing, in under 200 words. Part (a): what would it mean for this attribute to exist, and what independent evidence is there? Part (b): describe the causal path from the attribute to the mark on the screen. If part (b) reads like "the person considers the question and answers honestly", say what could interrupt that path.</p>`,
+checks:[
+{q:"Borsboom et al. define a valid test as one where:",
+o:["Scores predict relevant criteria","The attribute exists and variation in it causally produces variation in scores","The interpretive argument survives scrutiny","Convergent and discriminant evidence are both satisfied"],
+a:1,why:"Existence plus causal production. Prediction and convergence are at best symptoms of validity, and can hold for entirely wrong reasons."},
+{q:"Their main objection to the Messick tradition is that:",
+o:["It is too demanding for applied work","It makes validity an omnibus label for test quality, which cannot be falsified","It ignores reliability","It has no account of consequences"],
+a:1,why:"When a concept covers content, structure, generalizability, consequences and utility at once, no evidence can count against it. Their remedy is to narrow the concept until it can be wrong."}],
+monday:"Ask one question at the next tooling review: \"What is the causal path from the thing we care about to the number on this dashboard?\" Keep asking until you get a mechanism or an admission.",
+cards:[["Borsboom, Mellenbergh & van Heerden (2004)","A test is valid iff the attribute exists and variation in it causally produces variation in the scores."],
+["Their critique of the Messick tradition","Expanding validity to cover all test quality made it unfalsifiable; validity should be narrow, causal, and refutable."],
+["Response process theory","An account of the causal chain from attribute to observed response. Required for a validity claim, usually missing."]],
+srcs:["Borsboom, D., Mellenbergh, G. J. &amp; van Heerden, J. (2004). The concept of validity. <i>Psychological Review</i>, 111(4), 1061–1071.",
+"Borsboom, D. (2005). <i>Measuring the Mind.</i> Cambridge."]},
+
+{u:3,t:"Reflective, formative, network",lab:"",
+brief:`<p>One structural decision underlies every latent variable model, and management research gets it wrong constantly.</p>
+<p><b>Reflective:</b> the latent variable causes the indicators. Arrows point out. Depression causes you to report poor sleep. Indicators are interchangeable symptoms, so internal consistency is expected and dropping one item does not change the construct.</p>
+<p><b>Formative:</b> indicators are taken to cause or compose the composite. Arrows point in. Socioeconomic status from income, education, occupation. Here internal consistency is <b>not</b> expected, dropping an indicator changes the meaning of the composite, and — Borsboom's objection — there is no latent attribute being measured at all. You have made an index. An index can be useful. It is not a measurement, and validity in the causal sense does not apply.</p>
+<p>Then the alternative that reframes the whole question. Borsboom and Cramer's <b>network approach</b>: perhaps there is no common cause. Perhaps insomnia causes fatigue, fatigue causes concentration loss, concentration loss causes worry, and worry causes insomnia. The correlations that look like a latent factor are produced by a causal network among the symptoms themselves.</p>
+<div class="callout"><div class="ct">Take this to your own field</div>
+<p>Ask whether "engagement" is a latent state causing eleven survey answers, or a <b>name for a feedback loop</b>: interesting work → effort → recognition → belonging → more effort. If it is the loop, factor analysis will still return a tidy single factor, and you will have modelled it wrongly while fitting it well. Systems thinkers should find this familiar.</p></div>`,
+doit:`<p>Draw your construct three ways: reflective, formative, and as a network of six mutually influencing observables. Then ask which drawing you would bet on, and whether any evidence you hold could distinguish them. Usually none can — which is the finding.</p>`,
+checks:[
+{q:"For a genuinely formative composite, high internal consistency is:",
+o:["Required","Not expected, since indicators are not interchangeable effects of a common cause","Evidence of validity","Impossible"],
+a:1,why:"Formative indicators contribute distinct components. Income and education need not correlate strongly for SES to be a sensible index — and reporting alpha for one is a category error."},
+{q:"The network approach explains positive correlations among symptoms by:",
+o:["A common latent cause","Direct causal relations among the observables themselves","Measurement error","Common method variance"],
+a:1,why:"No common cause is needed. This matters because network and latent-factor models can fit the same data while implying completely different interventions."}],
+monday:"Take one composite index your organisation reports. Decide whether it is reflective or formative. If formative, stop calling its number a measurement — and stop reporting its alpha.",
+cards:[["Reflective vs formative","Reflective: latent variable causes indicators; interchangeable, internal consistency expected. Formative: indicators compose an index; not interchangeable, no latent attribute measured."],
+["Network approach (Borsboom & Cramer, 2013)","Correlations among indicators can arise from direct causal relations between them, with no common latent cause."]],
+srcs:["Borsboom, D. (2005). <i>Measuring the Mind</i>, Ch. 4.",
+"Borsboom, D. &amp; Cramer, A. O. J. (2013). Network analysis: an integrative approach to the structure of psychopathology. <i>Annual Review of Clinical Psychology</i>, 9, 91–121.",
+"Bollen, K. A. &amp; Lennox, R. (1991). Conventional wisdom on measurement. <i>Psychological Bulletin</i>, 110(2), 305–314."]},
+
+{u:4,t:"Item response theory and Rasch",lab:"icc",
+brief:`<p>Modern psychometrics moved from scores to <b>item-level probability models</b>, and one branch of it delivers on Unit 2.</p>
+<p>The Rasch model: the probability that person <i>n</i> answers item <i>i</i> correctly depends only on the difference between person ability θ and item difficulty b, through a logistic function. One parameter per person, one per item.</p>
+<p>The property that matters is <b>specific objectivity</b>. In the Rasch model, comparisons between two persons do not depend on which items you used, and comparisons between two items do not depend on which persons answered. Invariant comparison — which is what a unit of measurement gives you in physics.</p>
+<div class="callout"><div class="ct">The connection back to session 5</div>
+<p>Perline, Wright and Wainer showed the Rasch model is a <b>probabilistic form of additive conjoint measurement</b>. Person and item are the two attributes, response probability is the joint outcome, and the cancellation conditions appear as testable fit requirements. So Rasch fit is not model-checking bureaucracy. It is a test of whether your data support quantitative structure at all.</p></div>
+<p>Two-parameter models add item discrimination and three-parameter models add guessing. They fit better and they abandon specific objectivity — with varying discriminations, which person is ahead can depend on which items you chose. That trade-off is the whole Rasch-versus-IRT argument, and now you can state it fairly: 2PL buys fit by giving up invariant comparison, Rasch keeps invariance and treats misfit as information.</p>`,
+doit:`<p>Run the lab. Set two items to the same difficulty and different discriminations, and find the ability range where the item characteristic curves cross. Everyone above the crossing is ranked one way, everyone below the other way. That is the loss of invariance, visible.</p>`,
+checks:[
+{q:"Specific objectivity in the Rasch model means:",
+o:["Items measure a single construct","Comparisons between persons are independent of which items were used, and vice versa","Item parameters are estimated without error","The model always fits"],
+a:1,why:"Invariance of comparisons is the measurement property Rasch is built to preserve, and it is the closest psychometrics comes to a physical unit."},
+{q:"Why is Rasch model fit a substantive measurement test rather than a technicality?",
+o:["Because misfit means low reliability","Because the model is a probabilistic form of additive conjoint measurement, so fit tests quantitative structure","Because it determines sample size","Because it identifies the number of factors"],
+a:1,why:"The cancellation conditions of conjoint measurement appear as fit requirements. Misfit is evidence against additive structure — the falsifiable test Michell says the field skips."}],
+monday:"If your competency assessments are scored by summing ratings, ask whether anyone has ever checked item fit. If not, you have a cheap, real study available and nobody has run it.",
+cards:[["Rasch model","P(correct) is a logistic function of (θ − b): person ability minus item difficulty. One parameter each."],
+["Specific objectivity","Person comparisons are invariant across items, and item comparisons invariant across persons."],
+["Rasch as conjoint measurement","Perline, Wright & Wainer (1979): the Rasch model is a probabilistic form of additive conjoint measurement, so fit tests quantitative structure."],
+["Rasch vs 2PL trade-off","2PL adds discrimination and fits better, but ICCs cross, so invariant comparison is lost."]],
+srcs:["Rasch, G. (1960). <i>Probabilistic Models for Some Intelligence and Attainment Tests.</i>",
+"Perline, R., Wright, B. D. &amp; Wainer, H. (1979). The Rasch model as additive conjoint measurement. <i>Applied Psych. Meas.</i>, 3(2), 237–255.",
+"Embretson, S. E. &amp; Reise, S. P. (2000). <i>Item Response Theory for Psychologists.</i>"]},
+
+{u:4,t:"Measurement invariance",lab:"invar",
+brief:`<p>The most immediately dangerous topic in this course for anyone who compares groups. Which, in a multi-studio company, is you.</p>
+<p>Comparing means across groups presumes the instrument works the same way in each group. That presumption has a name, <b>measurement invariance</b>, and it is testable in a hierarchy (Meredith, 1993):</p>
+<p><b>Configural</b> — same factor structure, same items loading on the same factors. Weakest.<br>
+<b>Metric (weak)</b> — equal loadings across groups. Now a one-unit change in the latent variable means the same thing everywhere, so you may compare <b>relationships</b>.<br>
+<b>Scalar (strong)</b> — equal loadings <b>and</b> equal intercepts or thresholds. Only now may you compare <b>means</b>.<br>
+<b>Strict</b> — residual variances equal too. Rarely needed, rarely achieved.</p>
+<div class="callout"><div class="ct">The line to remember</div>
+<p><b>Without scalar invariance, a difference in observed means is not evidence of a difference in the attribute.</b> It may be a difference in how groups use the response scale.</p></div>
+<p>Cross-cultural work fails scalar invariance routinely, and the failure modes are systematic: extreme-response style, middle-category preference, acquiescence, differing norms about criticising an employer. Any of these shifts thresholds without shifting the attribute. A Hanoi studio and a Paris studio can return different engagement numbers with identical engagement.</p>
+<p>The lab shows the mechanism with the same machinery as Session 7 — identical latent means, shifted thresholds, and a gap appears from nothing.</p>`,
+doit:`<p>Run the lab, then take your last cross-group comparison — studio, department, tenure band, country. Write one sentence: has invariance ever been tested for this instrument across these groups? The answer is almost always no. That sentence belongs in the report.</p>`,
+checks:[
+{q:"You want to compare latent means between two studios. The minimum level of invariance you need is:",
+o:["Configural","Metric (equal loadings)","Scalar (equal loadings and intercepts/thresholds)","Strict (equal residuals)"],
+a:2,why:"Equal intercepts are what make the scale origin comparable. With metric invariance only, you may compare associations but not means."},
+{q:"Two teams report the same engagement mean, but one team's members systematically avoid extreme responses. This is:",
+o:["Random error that cancels out","A threshold difference — non-invariance — that can hide or manufacture a real difference","A reliability problem","Correctable by standardising within team"],
+a:1,why:"Response style shifts thresholds, which is systematic, not random. Within-team standardising erases exactly the between-team difference you were trying to estimate."}],
+monday:"Put one sentence in your next cross-studio deck: \"These scores have not been tested for measurement invariance across studios, so treat the gap as a hypothesis.\" It will be the most rigorous line in the room.",
+cards:[["Invariance hierarchy","Configural (same structure) → metric (equal loadings, compare relations) → scalar (equal intercepts, compare means) → strict (equal residuals)."],
+["The invariance rule","Without scalar invariance, an observed mean difference is not evidence of an attribute difference."],
+["Common causes of non-invariance","Extreme-response style, middle-category preference, acquiescence, differing cultural norms about criticism."]],
+srcs:["Meredith, W. (1993). Measurement invariance, factor analysis and factorial invariance. <i>Psychometrika</i>, 58, 525–543.",
+"Vandenberg, R. J. &amp; Lance, C. E. (2000). A review and synthesis of the measurement invariance literature. <i>Organizational Research Methods</i>, 3(1), 4–70.",
+"Putnick, D. L. &amp; Bornstein, M. H. (2016). Measurement invariance conventions and reporting. <i>Developmental Review</i>, 41, 71–90."]},
+
+{u:4,t:"Metrology, iteration, and Goodhart",lab:"",
+brief:`<p>Close with the two things that keep this from being a counsel of despair, and the one problem management cannot escape.</p>
+<p><b>First, metrology.</b> Physical measurement is not the effortless standard psychologists imagine. It is a vast institutional achievement: units, traceability chains, calibration, and an explicit <b>uncertainty budget</b> for every reported value. Note the difference in habit. Metrology reports a value with its uncertainty. Psychometrics reports a reliability coefficient for the instrument and then a point estimate for the person. Mari and Wilson argue psychometrics should adopt the uncertainty framing directly, and they are right.</p>
+<p><b>Second, epistemic iteration.</b> Hasok Chang's <i>Inventing Temperature</i> asks how thermometry was validated when there was no prior standard of temperature to validate it against. The answer is bootstrapping under constraint: start with an imperfect standard, use it to build knowledge, use that knowledge to improve the standard, repeat. Fixed points were argued over for a century. <b>Physics did not have its foundations first either.</b> So immaturity is a stage, not a verdict — provided each iteration is disciplined by something outside the instrument.</p>
+<div class="callout"><div class="ct">Third, the part that does not go away</div>
+<p>Your objects read the metric. Publish it and behaviour adapts to it, so the relationship you measured decays. Goodhart's law, the Lucas critique, and MacKenzie's performativity are three statements of one fact. This is not a measurement error to be engineered away. It is in the subject matter, and it means management measurement is permanently a moving target.</p></div>
+<p>Which suggests the ceiling honestly: management can have disciplined evidence, not laws. Medicine before trials, not physics.</p>`,
+doit:`<p><b>Capstone.</b> Write a two-page measurement audit of the instrument you have carried through all eighteen sessions. Six sections: (1) the quantity question, honestly answered; (2) the strongest defensible scale type and which of your statistics exceed it; (3) reliability evidence and what it cannot rule out; (4) the interpretive argument and its weakest link; (5) invariance status across the groups you compare; (6) what you will change, and the one measurement study worth running. Then send it to someone who will argue with it.</p>`,
+checks:[
+{q:"What does epistemic iteration explain about the history of thermometry?",
+o:["That temperature was measurable once thermometers were accurate enough","That a standard can be improved in successive cycles without a prior standard to validate it against","That measurement requires axioms first","That physical measurement was never controversial"],
+a:1,why:"Chang's point is that self-improvement without foundations is a real historical mechanism. It is the strongest available answer to the charge that psychology is doomed for lacking foundations."},
+{q:"Goodhart's law differs from measurement error because:",
+o:["It is larger in magnitude","The measured system responds to being measured, so the relationship changes rather than being noisily observed","It only affects financial metrics","It can be corrected statistically"],
+a:1,why:"Error is a property of observation; performativity changes the thing observed. No estimator fixes that — only changing how the metric is used, or accepting that it decays."}],
+monday:"Present the capstone audit to your team as a worked example. You now know something about measurement that most people with doctorates in management do not, and the way to keep it is to teach it.",
+cards:[["Uncertainty budget vs reliability","Metrology reports each value with its uncertainty. Psychometrics reports instrument reliability, then person point estimates."],
+["Epistemic iteration (Chang)","Standards improve through successive cycles without a prior standard — how thermometry was validated. Immaturity is a stage, not a verdict."],
+["Goodhart / Lucas / performativity","When the measured system responds to the metric, the measured relationship decays. Not error — a property of reflexive subject matter."]],
+srcs:["Chang, H. (2004). <i>Inventing Temperature: Measurement and Scientific Progress.</i> Oxford.",
+"Mari, L. &amp; Wilson, M. (2014). An introduction to the Rasch measurement approach for metrologists. <i>Measurement</i>, 51, 315–327.",
+"Tal, E. Measurement in Science. <i>Stanford Encyclopedia of Philosophy.</i>",
+"MacKenzie, D. (2006). <i>An Engine, Not a Camera.</i>"]}
+];
+</script>
+<script>
+/* ---------- storage: one key, in-memory fallback ---------- */
+const KEY='mt:state';
+let ST={done:{},notes:{},ans:{},box:{},last:0};
+const mem={};
+async function load(){
+  try{const r=await window.storage.get(KEY); if(r&&r.value) ST=Object.assign(ST,JSON.parse(r.value));}
+  catch(e){ if(mem[KEY]) ST=Object.assign(ST,mem[KEY]); }
+}
+let tsave;
+function save(){
+  mem[KEY]=ST;
+  clearTimeout(tsave);
+  tsave=setTimeout(()=>{ try{ window.storage.set(KEY,JSON.stringify(ST)); }catch(e){} },400);
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const el=(h)=>{const d=document.createElement('div');d.innerHTML=h.trim();return d.firstChild;};
+const SQRT2=Math.SQRT2;
+function erf(x){ // Abramowitz-Stegun 7.1.26
+  const s=x<0?-1:1; x=Math.abs(x);
+  const t=1/(1+0.3275911*x);
+  const v=1-(((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t)*Math.exp(-x*x);
+  return s*v;
+}
+const phi=z=>0.5*(1+erf(z/SQRT2));
+function catProbs(mu,sd,th){
+  const p=[];let prev=0;
+  th.forEach(t=>{const c=phi((t-mu)/sd);p.push(c-prev);prev=c;});
+  p.push(1-prev);return p;
+}
+const omean=p=>p.reduce((s,v,i)=>s+(i+1)*v,0);
+function slider(id,label,min,max,step,val,fmt){
+  return `<div class="ctrl"><label for="${id}">${label}</label>
+  <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${val}">
+  <output id="${id}o">${fmt?fmt(val):val}</output></div>`;
+}
+function bars(p,cls){
+  const mx=Math.max(...p,0.01);
+  return `<div class="bargrp">${p.map(v=>`<div class="bar ${cls||''}" style="height:${Math.max(1,v/mx*100)}%"></div>`).join('')}</div>`;
+}
+
+/* ---------- progress chrome ---------- */
+function chrome(){
+  const n=Object.values(ST.done).filter(Boolean).length;
+  $('#pct').textContent=Math.round(n/S.length*100)+'%';
+  $('#donecount').textContent=`${n} of ${S.length} sessions done`;
+  $('#ruler').innerHTML=S.map((s,i)=>{
+    const h=ST.done[i]?100:(i===ST.last?70:34);
+    const c=ST.done[i]?'done':(i===ST.last?'here':'');
+    return `<div class="tick ${c}" data-go="${i}" title="${i+1}. ${s.t}" style="height:${h}%"></div>`;
+  }).join('');
+}
+function rail(){
+  let h='';
+  UNITS.forEach((u,ui)=>{
+    h+=`<div class="unit"><div class="ut">${u}</div><ul class="slist">`;
+    S.forEach((s,i)=>{ if(s.u!==ui)return;
+      h+=`<li class="sitem ${i===ST.last?'active':''} ${ST.done[i]?'done':''}" data-go="${i}">
+      <span class="sn">${String(i+1).padStart(2,'0')}</span><span class="st">${s.t}</span></li>`;});
+    h+='</ul></div>';
+  });
+  $('#rail').innerHTML=h;
+}
+
+/* ---------- session view ---------- */
+function view(i){
+  ST.last=i;save();
+  const s=S[i];
+  const done=!!ST.done[i];
+  let h=`<div class="ptop"><span class="eyebrow">${UNITS[s.u]}</span>
+    <h1>${String(i+1).padStart(2,'0')} · ${s.t}</h1>
+    <div class="meta">30 minutes · <b>read</b> 10 · ${s.lab?'<b>lab</b> 8 · ':''}<b>exercise</b> ${s.lab?6:10} · <b>check</b> 6
+    ${done?'<span class="pill">done</span>':''}</div></div>
+    <div class="sec brief">${s.brief}</div>`;
+  if(s.lab) h+=`<div class="sec"><span class="eyebrow">Lab</span><div class="lab" id="lab"></div></div>`;
+  h+=`<div class="sec"><span class="eyebrow">Do this</span><div class="doit">${s.doit}</div></div>
+    <div class="sec"><span class="eyebrow">Check yourself</span><div id="quiz"></div></div>
+    <div class="sec"><span class="eyebrow">Your notes</span>
+      <textarea id="nt" placeholder="What you concluded, and the one thing you will not forget.">${(ST.notes[i]||'').replace(/</g,'&lt;')}</textarea>
+      <div class="row" style="margin-top:6px"><span class="saved" id="sv"></span></div></div>
+    <div class="sec"><span class="eyebrow">Monday test</span>
+      <div class="callout"><p>${s.monday}</p></div></div>
+    <div class="sec"><span class="eyebrow">Sources</span>
+      <ul class="srcs">${s.srcs.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    <div class="navrow">
+      <button class="btn" id="prev" ${i===0?'disabled':''}>← ${i>0?String(i).padStart(2,'0'):''}</button>
+      <button class="btn solid" id="mk">${done?'Mark not done':'Mark session done'}</button>
+      <button class="btn" id="next" ${i===S.length-1?'disabled':''}>${i<S.length-1?String(i+2).padStart(2,'0'):''} →</button>
+    </div>`;
+  $('#pane').innerHTML=h;
+  window.scrollTo({top:0,behavior:'smooth'});
+  quiz(i);
+  if(s.lab) LABS[s.lab]($('#lab'));
+  const nt=$('#nt');
+  nt.oninput=()=>{ST.notes[i]=nt.value;save();$('#sv').textContent='saved';setTimeout(()=>{const e=$('#sv');if(e)e.textContent=''},1200);};
+  $('#mk').onclick=()=>{ST.done[i]=!ST.done[i];save();chrome();rail();view(i);};
+  $('#prev').onclick=()=>{go(i-1)};
+  $('#next').onclick=()=>{go(i+1)};
+  rail();chrome();
+}
+function go(i){ if(i<0||i>=S.length)return; view(i); }
+
+function quiz(i){
+  const s=S[i];
+  $('#quiz').innerHTML=s.checks.map((c,qi)=>`<div class="q" data-q="${qi}">
+    <div class="qt">${c.q}</div>
+    ${c.o.map((o,oi)=>`<button class="opt" data-o="${oi}">${o}</button>`).join('')}
+    <div class="why" style="display:none">${c.why}</div></div>`).join('');
+  $('#quiz').onclick=e=>{
+    const b=e.target.closest('.opt'); if(!b)return;
+    const q=b.closest('.q'), qi=+q.dataset.q, oi=+b.dataset.o, c=s.checks[qi];
+    q.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+    q.querySelectorAll('.opt')[c.a].classList.add('right');
+    if(oi!==c.a) b.classList.add('wrong');
+    q.querySelector('.why').style.display='block';
+    ST.ans[i+'-'+qi]=(oi===c.a);save();
+  };
+}
+
+/* ================= LABS ================= */
+const LABS={};
+
+/* --- 1. scale sorter --- */
+LABS.scales=(n)=>{
+  const items=[
+    ["Employee ID number",0,"Numerals as labels only. Higher ID means hired later at best, and arithmetic on it is meaningless."],
+    ["Bugs closed this sprint",3,"A count. True zero, and ten is genuinely twice five."],
+    ["Temperature in °C",2,"Equal intervals, arbitrary zero. 20°C is not twice as hot as 10°C — the classic interval case."],
+    ["Satisfaction, 1–5 Likert",1,"Ordered categories. Equal spacing of the printed options is typography, not psychology."],
+    ["Percentile rank on an assessment",1,"A trap. Percentiles are a monotone but non-linear transform of the underlying score, so intervals are unequal by construction — dense in the middle, stretched at the tails."],
+    ["Sprint velocity in story points",1,"A trap. Points are a consensus ordering of effort with no demonstrated additivity, yet teams sum them, average them, and forecast from them."],
+    ["Calendar year, e.g. 2026",2,"A trap. Years have equal intervals and an arbitrary origin, so differences are meaningful and ratios are not. Year 2000 is not twice year 1000."],
+    ["Reaction time in milliseconds",3,"Ratio: absolute zero, ratios meaningful. One of the few genuinely ratio-scaled variables in behavioural work."]];
+  const names=["Nominal","Ordinal","Interval","Ratio"];
+  n.innerHTML=`<h3>Classify the scale type</h3>
+   <div class="labhint">Three of these are traps that appear in real dashboards. Choose before you read the feedback.</div>
+   <div id="sq"></div><div class="readout"><div class="ro"><div class="k">Correct</div><div class="v" id="scr">0 / 8</div></div></div>`;
+  $('#sq').innerHTML=items.map((it,ii)=>`<div class="q" data-i="${ii}"><div class="qt">${it[0]}</div>
+    <div class="row">${names.map((nm,k)=>`<button class="btn sm" data-k="${k}">${nm}</button>`).join('')}</div>
+    <div class="why" style="display:none">${it[2]}</div></div>`).join('');
+  let sc=0,ansd=0;
+  $('#sq').onclick=e=>{
+    const b=e.target.closest('button[data-k]'); if(!b)return;
+    const q=b.closest('.q'),ii=+q.dataset.i,k=+b.dataset.k,ok=items[ii][1];
+    q.querySelectorAll('button').forEach(x=>x.disabled=true);
+    q.querySelectorAll('button')[ok].style.borderColor='var(--ok)';
+    q.querySelectorAll('button')[ok].style.background='#f2f8ef';
+    if(k!==ok){b.style.borderColor='var(--red-bright)';b.style.textDecoration='line-through'}else sc++;
+    ansd++;q.querySelector('.why').style.display='block';
+    $('#scr').textContent=sc+' / 8';
+  };
+};
+
+/* --- 2. cancellation axioms --- */
+LABS.cancel=(n)=>{
+  const A=[[1,2,3],[4,5,6],[7,8,9]];
+  const B=[[1,2,6],[3,5,7],[4,8,9]];
+  let cur='B';
+  n.innerHTML=`<h3>Test the cancellation axioms</h3>
+   <div class="labhint">Rows are levels of attribute A (a1&lt;a2&lt;a3). Columns are levels of attribute P (p1&lt;p2&lt;p3).
+   Cells give the <b>rank order</b> of the joint outcome only — 1 is lowest, 9 is highest. No interval information is used anywhere.
+   One matrix admits an additive representation. The other does not. Work it out by hand first.</div>
+   <div class="row" style="margin-bottom:12px">
+     <button class="btn sm" id="mA">Matrix A</button><button class="btn sm solid" id="mB">Matrix B</button></div>
+   <div id="mtx"></div>
+   <div class="row"><button class="btn sm" id="c1">Check single cancellation</button>
+     <button class="btn sm" id="c2">Check double cancellation</button></div>
+   <div id="cv"></div>`;
+  const draw=(hi)=>{
+    const M=cur==='A'?A:B;
+    const H=hi||[];
+    $('#mtx').innerHTML=`<table class="mx"><tr><th></th><th>p1</th><th>p2</th><th>p3</th></tr>`+
+    M.map((r,i)=>`<tr><th>a${i+1}</th>`+r.map((v,j)=>
+      `<td class="${H.some(x=>x[0]===i&&x[1]===j)?'hi':''}">${v}</td>`).join('')+`</tr>`).join('')+`</table>`;
+  };
+  const verdict=(cls,txt)=>$('#cv').innerHTML=`<div class="verdict ${cls}">${txt}</div>`;
+  const pick=(k)=>{cur=k;$('#mA').className='btn sm'+(k==='A'?' solid':'');$('#mB').className='btn sm'+(k==='B'?' solid':'');draw();$('#cv').innerHTML=''};
+  $('#mA').onclick=()=>pick('A'); $('#mB').onclick=()=>pick('B');
+  $('#c1').onclick=()=>{
+    const M=cur==='A'?A:B;let bad=null;
+    for(let i=0;i<3;i++)for(let j=0;j<2;j++) if(M[i][j]>=M[i][j+1]) bad=[[i,j],[i,j+1]];
+    for(let j=0;j<3;j++)for(let i=0;i<2;i++) if(M[i][j]>=M[i+1][j]) bad=[[i,j],[i+1,j]];
+    if(bad){draw(bad);verdict('bad','Single cancellation fails. The ordering across one attribute reverses at some level of the other, so independence does not hold.');}
+    else{draw();verdict('good','Single cancellation holds. Every row increases left to right and every column increases top to bottom, so the two attributes act independently on the outcome.');}
+  };
+  $('#c2').onclick=()=>{
+    const M=cur==='A'?A:B;
+    const p1=M[1][0]>M[0][1], p2=M[2][1]>M[1][2], concl=M[2][0]>M[0][2];
+    const hi=[[1,0],[0,1],[2,1],[1,2],[2,0],[0,2]];
+    if(p1&&p2&&!concl){draw(hi);
+      verdict('bad',`Double cancellation is violated. (a2,p1)=${M[1][0]} &gt; (a1,p2)=${M[0][1]} and (a3,p2)=${M[2][1]} &gt; (a2,p3)=${M[1][2]},
+      so an additive representation requires (a3,p1) &gt; (a1,p3). But ${M[2][0]} &lt; ${M[0][2]}.
+      The trade-offs are inconsistent, so no additive representation exists — established from rank order alone, with no assumption of interval scaling.`);}
+    else if(p1&&p2&&concl){draw(hi);
+      verdict('good',`Double cancellation holds here: ${M[1][0]}&gt;${M[0][1]} and ${M[2][1]}&gt;${M[1][2]}, and the required ${M[2][0]}&gt;${M[0][2]} is satisfied. Consistent with additivity so far.`);}
+    else{draw(hi);verdict('good','The premises of double cancellation are not both satisfied in this matrix, so the axiom imposes no constraint here. Nothing is violated, and nothing is confirmed.');}
+  };
+  pick('B');
+};
+
+/* --- 3. ordinal sign reversal --- */
+LABS.reversal=(n)=>{
+  n.innerHTML=`<h3>Make the mean lie</h3>
+   <div class="labhint">Two groups have a continuous latent attribute. A 5-point item collapses it through four thresholds.
+   Move the sliders until the group with the <b>higher latent mean</b> shows the <b>lower observed mean</b>.</div>
+   ${slider('t1','Lowest threshold',-3,1,0.1,-2.5,v=>(+v).toFixed(1))}
+   ${slider('gp','Gap between thresholds',0.2,1.5,0.1,0.3,v=>(+v).toFixed(1))}
+   ${slider('mA','Group A latent mean',-1,2,0.1,0,v=>(+v).toFixed(1))}
+   ${slider('sA','Group A latent SD',0.5,4,0.1,1,v=>(+v).toFixed(1))}
+   ${slider('mB','Group B latent mean',-1,2,0.1,0.3,v=>(+v).toFixed(1))}
+   ${slider('sB','Group B latent SD',0.5,4,0.1,4,v=>(+v).toFixed(1))}
+   <div class="row" style="margin:10px 0"><button class="btn sm" id="pre">Load a reversal</button></div>
+   <div class="row" style="align-items:flex-start;gap:26px">
+     <div style="flex:1"><div class="blab">Group A responses 1→5</div><div class="bars" id="bA"></div></div>
+     <div style="flex:1"><div class="blab">Group B responses 1→5</div><div class="bars" id="bB"></div></div></div>
+   <div class="readout">
+     <div class="ro"><div class="k">Latent B − A</div><div class="v" id="ld">–</div></div>
+     <div class="ro"><div class="k">Observed B − A</div><div class="v" id="od">–</div></div>
+     <div class="ro"><div class="k">A observed mean</div><div class="v" id="oa">–</div></div>
+     <div class="ro"><div class="k">B observed mean</div><div class="v" id="ob">–</div></div></div>
+   <div id="rv"></div>`;
+  const ids=['t1','gp','mA','sA','mB','sB'];
+  const upd=()=>{
+    const g={};ids.forEach(k=>{g[k]=+$('#'+k).value;$('#'+k+'o').textContent=g[k].toFixed(1)});
+    const th=[0,1,2,3].map(i=>g.t1+i*g.gp);
+    const pA=catProbs(g.mA,g.sA,th), pB=catProbs(g.mB,g.sB,th);
+    const oA=omean(pA), oB=omean(pB), ld=g.mB-g.mA, od=oB-oA;
+    $('#bA').innerHTML=bars(pA); $('#bB').innerHTML=bars(pB,'b2');
+    $('#ld').textContent=(ld>0?'+':'')+ld.toFixed(2);
+    $('#od').textContent=(od>0?'+':'')+od.toFixed(2);
+    $('#oa').textContent=oA.toFixed(2); $('#ob').textContent=oB.toFixed(2);
+    let v='';
+    if(Math.abs(ld)>0.05&&Math.sign(ld)!==Math.sign(od)&&Math.abs(od)>0.05)
+      v=`<div class="verdict bad"><b>Sign reversal.</b> Group B's latent mean is ${ld>0?'higher':'lower'} by ${Math.abs(ld).toFixed(2)},
+        yet its observed mean is ${od>0?'higher':'lower'} by ${Math.abs(od).toFixed(2)}. A t-test on these responses returns a confident answer in the wrong direction. More respondents would only sharpen it.</div>`;
+    else if(Math.abs(ld)<0.05&&Math.abs(od)>0.1)
+      v=`<div class="verdict bad"><b>Gap from nothing.</b> The latent means are equal, and the observed means differ by ${Math.abs(od).toFixed(2)} because the groups differ in spread.</div>`;
+    else if(Math.abs(od)<Math.abs(ld)*0.5&&Math.abs(ld)>0.2)
+      v=`<div class="verdict bad"><b>Compression.</b> A latent difference of ${ld.toFixed(2)} shows up as only ${od.toFixed(2)} — the effect size is understated, not just noisy.</div>`;
+    else v=`<div class="verdict good">Direction preserved here. Now raise one group's SD and push the thresholds toward a floor or ceiling.</div>`;
+    $('#rv').innerHTML=v;
+  };
+  ids.forEach(k=>$('#'+k).oninput=upd);
+  $('#pre').onclick=()=>{const v={t1:-2.5,gp:0.3,mA:0,sA:1,mB:0.3,sB:4};ids.forEach(k=>$('#'+k).value=v[k]);upd()};
+  upd();
+};
+
+/* --- 4. alpha inflation --- */
+LABS.alpha=(n)=>{
+  n.innerHTML=`<h3>How high can alpha go on nothing?</h3>
+   <div class="labhint">Alpha is a function of item count and average inter-item correlation, nothing else.
+   Switch on two orthogonal factors to see a scale that measures two different things and still reports respectably.</div>
+   ${slider('k','Number of items',3,60,1,10)}
+   ${slider('r','Correlation between items',0.02,0.7,0.01,0.15,v=>(+v).toFixed(2))}
+   <div class="row" style="margin:8px 0 4px">
+     <button class="btn sm" id="tf">Two orthogonal factors: off</button>
+     <button class="btn sm" id="p1">Junk preset</button></div>
+   <div class="readout">
+     <div class="ro"><div class="k">Cronbach's alpha</div><div class="v" id="al">–</div></div>
+     <div class="ro"><div class="k">Average inter-item r</div><div class="v" id="rb">–</div></div>
+     <div class="ro"><div class="k">Shared variance per pair</div><div class="v" id="sv2">–</div></div></div>
+   <div id="av"></div>`;
+  let two=false;
+  const upd=()=>{
+    const k=+$('#k').value, r=+$('#r').value;
+    $('#ko').textContent=k; $('#ro').textContent=r.toFixed(2);
+    let rbar=r, note='';
+    if(two){ const h=Math.floor(k/2); const pairs=k*(k-1)/2; const within=h*(h-1)/2+(k-h)*(k-h-1)/2;
+      rbar=r*within/pairs; note=`Items split into two uncorrelated halves. Within a half the correlation is ${r.toFixed(2)}; across halves it is zero.`; }
+    const a=k*rbar/(1+(k-1)*rbar);
+    $('#al').textContent=a.toFixed(3); $('#rb').textContent=rbar.toFixed(3);
+    $('#sv2').textContent=(rbar*rbar*100).toFixed(1)+'%';
+    let v;
+    if(two&&a>=0.7) v=`<div class="verdict bad"><b>Alpha ${a.toFixed(2)} on a two-dimensional scale.</b> ${note}
+      Alpha passes every conventional threshold while the scale measures two unrelated things. This is why alpha is not evidence of unidimensionality.</div>`;
+    else if(a>=0.8&&rbar<0.2) v=`<div class="verdict bad"><b>Alpha ${a.toFixed(2)} from items sharing ${(rbar*rbar*100).toFixed(1)}% of their variance.</b>
+      Item count is doing the work, not item quality. Most journals would print this without comment.</div>`;
+    else if(a>=0.9) v=`<div class="verdict bad"><b>Alpha ${a.toFixed(2)}.</b> With an average correlation of ${rbar.toFixed(2)} the items are near-paraphrases.
+      Reliability rose, the construct narrowed — the attenuation paradox.</div>`;
+    else v=`<div class="verdict good">Alpha ${a.toFixed(2)}. Now hold the correlation still and drag the item count upward.</div>`;
+    $('#av').innerHTML=v;
+  };
+  $('#k').oninput=upd; $('#r').oninput=upd;
+  $('#tf').onclick=()=>{two=!two;$('#tf').textContent='Two orthogonal factors: '+(two?'on':'off');$('#tf').className='btn sm'+(two?' solid':'');upd()};
+  $('#p1').onclick=()=>{$('#k').value=40;$('#r').value=0.12;upd()};
+  upd();
+};
+
+/* --- 5. ICC playground --- */
+LABS.icc=(n)=>{
+  n.innerHTML=`<h3>Item characteristic curves, and where invariance breaks</h3>
+   <div class="labhint">Two items. Give them equal difficulty and different discrimination, then find the ability at which the curves cross.
+   Above the crossing the items rank one way; below it, the other way.</div>
+   ${slider('a1','Item 1 discrimination a',0.2,3,0.1,1,v=>(+v).toFixed(1))}
+   ${slider('b1','Item 1 difficulty b',-3,3,0.1,0,v=>(+v).toFixed(1))}
+   ${slider('a2','Item 2 discrimination a',0.2,3,0.1,1,v=>(+v).toFixed(1))}
+   ${slider('b2','Item 2 difficulty b',-3,3,0.1,1,v=>(+v).toFixed(1))}
+   ${slider('cg','Guessing c (both items)',0,0.4,0.01,0,v=>(+v).toFixed(2))}
+   <canvas id="cv2" width="700" height="300"></canvas>
+   <div id="iv"></div>`;
+  const ids=['a1','b1','a2','b2','cg'];
+  const P=(th,a,b,c)=>c+(1-c)/(1+Math.exp(-a*(th-b)));
+  const upd=()=>{
+    const g={};ids.forEach(k=>{g[k]=+$('#'+k).value;$('#'+k+'o').textContent=g[k].toFixed(k==='cg'?2:1)});
+    const cv=$('#cv2'),x=cv.getContext('2d'),W=700,H=300,L=44,R=14,T=12,B=30;
+    x.clearRect(0,0,W,H);
+    const px=t=>L+(t+4)/8*(W-L-R), py=p=>H-B-p*(H-T-B);
+    x.strokeStyle='#e8e8e8';x.lineWidth=1;x.font='11px sans-serif';x.fillStyle='#4a4a4a';
+    [0,0.25,0.5,0.75,1].forEach(p=>{x.beginPath();x.moveTo(L,py(p));x.lineTo(W-R,py(p));x.stroke();
+      x.fillText(p.toFixed(2),8,py(p)+4)});
+    [-4,-2,0,2,4].forEach(t=>{x.beginPath();x.moveTo(px(t),T);x.lineTo(px(t),H-B);x.stroke();
+      x.fillText(t,px(t)-4,H-10)});
+    x.fillText('ability θ',W-70,H-10);
+    const curve=(a,b,col)=>{x.beginPath();x.strokeStyle=col;x.lineWidth=2.5;
+      for(let i=0;i<=280;i++){const t=-4+8*i/280,p=P(t,a,b,g.cg);i?x.lineTo(px(t),py(p)):x.moveTo(px(t),py(p))}x.stroke();};
+    curve(g.a1,g.b1,'#8e011f'); curve(g.a2,g.b2,'#bd0129');
+    x.fillStyle='#8e011f';x.fillText('item 1',L+8,T+14);x.fillStyle='#bd0129';x.fillText('item 2',L+58,T+14);
+    let cross=null;let prev=P(-4,g.a1,g.b1,g.cg)-P(-4,g.a2,g.b2,g.cg);
+    for(let i=1;i<=800;i++){const t=-4+8*i/800,d=P(t,g.a1,g.b1,g.cg)-P(t,g.a2,g.b2,g.cg);
+      if(prev*d<0&&Math.abs(d)<0.5){cross=t;break} prev=d;}
+    if(cross!==null&&Math.abs(g.a1-g.a2)>0.05){
+      x.strokeStyle='#4a4a4a';x.setLineDash([4,4]);x.beginPath();x.moveTo(px(cross),T);x.lineTo(px(cross),H-B);x.stroke();x.setLineDash([]);
+      $('#iv').innerHTML=`<div class="verdict bad"><b>The curves cross at θ = ${cross.toFixed(2)}.</b>
+        Which item is harder depends on who is answering, so item comparisons are no longer invariant across persons.
+        This is exactly what the Rasch model gives up when discriminations are allowed to differ, and what it protects when they are held equal.</div>`;
+    } else if(Math.abs(g.a1-g.a2)<=0.05){
+      $('#iv').innerHTML=`<div class="verdict good"><b>Equal discriminations: Rasch conditions.</b> The curves never cross, so item difficulty order is the same for every person and person order is the same for every item. That is specific objectivity.</div>`;
+    } else $('#iv').innerHTML=`<div class="verdict good">Discriminations differ, but the crossing falls outside the plotted ability range. Move the difficulties closer together.</div>`;
+  };
+  ids.forEach(k=>$('#'+k).oninput=upd); upd();
+};
+
+/* --- 6. invariance --- */
+LABS.invar=(n)=>{
+  n.innerHTML=`<h3>A gap that is not there</h3>
+   <div class="labhint">Two studios with the <b>same</b> latent engagement. Only their response thresholds differ —
+   one group avoids the extreme categories, or reads "agree" as a stronger claim. Watch the observed gap appear.</div>
+   ${slider('mu','Latent mean, both groups',-1,1,0.1,0,v=>(+v).toFixed(1))}
+   ${slider('sh','Threshold shift, studio B',-1.5,1.5,0.1,0.6,v=>(+v).toFixed(1))}
+   ${slider('sq','Threshold squeeze, studio B',0.4,1.8,0.1,1,v=>(+v).toFixed(1))}
+   <div class="row" style="align-items:flex-start;gap:26px;margin-top:12px">
+     <div style="flex:1"><div class="blab">Studio A responses 1→5</div><div class="bars" id="iA"></div></div>
+     <div style="flex:1"><div class="blab">Studio B responses 1→5</div><div class="bars" id="iB"></div></div></div>
+   <div class="readout">
+     <div class="ro"><div class="k">True difference</div><div class="v">0.00</div></div>
+     <div class="ro"><div class="k">Reported gap</div><div class="v" id="gp2">–</div></div>
+     <div class="ro"><div class="k">A mean</div><div class="v" id="ma">–</div></div>
+     <div class="ro"><div class="k">B mean</div><div class="v" id="mb">–</div></div></div>
+   <div id="nv"></div>`;
+  const ids=['mu','sh','sq'];
+  const upd=()=>{
+    const g={};ids.forEach(k=>{g[k]=+$('#'+k).value;$('#'+k+'o').textContent=g[k].toFixed(1)});
+    const tA=[-1.5,-0.5,0.5,1.5];
+    const tB=tA.map(t=>t*g.sq+g.sh);
+    const pA=catProbs(g.mu,1,tA), pB=catProbs(g.mu,1,tB);
+    const oA=omean(pA),oB=omean(pB),d=oB-oA;
+    $('#iA').innerHTML=bars(pA);$('#iB').innerHTML=bars(pB,'b2');
+    $('#ma').textContent=oA.toFixed(2);$('#mb').textContent=oB.toFixed(2);
+    $('#gp2').textContent=(d>0?'+':'')+d.toFixed(2);
+    $('#nv').innerHTML=Math.abs(d)>0.1
+      ? `<div class="verdict bad"><b>A reported gap of ${d.toFixed(2)} points from an attribute difference of exactly zero.</b>
+         Scalar invariance fails, so the gap is a fact about the response scale, not about engagement.
+         On a 1–5 item this is the size of gap that triggers action plans and quarterly reviews.</div>`
+      : `<div class="verdict good">Thresholds are close enough that the reported gap is small. This is the condition scalar invariance testing is designed to check — and it is rarely checked.</div>`;
+  };
+  ids.forEach(k=>$('#'+k).oninput=upd); upd();
+};
+
+/* ================= flashcards ================= */
+function deck(){
+  const d=[];
+  S.forEach((s,i)=>s.cards.forEach((c,j)=>{
+    const id=i+':'+j;
+    if(ST.done[i]||ST.box[id]) d.push({id,f:c[0],b:c[1],box:ST.box[id]||1,si:i});
+  }));
+  return d.sort((a,b)=>a.box-b.box||Math.random()-0.5);
+}
+function cards(){
+  let d=deck(),k=0,shown=false;
+  if(!d.length){
+    $('#pane').innerHTML=`<div class="ptop"><span class="eyebrow">Review</span><h1>No cards yet</h1></div>
+    <p>Cards unlock as you mark sessions done. Finish Session 01 and come back.</p>
+    <button class="btn solid" id="bk">Back to Session 01</button>`;
+    $('#bk').onclick=()=>go(0);return;
+  }
+  const render=()=>{
+    if(k>=d.length){
+      $('#pane').innerHTML=`<div class="ptop"><span class="eyebrow">Review</span><h1>Deck finished</h1>
+        <div class="meta">${d.length} cards reviewed. Cards you missed come back in box 1.</div></div>
+        <div class="row"><button class="btn solid" id="ag">Review again</button>
+        <button class="btn" id="bk">Back to sessions</button></div>`;
+      $('#ag').onclick=cards; $('#bk').onclick=()=>go(ST.last);return;
+    }
+    const c=d[k];
+    $('#pane').innerHTML=`<div class="ptop"><span class="eyebrow">Review · card ${k+1} of ${d.length} · box ${c.box}</span>
+      <h1>Recall</h1><div class="meta">From session ${String(c.si+1).padStart(2,'0')} · ${S[c.si].t}</div></div>
+      <div class="card"><div class="f">${c.f}</div>
+        <div class="b" id="bk2" style="display:${shown?'block':'none'}">${c.b}</div></div>
+      <div class="row" style="margin-top:16px">
+        ${shown?`<button class="btn" id="ag">Again</button><button class="btn solid" id="ok">Got it</button>`
+                :`<button class="btn solid" id="sh">Show answer</button>`}
+        <button class="btn" id="ex" style="margin-left:auto">Exit review</button></div>`;
+    $('#ex').onclick=()=>go(ST.last);
+    if(shown){
+      $('#ag').onclick=()=>{ST.box[c.id]=1;save();shown=false;k++;render()};
+      $('#ok').onclick=()=>{ST.box[c.id]=Math.min(4,c.box+1);save();shown=false;k++;render()};
+    } else $('#sh').onclick=()=>{shown=true;render()};
+  };
+  render();
+}
+
+/* ================= backup ================= */
+function backup(){
+  $('#pane').innerHTML=`<div class="ptop"><span class="eyebrow">Backup</span><h1>Save or restore progress</h1>
+    <div class="meta">Progress is stored automatically. Copy this text somewhere safe if you want a hard backup, or paste an old backup in and restore.</div></div>
+    <textarea id="js" style="min-height:200px;font-size:12.5px">${JSON.stringify(ST)}</textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="cp">Copy</button>
+      <button class="btn" id="rs">Restore from this text</button>
+      <button class="btn" id="bk" style="margin-left:auto">Back to sessions</button></div><div id="msg"></div>`;
+  $('#cp').onclick=()=>{$('#js').select();document.execCommand('copy');$('#msg').innerHTML='<div class="verdict good">Copied.</div>'};
+  $('#rs').onclick=()=>{try{ST=Object.assign({done:{},notes:{},ans:{},box:{},last:0},JSON.parse($('#js').value));save();chrome();rail();
+    $('#msg').innerHTML='<div class="verdict good">Restored.</div>'}catch(e){$('#msg').innerHTML='<div class="verdict bad">That is not valid backup text.</div>'}};
+  $('#bk').onclick=()=>go(ST.last);
+}
+
+/* ================= boot ================= */
+document.addEventListener('click',e=>{const t=e.target.closest('[data-go]');if(t)go(+t.dataset.go)});
+$('#btnCards').onclick=cards;
+$('#btnData').onclick=backup;
+(async()=>{await load();chrome();rail();view(ST.last||0);})();
+</script>
