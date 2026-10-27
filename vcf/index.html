@@ -48,13 +48,15 @@
     .tabs {
       display: flex;
       background: var(--red-dark);
+      padding: 8px 8px 0;
+      gap: 4px;
     }
 
     .tab {
       flex: 1;
-      padding: 12px 12px 10px;
+      padding: 10px 12px 10px;
       border: none;
-      border-radius: 0;
+      border-radius: 10px 10px 0 0;
       background: transparent;
       color: rgba(255,255,255,0.38);
       font-family: var(--sans);
@@ -64,18 +66,16 @@
       text-transform: uppercase;
       cursor: pointer;
       transition: color 0.15s, background 0.15s;
-      border-bottom: 2px solid transparent;
     }
 
     .tab.active {
       background: var(--red-deep);
       color: white;
-      border-bottom-color: var(--red-bright);
     }
 
     .tab:not(.active):hover {
       color: rgba(255,255,255,0.6);
-      background: rgba(255,255,255,0.03);
+      background: rgba(255,255,255,0.05);
     }
 
     /* ── Card shell ── */
