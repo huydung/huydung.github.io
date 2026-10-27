@@ -57,9 +57,9 @@
       inset: 0;
       z-index: -1;
       pointer-events: none;
-      background: radial-gradient(rgba(248,247,208,0.13) 1px, transparent 1.5px) 0 0 / 22px 22px;
-      -webkit-mask: radial-gradient(ellipse 75% 65% at 50% 45%, #000 25%, transparent 85%);
-              mask: radial-gradient(ellipse 75% 65% at 50% 45%, #000 25%, transparent 85%);
+      background: radial-gradient(rgba(248,247,208,0.14) 1.2px, transparent 1.8px) 0 0 / 20px 20px;
+      -webkit-mask: radial-gradient(ellipse 85% 75% at 50% 45%, #000 35%, transparent 95%);
+              mask: radial-gradient(ellipse 85% 75% at 50% 45%, #000 35%, transparent 95%);
     }
 
     :focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
@@ -70,17 +70,22 @@
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 40px 90px rgba(0,0,0,0.7), 0 6px 24px rgba(0,0,0,0.45);
+      /* One gradient behind the active tab and the card, so they join without a seam */
+      background:
+        radial-gradient(ellipse 160% 90% at 110% 0%, rgba(189,1,41,0.4), transparent 50%),
+        radial-gradient(ellipse 120% 80% at -20% 110%, rgba(40,0,8,0.7), transparent 55%),
+        var(--red-deep);
     }
 
     /* ── Tabs ── */
-    /* Dark bar behind both tabs, so the active tab's rounded corner shows red-dark, not the page */
-    .tabs { display: flex; background: var(--red-dark); }
+    .tabs { display: flex; }
 
     .tab {
+      position: relative;
       flex: 1;
       min-height: 44px;
       border: none;
-      background: none;
+      background: var(--red-dark);
       color: rgba(255,255,255,0.55);
       font: 700 11px var(--sans);
       letter-spacing: 0.09em;
@@ -90,17 +95,22 @@
     }
     .tab:hover { color: rgba(255,255,255,0.8); }
     .tab:focus-visible { outline-offset: -4px; }
-    .tab[aria-selected="true"] { background: var(--red-deep); color: #fff; }
-    /* Round only the inner top corner; the outer one is clipped by .card-wrapper */
-    .tab:first-child[aria-selected="true"] { border-top-right-radius: var(--radius); }
-    .tab:last-child[aria-selected="true"]  { border-top-left-radius: var(--radius); }
-
-    /* ── Card ── */
-    .card {
-      background:
-        radial-gradient(ellipse 160% 90% at 110% 0%, rgba(189,1,41,0.4), transparent 50%),
-        radial-gradient(ellipse 120% 80% at -20% 110%, rgba(40,0,8,0.7), transparent 55%),
-        var(--red-deep);
+    .tab[aria-selected="true"] { background: none; color: #fff; }
+    /* The inactive tab paints the area outside the active tab's rounded inner corner */
+    .tab[aria-selected="false"]::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      width: var(--radius);
+      height: var(--radius);
+    }
+    .tab:first-child[aria-selected="false"]::after {
+      right: calc(-1 * var(--radius));
+      background: radial-gradient(circle at 100% 100%, transparent calc(var(--radius) - 0.5px), var(--red-dark) var(--radius));
+    }
+    .tab:last-child[aria-selected="false"]::after {
+      left: calc(-1 * var(--radius));
+      background: radial-gradient(circle at 0 100%, transparent calc(var(--radius) - 0.5px), var(--red-dark) var(--radius));
     }
 
     /* Both tabs' content shares one grid cell, so the card height never jumps */
