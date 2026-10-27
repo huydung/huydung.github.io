@@ -33,7 +33,12 @@
     body {
       min-height: 100vh;
       min-height: 100svh;
-      background: #0d0d0d radial-gradient(ellipse 80% 60% at 50% 0%, rgba(142,1,31,0.2), transparent 60%) no-repeat;
+      background:
+        radial-gradient(55% 45% at 12% 8%, rgba(189,1,41,0.38), transparent 70%),
+        radial-gradient(50% 45% at 92% 96%, rgba(142,1,31,0.42), transparent 70%),
+        radial-gradient(35% 30% at 88% 12%, rgba(248,247,208,0.07), transparent 70%),
+        #0b0607;
+      background-attachment: fixed;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -45,24 +50,37 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* Dot grid that fades out toward the edges */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background: radial-gradient(rgba(248,247,208,0.13) 1px, transparent 1.5px) 0 0 / 22px 22px;
+      -webkit-mask: radial-gradient(ellipse 75% 65% at 50% 45%, #000 25%, transparent 85%);
+              mask: radial-gradient(ellipse 75% 65% at 50% 45%, #000 25%, transparent 85%);
+    }
+
     :focus-visible { outline: 2px solid var(--cream); outline-offset: 2px; }
 
     .card-wrapper {
       width: 100%;
-      max-width: 400px;
+      max-width: 460px;
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: 0 40px 90px rgba(0,0,0,0.7), 0 6px 24px rgba(0,0,0,0.45);
     }
 
     /* ── Tabs ── */
-    .tabs { display: flex; }
+    /* Dark bar behind both tabs, so the active tab's rounded corner shows red-dark, not the page */
+    .tabs { display: flex; background: var(--red-dark); }
 
     .tab {
       flex: 1;
       min-height: 44px;
       border: none;
-      background: var(--red-dark);
+      background: none;
       color: rgba(255,255,255,0.55);
       font: 700 11px var(--sans);
       letter-spacing: 0.09em;
@@ -98,15 +116,20 @@
       padding: var(--pad) var(--pad) 4px;
     }
 
+    /* Squircle: the frame and the photo share one mask; the frame's padding is the ring */
+    .avatar, .avatar img {
+      --squircle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 0C8 0 0 8 0 50s8 50 50 50 50-8 50-50S92 0 50 0Z'/%3E%3C/svg%3E");
+      -webkit-mask: var(--squircle) center / 100% 100% no-repeat;
+              mask: var(--squircle) center / 100% 100% no-repeat;
+    }
     .avatar {
       width: clamp(76px, 24vw, 100px);
-      height: auto;
       aspect-ratio: 1;
       flex-shrink: 0;
-      border-radius: 22px;
-      object-fit: cover;
-      border: 2.5px solid rgba(255,255,255,0.22);
+      padding: 2.5px;
+      background: rgba(255,255,255,0.25);
     }
+    .avatar img { display: block; width: 100%; height: 100%; object-fit: cover; }
 
     .profile-info {
       flex: 1;
@@ -114,14 +137,18 @@
       display: flex;
       flex-direction: column;
       gap: 6px;
+      container-type: inline-size;
     }
 
+    /* One line at any width: the name is ~12.2em wide, so 8% of the column fits */
     .name {
-      font: 700 clamp(17px, 5vw, 20px)/1.25 var(--serif);
-      text-wrap: balance;
+      font: 700 clamp(12px, 8cqi, 22px)/1.25 var(--serif);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .name-highlight { color: var(--cream); }
-    .name-dave { font-weight: 300; font-style: italic; white-space: nowrap; }
+    .name-dave { font-weight: 300; font-style: italic; }
 
     .title {
       font: italic 300 13px/1.4 var(--serif);
@@ -243,7 +270,7 @@
 
     .contact-value {
       display: block;
-      font-size: 13.5px;
+      font-size: clamp(12px, 3.4vw, 13.5px);
       color: rgba(255,255,255,0.92);
       white-space: nowrap;
       overflow: hidden;
@@ -282,7 +309,7 @@
 
   <div class="card" data-active="gameloft">
     <header class="card-header">
-      <img class="avatar" src="photo.jpg" width="100" height="100" alt="Photo of Nguyễn Huy Dũng">
+      <span class="avatar"><img src="photo.jpg" width="100" height="100" alt="Photo of Nguyễn Huy Dũng"></span>
       <div class="profile-info">
         <h1 class="name">Nguyễn Huy <span class="name-highlight">Dũng</span> <span class="name-dave">(Dave)</span></h1>
         <div class="stack">
