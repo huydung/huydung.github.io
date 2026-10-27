@@ -37,56 +37,56 @@
     .card-wrapper {
       width: 100%;
       max-width: 400px;
+      border-radius: 18px;
+      overflow: hidden;
+      box-shadow:
+        0 40px 90px rgba(0,0,0,0.7),
+        0 6px 24px rgba(0,0,0,0.45);
     }
 
     /* ── Tabs ── */
     .tabs {
       display: flex;
-      gap: 6px;
-      padding: 5px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.07);
-      border-bottom: none;
-      border-radius: 14px 14px 0 0;
+      background: var(--red-dark);
     }
 
     .tab {
       flex: 1;
-      padding: 8px 12px;
+      padding: 12px 12px 10px;
       border: none;
-      border-radius: 9px;
+      border-radius: 0;
       background: transparent;
-      color: rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.38);
       font-family: var(--sans);
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.09em;
       text-transform: uppercase;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: color 0.15s, background 0.15s;
+      border-bottom: 2px solid transparent;
     }
 
     .tab.active {
-      background: var(--red-deep);
+      background: rgba(255,255,255,0.05);
       color: white;
-      box-shadow: 0 2px 10px rgba(142,1,31,0.5);
+      border-bottom-color: var(--red-bright);
     }
 
     .tab:not(.active):hover {
-      background: rgba(255,255,255,0.06);
-      color: rgba(255,255,255,0.55);
+      color: rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.03);
     }
 
     /* ── Card shell ── */
     .card {
-      background: var(--red-deep);
-      border-radius: 0 0 20px 20px;
+      background:
+        radial-gradient(ellipse 160% 90% at 110% 0%, rgba(189,1,41,0.4) 0%, transparent 50%),
+        radial-gradient(ellipse 120% 80% at -20% 110%, rgba(40,0,8,0.7) 0%, transparent 55%),
+        var(--red-deep);
       overflow: hidden;
       position: relative;
-      box-shadow:
-        0 30px 80px rgba(0,0,0,0.65),
-        0 4px 20px rgba(0,0,0,0.4),
-        inset 0 1px 0 rgba(255,255,255,0.08);
+      display: grid;
     }
 
     /* bright red top accent strip */
@@ -99,8 +99,8 @@
       opacity: 0.8;
     }
 
-    .panel { display: none; }
-    .panel.active { display: block; }
+    .panel { grid-area: 1/1; visibility: hidden; pointer-events: none; }
+    .panel.active { visibility: visible; pointer-events: auto; }
 
     /* ── Card header ── */
     .card-header {
@@ -121,11 +121,14 @@
     /* ── Name ── */
     .name {
       font-family: var(--serif);
-      font-size: clamp(17px, 4.2vw, 21px);
+      font-size: clamp(14px, 3.8vw, 20px);
       font-weight: 700;
       color: white;
       line-height: 1.2;
       margin-bottom: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .name-highlight {
@@ -137,7 +140,7 @@
       font-weight: 300;
       font-style: italic;
       font-size: 0.6em;
-      color: rgba(248,247,208,0.45);
+      color: rgba(248,247,208,0.75);
       margin-left: 8px;
       vertical-align: middle;
     }
@@ -146,11 +149,14 @@
       font-family: var(--serif);
       font-style: italic;
       font-weight: 300;
-      font-size: 14px;
+      font-size: 13px;
       color: var(--cream);
       line-height: 1.4;
       margin-bottom: 4px;
       opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .org {
@@ -549,12 +555,21 @@ function switchTab(id, btn) {
   document.getElementById('panel-' + id).classList.add('active');
 }
 
+// RFC 2426: fold lines at 75 chars, continuations start with a space
+function foldLine(s) {
+  let out = s.slice(0, 75);
+  s = s.slice(75);
+  while (s.length > 0) { out += '\r\n ' + s.slice(0, 74); s = s.slice(74); }
+  return out;
+}
+
 function downloadVCard(type) {
+  const photo = foldLine('PHOTO;ENCODING=b;TYPE=JPEG:' + PHOTO_B64);
   let vcf;
   if (type === 'gameloft') {
-    vcf = `BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nORG:Gameloft\r\nTITLE:Production Manager\r\nEMAIL;TYPE=WORK:Dung.NguyenHuy@gameloft.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://www.gameloft.com/gameloft-studios/hanoi\r\nPHOTO;ENCODING=b;TYPE=JPEG:' + PHOTO_B64 + '\r\nX-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/nguyenhuydung/\r\nADR;TYPE=WORK:;;Hanoi;Vietnam;;;\r\nEND:VCARD`;
+    vcf = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nORG:Gameloft\r\nTITLE:Production Manager\r\nEMAIL;TYPE=WORK:Dung.NguyenHuy@gameloft.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://www.gameloft.com/gameloft-studios/hanoi\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/nguyenhuydung/\r\nADR;TYPE=WORK:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
   } else {
-    vcf = `BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nTITLE:Educator, Trainer, Speaker\r\nEMAIL;TYPE=INTERNET:contact@huydung.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://huydung.com\r\nPHOTO;ENCODING=b;TYPE=JPEG:' + PHOTO_B64 + '\r\nX-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/huydung1406\r\nX-SOCIALPROFILE;TYPE=youtube:https://www.youtube.com/@bodungtv\r\nADR;TYPE=HOME:;;Hanoi;Vietnam;;;\r\nEND:VCARD`;
+    vcf = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nTITLE:Educator, Trainer, Speaker\r\nEMAIL;TYPE=INTERNET:contact@huydung.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://huydung.com\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/huydung1406\r\nX-SOCIALPROFILE;TYPE=youtube:https://www.youtube.com/@bodungtv\r\nADR;TYPE=HOME:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
   }
 
   const blob = new Blob([vcf], {type: 'text/vcard'});
