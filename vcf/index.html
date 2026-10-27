@@ -68,7 +68,7 @@
     }
 
     .tab.active {
-      background: rgba(255,255,255,0.05);
+      background: var(--red-deep);
       color: white;
       border-bottom-color: var(--red-bright);
     }
@@ -139,10 +139,8 @@
       font-family: var(--serif);
       font-weight: 300;
       font-style: italic;
-      font-size: 0.6em;
-      color: rgba(248,247,208,0.75);
-      margin-left: 8px;
-      vertical-align: middle;
+      color: white;
+      margin-left: 6px;
     }
 
     .title {
@@ -231,11 +229,7 @@
     }
 
     /* ── Divider ── */
-    .divider {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      margin: 0 28px;
-    }
+    .divider { display: none; }
 
     /* ── Card body (contacts) ── */
     .card-body {
@@ -461,7 +455,7 @@
             <div class="name">
               Nguyễn Huy <span class="name-highlight">Dũng</span><span class="name-dave">(Dave)</span>
             </div>
-            <div class="title">Educator · Trainer · Speaker</div>
+            <div class="title">Trainer - Speaker - Coach</div>
             <div class="badges">
               <span class="badge" data-tooltip="Master of International Business from RMIT">MIB</span>
               <span class="badge" data-tooltip="Project Management Professional">PMP</span>
@@ -564,12 +558,13 @@ function foldLine(s) {
 }
 
 function downloadVCard(type) {
-  const photo = foldLine('PHOTO;ENCODING=b;TYPE=JPEG:' + PHOTO_B64);
+  const b64 = PHOTO_B64.replace(/[\r\n]/g, '');
+  const photo = foldLine('PHOTO:data:image/jpeg;base64,' + b64);
   let vcf;
   if (type === 'gameloft') {
-    vcf = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nORG:Gameloft\r\nTITLE:Production Manager\r\nEMAIL;TYPE=WORK:Dung.NguyenHuy@gameloft.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://www.gameloft.com/gameloft-studios/hanoi\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/nguyenhuydung/\r\nADR;TYPE=WORK:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
+    vcf = 'BEGIN:VCARD\r\nVERSION:4.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nORG:Gameloft\r\nTITLE:Production Manager\r\nEMAIL;TYPE=work:Dung.NguyenHuy@gameloft.com\r\nTEL;TYPE=cell:+84984903707\r\nURL:https://www.gameloft.com/gameloft-studios/hanoi\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=linkedin:https://www.linkedin.com/in/nguyenhuydung/\r\nADR;TYPE=work:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
   } else {
-    vcf = 'BEGIN:VCARD\r\nVERSION:3.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nTITLE:Educator, Trainer, Speaker\r\nEMAIL;TYPE=INTERNET:contact@huydung.com\r\nTEL;TYPE=CELL:+84984903707\r\nURL:https://huydung.com\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/huydung1406\r\nX-SOCIALPROFILE;TYPE=youtube:https://www.youtube.com/@bodungtv\r\nADR;TYPE=HOME:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
+    vcf = 'BEGIN:VCARD\r\nVERSION:4.0\r\nN:Nguyễn;Huy Dũng;;;\r\nFN:Nguyễn Huy Dũng\r\nNICKNAME:DaveHD\r\nTITLE:Trainer, Speaker, Coach\r\nEMAIL;TYPE=internet:contact@huydung.com\r\nTEL;TYPE=cell:+84984903707\r\nURL:https://huydung.com\r\n' + photo + '\r\nX-SOCIALPROFILE;TYPE=facebook:https://www.facebook.com/huydung1406\r\nX-SOCIALPROFILE;TYPE=youtube:https://www.youtube.com/@bodungtv\r\nADR;TYPE=home:;;Hanoi;Vietnam;;;\r\nEND:VCARD';
   }
 
   const blob = new Blob([vcf], {type: 'text/vcard'});
