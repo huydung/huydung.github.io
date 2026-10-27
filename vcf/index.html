@@ -68,8 +68,12 @@
     .tab.active {
       background: var(--red-deep);
       color: white;
-      border-radius: 10px 10px 0 0;
+      border-radius: 0;
     }
+
+    /* Round only the inner top corner — outer corner clipped by card-wrapper */
+    .tab:first-child.active { border-radius: 0 18px 0 0; }
+    .tab:last-child.active  { border-radius: 18px 0 0 0; }
 
     .tab:not(.active):hover {
       color: rgba(255,255,255,0.6);
