@@ -22,3 +22,5 @@ On this site, I share my thoughts on {% assign filtered_categories = site.featur
 ---
 
 ## Let's Connect: [Ask me anything](https://docs.google.com/forms/d/e/1FAIpQLSeYmMIn9eZgPpUE6J0SPeUaMPN5KABRE_al-GRZkD2mDeW-Vw/viewform), or [book a free call](https://calendly.com/huydung/clarity-call)!
+
+👉 **[Digital Business Card](https://huydung.com/vcf)** — save my contact in one tap.
