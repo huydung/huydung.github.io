@@ -5,7 +5,7 @@ description: >
   Buổi sinh hoạt trải nghiệm 40 phút cho lớp 2B0 trong chương trình "Cha mẹ cùng thầy cô lên lớp" của May Academy. 4 điều chú muốn các con nhớ về nghề nghiệp và việc học.
 image:
   path: /assets/img/posts/2026-mai-nay-em-lon-02.jpg
-categories: [vietnamese, life]
+categories: [vietnamese, education]
 tags: [parenting, education, teaching, kids]
 date: 2026-11-09
 ---

@@ -5,7 +5,7 @@ description: >
   90 phút dạy "Học cách học" cho lớp 6B0, với một website-kiêm-slide làm cùng Claude trong 2-3 buổi tối. Và vì sao mình vẫn phản đối để trẻ con tự dùng AI trong học tập.
 image:
   path: /assets/img/posts/2026-hoc-cach-hoc-02.jpg
-categories: [vietnamese, life]
+categories: [vietnamese, education]
 tags: [parenting, education, teaching, kids, ai, learning-how-to-learn]
 date: 2026-11-17
 ---
